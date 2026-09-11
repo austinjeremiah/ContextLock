@@ -78,8 +78,11 @@ export function ContextAgentSidebar({
   } = useWorkbench();
 
   const meta = metaForSegment(segment);
+  /* The initial thread carries no timestamp: a clock read during the first
+     render produces different values on the server and the client. Threads the
+     user creates are stamped in the handler, where that is safe. */
   const [threads, setThreads] = useState<AgentThread[]>([
-    { id: 'thr_1', title: 'Current thread', createdAt: new Date().toISOString(), messages: [] },
+    { id: 'thr_1', title: 'Current thread', createdAt: '', messages: [] },
   ]);
   const [activeThreadId, setActiveThreadId] = useState('thr_1');
   const [streaming, setStreaming] = useState(false);
