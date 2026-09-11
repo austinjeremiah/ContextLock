@@ -211,7 +211,14 @@ html:has(.cl-studio) { font-size: 16px; }
   letter-spacing: -0.3px;
   padding-right: 6px;
   white-space: nowrap;
+  /* It navigates home, so it has to read as something you can press. */
+  cursor: pointer;
+  border-radius: 6px;
+  padding: 2px 6px 2px 2px;
+  transition: opacity 0.15s ease;
 }
+.cl-titlebar-mark:hover { opacity: 0.72; }
+.cl-titlebar-mark:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
 .cl-titlebar-spacer { flex: 1 1 auto; min-width: 4px; }
 .cl-titlebar > * { flex-shrink: 0; }
 

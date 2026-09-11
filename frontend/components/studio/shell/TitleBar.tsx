@@ -8,7 +8,7 @@
  * user menu. The environment badge is always visible and never conditional.
  */
 import { useRouter } from 'next/navigation';
-import { AlertTriangle, Bell, Check, ChevronDown, GitCompare, Plus, Search, TriangleAlert, User } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, Bell, Check, ChevronDown, GitCompare, Plus, Search, TriangleAlert, User } from 'lucide-react';
 import { Popover, MenuItem, MenuLabel, MenuSeparator } from './Popover';
 import { StatusBadge } from '../primitives';
 import { WalletChip } from '../wallet/WalletChip';
@@ -36,7 +36,18 @@ export function TitleBar({
 
   return (
     <header className="cl-titlebar">
-      <span className="cl-titlebar-mark">ContextLock</span>
+      {/* The wordmark is the way out of a project. Every product puts "home"
+          here, so leaving it inert stranded you inside the workbench with no
+          obvious exit. */}
+      <button
+        type="button"
+        className="cl-titlebar-mark"
+        onClick={() => router.push('/projects')}
+        title="All projects"
+        aria-label="All projects"
+      >
+        ContextLock
+      </button>
 
       {/* project switcher (spec §4.1) */}
       <Popover
@@ -51,6 +62,18 @@ export function TitleBar({
       >
         {({ close }) => (
           <>
+            {/* First item, not buried: leaving the project is the thing people
+                look for in the project switcher. */}
+            <MenuItem
+              onClick={() => {
+                close();
+                router.push('/projects');
+              }}
+              hint={<ArrowLeft size={12} aria-hidden />}
+            >
+              All projects
+            </MenuItem>
+            <MenuSeparator />
             <MenuLabel>Recent projects</MenuLabel>
             {projects.map((p) => (
               <MenuItem
