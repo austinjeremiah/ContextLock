@@ -60,15 +60,133 @@ Architecture, Permissions).
 | Architecture | §13 | React Flow canvas, 14 node categories, labelled edges (READ / CONTEXT / TRIGGER / POLICY / AUTHORIZATION / EXECUTE / ESCALATE); **live overlay reuses the same graph**; 7 layer toggles; node inspector opens **inside the center pane** with navigation only — no destructive controls; accessible alternate node list; Fit / Zoom / Lock / Layers / Live Overlay / Export SVG |
 | Permissions & Security | §14 | Posture summary; three-column **ALLOW / ESCALATE / DENY** matrix with per-rule policy refs and proof links; 7 constraint panels (capability bindings, recipients, expiry/nonce, data trust, confidentiality, identity, org aggregate); authority-increase review; Open Policy / Compare / Run boundary simulations / Export / Create policy revision. Deliberately offers **no** enable/disable control |
 
-## ⬜ Remaining phases
+## ✅ UI hardening round (after FE-3 review)
 
-- **FE-4 — Test surfaces:** Simulation Center (§15), Reality Lab (§16), Attack Lab (§17) ← **next**
-- **FE-5 — Engineering:** Code / Monaco (§18), Integrations & Data Sources (§19)
-- **FE-6 — Deployment:** Preflight, cost estimate, deployment progress (§20) — wallet connect lands here
-- **FE-7 — Live operations:** Overview (§21), Activity (§22), Policies (§23), Runtime (§24), Control Plane (§25), Chainlink CRE (§26), Identity/ENS (§27)
-- **FE-8 — Context Agent integration:** page context envelopes and proposed patches across every page (§39)
-- **FE-9 — Reports, settings, polish:** Safety Reports (§28), Settings (§29), a11y (§45), responsive monitoring mode (§46)
-- **Landing page polish** — last, by explicit decision
+Commits `16dbf7d`, `f6828d9`, `77a1ecf`. Driven by review of the running app —
+the findings are generalised into **House rules** below so they are not
+rediscovered later.
+
+- Contrast: element resets were outranking component classes, so every button
+  inherited its parent's ink (blue icons on the blue rail, cream menus on cream).
+- Chrome bars: colour is inherited, not forced with `*`; badges and status dots
+  get light-end hues on navy.
+- Panels: explorer, agent sidebar and bottom panel now fill their sized wrapper.
+- Full-width buttons wrap instead of forcing their container off-screen.
+- Tab ✕ navigates to a neighbour instead of stranding the page.
+- Explorer header shows the project, not a repeat of the group label.
+- Revision indicator rebuilt as labelled segments, amber when trailing.
+- Output log reads as a log: timestamp / scope / message, tinted by level.
+- Architecture is per-agent; a reporting-only agent has no execution path drawn.
+- Code runs the dark editor theme across the whole shell.
+- Dev compile time: wallet stack moved behind a dynamic import, Turbopack on.
+
+## ⬜ Remaining phases — 6 phases plus landing polish
+
+| Phase | Scope | Pages |
+|---|---|---|
+| **FE-4** ← next | Test surfaces | Simulation Center (§15), Reality Lab (§16), Attack Lab (§17) |
+| **FE-5** | Engineering | Code / Monaco editor + file tree + diff (§18), Integrations & Data Sources (§19) |
+| **FE-6** | Deployment | Preflight, cost estimate, deployment progress (§20) — **wallet connect lands here** |
+| **FE-7** | Live operations | Overview (§21), Activity (§22), Policies (§23), Runtime (§24), Control Plane (§25), Chainlink CRE (§26), Identity/ENS (§27) |
+| **FE-8** | Context Agent | page context envelopes, selections and proposed patches across every page (§39) |
+| **FE-9** | Output + polish | Safety Reports (§28), Settings (§29), a11y (§45), responsive monitoring mode (§46) |
+| **Landing** | Polish pass | last, by explicit decision |
+
+**Current page count:** 8 built (Projects, New project, Composer, Organization,
+Blueprint, Architecture, Permissions, Code shell) · 15 navigable but not yet
+built, each rendering the shared `PendingSurface`.
+
+---
+
+## House rules
+
+Learned the hard way. Check these *before* writing a page, not after.
+
+### The landing page's CSS is global and it leaks
+
+`inline.css` and `webflow.css` style bare elements for the marketing site and
+apply to everything, including the workbench.
+
+- `section { padding: 30rem 0; width: 100vw }` → phantom gaps and right-side
+  overflow inside any centred column.
+- `* { font-weight: 100; line-height: 100%; color: var(--color) }`.
+- `h1`–`h6` at 38px/bold with top margins, `label` bold+block, `ul/ol` padded
+  40px, `dd` indented 40px.
+- `html { font-size: calc(100vw / 1920 * 10) }` → 1rem ≈ 7.5px at 1440px wide.
+
+All are neutralised inside `.cl-studio`. **Never use `rem` in workbench CSS** —
+the root size is not what you think. Workbench pages pin `html` to 16px via
+`html:has(.cl-studio)` so third-party rem-based CSS (RainbowKit) renders sanely.
+
+### Specificity: element resets must use `:where()`
+
+`.cl-studio button { color: inherit }` is **(0,1,1)** and silently outranks every
+component class at **(0,1,0)** — `.cl-btn-primary`, `.cl-rail-btn`,
+`.cl-palette-item`. The symptom is components ignoring their own colour and
+inheriting their parent's. Always write `.cl-studio :where(button) { … }`.
+
+For the same reason, never colour a region with `.region * { color: … }`: it
+captures popovers and dialogs rendered inside that region. Set colour on the
+region and let it inherit, then re-assert it on any surface with its own ground.
+
+### A flex child must be told to fill its wrapper
+
+The shell sizes panels on a wrapper div. A panel that is only
+`display: flex; flex-direction: column` sizes to its **content**, leaving dead
+space or clipping. Every panel needs `flex: 1 1 auto; width: 100%`. This bit the
+explorer, the agent sidebar and the bottom panel separately.
+
+### `white-space: nowrap` belongs on toolbar buttons only
+
+`.cl-btn` is nowrap so toolbars do not ragged-wrap. A full-width button holding a
+sentence must override it, or it forces its container wider than the viewport.
+Use `.cl-btn-block`, which wraps and left-aligns.
+
+### The verdict palette is tuned for the cream ground
+
+`--cl-pass` / `--cl-warn` and friends are dark inks. On the navy chrome bars they
+are nearly unreadable, so badges there switch to outline form with light-end
+hues. If a new surface has a dark ground, it needs the same treatment.
+
+### Per-agent data is not optional
+
+Agents are distinct principals. Anything rendered per-agent — architecture,
+blueprint, permissions, budgets — must be derived from the selected agent. A
+shared graph made Reporter appear to have an execution path, contradicting
+Organization and Permissions. **Blueprint and Permissions still render
+Guardian's data for every agent** and should be made per-agent as those phases
+are revisited.
+
+When data varies by agent, the memo that builds it must depend on the agent, and
+any selection keyed to the old data must reset.
+
+### Keep the wallet lazy
+
+wagmi + RainbowKit + viem + WalletConnect is ~7,000 modules. Mounted in the
+layout it made every route compile all of it (~20s per page in dev, which does
+not tree-shake). It lives in `components/studio/wallet/` behind `dynamic()`.
+**Only Deploy and Policies may mount it.** Never import it in a layout or a
+shared provider.
+
+### Product copy, not build notes
+
+No phase numbers, no "in progress", no framework names in anything a user reads.
+An unbuilt page says what it is for and that it is not available — nothing else.
+Never show a healthy or green state for something that does not exist yet.
+
+### Repo
+
+- Commit messages carry **no Claude attribution trailers**.
+- `.gitignore` patterns for build output must be **anchored** (`/build/`, not
+  `build/`) — an unanchored pattern matched the `app/.../build/` route segment
+  and silently dropped a real page from a commit.
+- `npm run dev` uses Turbopack; `npm run dev:webpack` is the fallback. After
+  switching between them, `rm -rf .next` or the production build fails with
+  `Cannot find module for page: /`.
+
+### Working agreement
+
+Build one phase, stop, and let the UI be reviewed before starting the next.
 
 ---
 
@@ -87,17 +205,3 @@ Architecture, Permissions).
    so backend wiring is a data-source swap, not a rewrite.
 5. **Chrome slightly taller than spec dimensions** — title bar 44px (spec 40),
    status bar 26px (spec 24) — for legibility at the chosen type scale.
-
-## Fixes worth remembering
-
-- **Landing CSS leaked into the workbench.** `inline.css` styles bare `section`
-  with `padding: 30rem 0; width: 100vw`, which produced huge vertical gaps and
-  content overflowing to the right. `webflow.css` likewise restyles bare
-  `h1`–`h6`, `label`, `ul/ol`, `dd`. Both are now neutralised inside
-  `.cl-studio` using `:where()` so component classes still win.
-- **`.gitignore` was eating a route.** An unanchored `build/` pattern matched the
-  `app/projects/[projectId]/build/` route segment, so the Composer page was
-  silently never committed. Build-output ignores are now anchored to the root.
-- **RainbowKit pulls optional `@x402/*` payment modules** through
-  `@coinbase/cdp-sdk`. None are used — the wallet only connects and signs on a
-  testnet — so they are ignored via webpack `IgnorePlugin` rather than installed.
