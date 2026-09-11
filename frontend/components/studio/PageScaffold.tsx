@@ -64,7 +64,7 @@ export function StudioPage({
       /* Banners take their natural height; the body takes what is left. Using
          height: 100% here made the body a full pane tall *below* the banners,
          which overflowed and left the page unable to scroll. */
-      <div style={{ display: 'flex', flexDirection: 'column', flex: '1 1 auto', minHeight: 0 }}>
+      <div className="cl-bleed" style={{ display: 'flex', flexDirection: 'column', flex: '1 1 auto', minHeight: 0 }}>
         {banners ? <div style={{ flex: '0 0 auto', padding: '12px 16px 0' }}>{banners}</div> : null}
         <div style={{ display: 'flex', flexDirection: 'column', flex: '1 1 auto', minHeight: 0 }}>{children}</div>
       </div>

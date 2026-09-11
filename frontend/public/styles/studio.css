@@ -432,6 +432,25 @@ html:has(.cl-studio) { font-size: 16px; }
 
 .cl-page { position: relative; flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; }
 
+/* ---------------------------------------------------------------------------
+   Bleed pages own their scrolling.
+
+   A split view scrolls its panes independently — the scenario list on one side,
+   the detail on the other. That only works if the page column itself does NOT
+   scroll: otherwise the whole split moves together, and scrolling the list far
+   enough drags the (shorter) detail pane off screen, leaving empty space beside
+   a long list.
+
+   So where a bleed page is present the column is pinned to the pane height and
+   its own overflow is turned off, handing scrolling to the panes inside.
+   --------------------------------------------------------------------------- */
+.cl-page:has(> .cl-page-content > .cl-bleed) { overflow: hidden; }
+.cl-page:has(> .cl-page-content > .cl-bleed) > .cl-page-content { height: 100%; min-height: 0; }
+
+/* Each side scrolls on its own and never outruns the other. */
+.cl-split-side { overscroll-behavior: contain; }
+.cl-split-main { overscroll-behavior: contain; }
+
 /* Lenis needs a content element inside its scroll wrapper. It must still let a
    full-bleed page (canvas, split view) fill the pane, so it is a flex column
    whose child grows rather than an auto-height div. */
