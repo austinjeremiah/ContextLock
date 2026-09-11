@@ -212,6 +212,36 @@ html:has(.cl-studio) { font-size: 16px; }
 .cl-chip[data-static="true"] { cursor: default; }
 .cl-chip[data-static="true"]:hover { background: rgba(254, 241, 208, 0.06); border-color: var(--cl-line-chrome); }
 
+/* Revision indicator: the single most-consulted fact in the title bar, so it
+   is set in the medium face at full UI size with its parts visibly separated. */
+.cl-rev-chip {
+  display: inline-flex;
+  align-items: stretch;
+  height: 30px;
+  border: 1px solid var(--cl-line-chrome);
+  background: rgba(254, 241, 208, 0.07);
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.cl-rev-chip:hover { background: rgba(254, 241, 208, 0.16); border-color: rgba(254, 241, 208, 0.45); }
+.cl-rev-seg {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  padding: 0 11px;
+  align-self: center;
+  white-space: nowrap;
+}
+.cl-rev-seg + .cl-rev-seg { border-left: 1px solid var(--cl-line-chrome); }
+.cl-rev-seg-label {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.68;
+}
+.cl-rev-seg-value { font-family: var(--medium); font-size: 14px; }
+.cl-rev-seg[data-stale="true"] .cl-rev-seg-value { color: #e8b055; }
+
 /* the always-on environment badge (doc §4.4) */
 .cl-env-badge {
   display: inline-flex;
@@ -223,11 +253,13 @@ html:has(.cl-studio) { font-size: 16px; }
   font-size: 11.5px;
   letter-spacing: 0.1em;
   color: var(--cl-chrome);
-  background: var(--cl-soft, #fef1d0);
-  border: 1px solid var(--cl-canvas);
+  background: var(--cl-ink-inv);
+  border: 1px solid var(--cl-ink-inv);
   white-space: nowrap;
 }
 .cl-env-badge span { color: var(--cl-chrome); }
+.cl-theme-dark .cl-env-badge,
+.cl-theme-dark .cl-env-badge span { color: #080b16; }
 
 .cl-cmd-field {
   display: flex;
@@ -383,7 +415,7 @@ html:has(.cl-studio) { font-size: 16px; }
 .cl-tab-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--cl-ink-2); }
 .cl-tab-live { width: 7px; height: 7px; border-radius: 50%; background: var(--cl-pass); box-shadow: 0 0 0 2px var(--cl-pass-bg); }
 
-.cl-page { flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; }
+.cl-page { position: relative; flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; }
 .cl-page-pad { padding: 24px 28px 48px; max-width: 1280px; }
 .cl-page-head { display: flex; align-items: flex-start; gap: 16px; padding-bottom: 14px; margin-bottom: 18px; border-bottom: 1px solid var(--cl-line); }
 .cl-page-head-main { flex: 1 1 auto; min-width: 0; }
@@ -392,7 +424,7 @@ html:has(.cl-studio) { font-size: 16px; }
 .cl-page-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
 
 /* --- bottom panel --------------------------------------------------------- */
-.cl-bottom { display: flex; flex-direction: column; min-height: 0; background: var(--cl-panel); border-top: 1px solid var(--cl-line); }
+.cl-bottom { display: flex; flex: 1 1 auto; width: 100%; flex-direction: column; min-height: 0; background: var(--cl-panel); border-top: 1px solid var(--cl-line); }
 .cl-bottom-head { display: flex; align-items: center; gap: 2px; height: 33px; flex: 0 0 auto; padding: 0 8px 0 0; border-bottom: 1px solid var(--cl-line); }
 .cl-bottom-tab {
   display: inline-flex; align-items: center; gap: 6px;
@@ -775,8 +807,9 @@ body.cl-resizing-v, body.cl-resizing-v * { cursor: row-resize !important; user-s
   font-family: var(--mono, ui-monospace); font-size: 11px;
   border: 1px solid var(--cl-line-strong); color: var(--cl-ink-2);
 }
-.cl-step-name { flex: 1 1 auto; font-size: 13.5px; font-family: var(--medium); }
-.cl-step-detail { flex: 0 1 auto; font-size: 12.5px; color: var(--cl-ink-3); }
+.cl-step-name { flex: 0 0 190px; min-width: 0; font-size: 13.5px; font-family: var(--medium); }
+.cl-step-status { flex: 0 0 104px; display: flex; }
+.cl-step-detail { flex: 1 1 auto; min-width: 0; font-size: 12.5px; color: var(--cl-ink-3); }
 
 .cl-trace { display: flex; flex-direction: column; padding-left: 6px; }
 .cl-trace-node { position: relative; padding: 0 0 16px 22px; }
@@ -940,30 +973,46 @@ body.cl-resizing-v, body.cl-resizing-v * { cursor: row-resize !important; user-s
 .cl-theme-dark ::-webkit-scrollbar-thumb { background: rgba(159, 183, 232, 0.24); background-clip: padding-box; }
 .cl-theme-dark * { scrollbar-color: rgba(159, 183, 232, 0.28) transparent; }
 
-/* ---------------------------------------------------------------------------
-   Entering the dark surface.
-
-   The landing page's "Enter Site" flood is owned by the Three.js engine, so it
-   cannot be reused directly. This is the same gesture in plain CSS: a deep-blue
-   wipe sweeps across and lifts, revealing the dark editor underneath. Purely
-   decorative, so it is skipped entirely under reduced motion.
-   --------------------------------------------------------------------------- */
-.cl-theme-wipe {
-  position: absolute;
-  inset: 0;
-  z-index: 60;
-  pointer-events: none;
-  background: linear-gradient(100deg, var(--dark-blue, #010d6e) 0%, #06101f 55%, #0c1020 100%);
-  transform-origin: left center;
-  animation: cl-wipe 720ms cubic-bezier(0.76, 0, 0.24, 1) forwards;
+/* ============================================================================
+   Output log
+   ----------------------------------------------------------------------------
+   A build log rendered in one flat ink colour is a wall of text. Timestamp,
+   scope and message each get their own weight, and the level tints the message
+   so a failure is findable by scanning rather than by reading.
+   ========================================================================== */
+.cl-log {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 12.5px;
+  line-height: 1.75;
+  padding: 2px 0;
 }
-
-@keyframes cl-wipe {
-  0%   { clip-path: inset(0 100% 0 0); opacity: 1; }
-  45%  { clip-path: inset(0 0 0 0);    opacity: 1; }
-  100% { clip-path: inset(0 0 0 0);    opacity: 0; }
+.cl-log-line {
+  display: grid;
+  grid-template-columns: 68px 76px minmax(0, 1fr);
+  gap: 12px;
+  padding: 1px 6px;
+  border-left: 2px solid transparent;
 }
+.cl-log-line:hover { background: rgba(0, 66, 175, 0.05); }
+.cl-log-time { color: var(--cl-ink-3); }
+.cl-log-scope { color: var(--cl-ink-3); opacity: 0.85; }
+.cl-log-msg { color: var(--cl-ink-2); overflow-wrap: anywhere; }
 
-@media (prefers-reduced-motion: reduce) {
-  .cl-theme-wipe { animation: none; display: none; }
+.cl-log-line[data-level="step"] .cl-log-msg { color: var(--cl-ink); }
+.cl-log-line[data-level="info"] .cl-log-msg { color: var(--cl-ink-2); }
+.cl-log-line[data-level="pass"] .cl-log-msg { color: var(--cl-pass); }
+.cl-log-line[data-level="warn"] {
+  border-left-color: var(--cl-warn);
+  background: var(--cl-warn-bg);
+}
+.cl-log-line[data-level="warn"] .cl-log-msg { color: var(--cl-warn); }
+.cl-log-line[data-level="fail"] {
+  border-left-color: var(--cl-deny);
+  background: var(--cl-deny-bg);
+}
+.cl-log-line[data-level="fail"] .cl-log-msg { color: var(--cl-deny); }
+
+@media (max-width: 899px) {
+  .cl-log-line { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .cl-log-scope { display: none; }
 }

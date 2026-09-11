@@ -132,8 +132,13 @@ export function Workbench({
 
   const showAgentDocked = agentOpen && !agentDrawer;
 
+  /* Code is the one surface that genuinely is an editor, so the whole workbench
+     flips dark there — rail, explorer, chrome and all. Darkening only the centre
+     pane leaves the shell looking half-broken. */
+  const darkSurface = segment === 'code';
+
   return (
-    <div className="cl-studio cl-shell">
+    <div className={`cl-studio cl-shell${darkSurface ? ' cl-theme-dark' : ''}`}>
       <TitleBar
         project={project}
         projects={projects}

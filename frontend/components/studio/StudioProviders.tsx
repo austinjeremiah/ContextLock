@@ -3,30 +3,22 @@
 /**
  * Client providers for every Studio route.
  *
- *  - TanStack Query   server state (spec §38)
- *  - wagmi/RainbowKit testnet wallet connection for Deploy and Policy signing
- *  - WorkbenchProvider local UI state
+ *  - TanStack Query        server state (spec §38)
+ *  - WorkbenchProvider     local UI state
  *  - ControlBridgeProvider carries "open this control" requests to the page
+ *
+ * The wallet stack (wagmi + RainbowKit + viem + WalletConnect) is deliberately
+ * NOT here. It is ~7,000 modules, and mounting it in the layout made every
+ * route in the app compile all of it — dev builds were taking ~20s per page.
+ * Only Deploy and Policies ever need a wallet, so it is loaded lazily by
+ * <WalletProvider> on those routes instead.
  *
  * The landing page does not mount any of this.
  */
 import { useState, type ReactNode } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { WagmiProvider } from 'wagmi';
-import { RainbowKitProvider, lightTheme } from '@rainbow-me/rainbowkit';
-import '@rainbow-me/rainbowkit/styles.css';
-import { wagmiConfig } from '@/lib/studio/wagmi';
 import { WorkbenchProvider } from '@/lib/studio/workbench';
 import { ControlBridgeProvider } from '@/lib/studio/control-bridge';
-
-/** RainbowKit restyled onto the site palette so the modal matches the workbench. */
-const walletTheme = lightTheme({
-  accentColor: '#0042af',
-  accentColorForeground: '#fef1d0',
-  borderRadius: 'none',
-  fontStack: 'system',
-  overlayBlur: 'small',
-});
 
 export function StudioProviders({ children }: { children: ReactNode }) {
   const [queryClient] = useState(
@@ -45,14 +37,10 @@ export function StudioProviders({ children }: { children: ReactNode }) {
   );
 
   return (
-    <WagmiProvider config={wagmiConfig}>
-      <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider theme={walletTheme} modalSize="compact" showRecentTransactions={false}>
-          <WorkbenchProvider>
-            <ControlBridgeProvider>{children}</ControlBridgeProvider>
-          </WorkbenchProvider>
-        </RainbowKitProvider>
-      </QueryClientProvider>
-    </WagmiProvider>
+    <QueryClientProvider client={queryClient}>
+      <WorkbenchProvider>
+        <ControlBridgeProvider>{children}</ControlBridgeProvider>
+      </WorkbenchProvider>
+    </QueryClientProvider>
   );
 }

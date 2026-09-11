@@ -19,6 +19,21 @@ export function EditorTabBar() {
   const pathname = usePathname();
   const { tabs, closeTab, pinTab, toggleBottom, bottomOpen, toggleAgent, agentOpen } = useWorkbench();
 
+  /**
+   * Closing the tab you are standing on has to move you somewhere — to the
+   * neighbouring tab, or back to Overview when it was the last one. Otherwise
+   * the tab vanishes and its page stays on screen, unselected.
+   */
+  const close = (id: string) => {
+    const focus = closeTab(id);
+    if (focus) {
+      router.push(focus.href);
+    } else if (tabs.length <= 1) {
+      const projectId = pathname.split('/')[2];
+      if (projectId) router.push(`/projects/${projectId}/overview`);
+    }
+  };
+
   return (
     <div className="cl-tabbar" role="tablist" aria-label="Open editors">
       {tabs.map((tab) => {
@@ -43,7 +58,7 @@ export function EditorTabBar() {
             onAuxClick={(e) => {
               if (e.button === 1) {
                 e.preventDefault();
-                closeTab(tab.id);
+                close(tab.id);
               }
             }}
             title={tab.stale ? `${tab.title} · stale artifact` : tab.title}
@@ -59,7 +74,7 @@ export function EditorTabBar() {
               className="cl-tab-close"
               onClick={(e) => {
                 e.stopPropagation();
-                closeTab(tab.id);
+                close(tab.id);
               }}
             >
               <X size={11} aria-hidden />

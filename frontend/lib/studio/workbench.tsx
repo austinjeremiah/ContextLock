@@ -86,7 +86,8 @@ interface WorkbenchValue {
   activeTabId: string | null;
   openTab: (tab: Omit<EditorTab, 'preview'> & { preview?: boolean }) => void;
   pinTab: (id: string) => void;
-  closeTab: (id: string) => void;
+  /** Returns the tab that should take focus when the closed tab was active. */
+  closeTab: (id: string) => EditorTab | null;
   closeOtherTabs: (id: string) => void;
 
   /* agent sidebar */
@@ -152,6 +153,13 @@ export function WorkbenchProvider({ children }: { children: ReactNode }) {
   const [viewport, setViewport] = useState<WorkbenchValue['viewport']>('wide');
   const [hydrated, setHydrated] = useState(false);
   const agentInputRef = useRef<HTMLTextAreaElement | null>(null);
+
+  /* Mirrors of tab state so close/open can read the latest value without
+     re-creating their callbacks on every tab change. */
+  const tabsRef = useRef<EditorTab[]>([]);
+  const activeTabRef = useRef<string | null>(null);
+  tabsRef.current = tabs;
+  activeTabRef.current = activeTabId;
 
   /* restore persisted layout after mount so SSR markup stays deterministic */
   useEffect(() => {
@@ -228,17 +236,25 @@ export function WorkbenchProvider({ children }: { children: ReactNode }) {
     setTabs((prev) => prev.map((t) => (t.id === id ? { ...t, preview: false } : t)));
   }, []);
 
-  const closeTab = useCallback((id: string) => {
-    setTabs((prev) => {
-      const next = prev.filter((t) => t.id !== id);
-      setActiveTabId((current) => {
-        if (current !== id) return current;
-        const idx = prev.findIndex((t) => t.id === id);
-        const fallback = next[idx] ?? next[idx - 1] ?? next[next.length - 1];
-        return fallback?.id ?? null;
-      });
-      return next;
-    });
+  /**
+   * Closes a tab and returns the tab that should take focus, so the caller can
+   * navigate there. Without this, closing the tab you are standing on removed
+   * the tab but left its page on screen with nothing selected.
+   */
+  const closeTab = useCallback((id: string): EditorTab | null => {
+    const current = tabsRef.current;
+    const index = current.findIndex((t) => t.id === id);
+    if (index === -1) return null;
+
+    const next = current.filter((t) => t.id !== id);
+    const neighbour = next[index] ?? next[index - 1] ?? next[next.length - 1] ?? null;
+    const wasActive = activeTabRef.current === id;
+
+    setTabs(next);
+    if (wasActive) setActiveTabId(neighbour?.id ?? null);
+
+    // The caller only needs to navigate if the tab being closed is on screen.
+    return wasActive ? neighbour : null;
   }, []);
 
   const closeOtherTabs = useCallback((id: string) => {

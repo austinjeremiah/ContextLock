@@ -8,13 +8,11 @@
  * second one, the node inspector opens inside the center workspace (never over
  * the Agent Sidebar), and an accessible node list mirrors the canvas (§45).
  */
-import { useCallback, useMemo, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
   Background,
   BackgroundVariant,
-  Controls,
-  MiniMap,
   ReactFlow,
   ReactFlowProvider,
   useReactFlow,
@@ -39,15 +37,16 @@ import { ArchFlowNode } from '@/components/studio/architecture/ArchNode';
 import {
   Badge,
   BlockchainRef,
+  BlockerBanner,
   FreshnessBadge,
   KeyValue,
   StatusBadge,
 } from '@/components/studio/primitives';
 import { Popover, MenuLabel } from '@/components/studio/shell/Popover';
 import { useWorkbench } from '@/lib/studio/workbench';
-import { PROJECT } from '@/lib/studio/mock/core';
-import { ARCHITECTURE, ARCH_LAYERS, EDGE_KIND_LABEL } from '@/lib/studio/mock/design';
-import type { ArchLayer, ArchNodeData } from '@/lib/studio/types';
+import { PROJECT, agentBySlug } from '@/lib/studio/mock/core';
+import { ARCH_LAYERS, EDGE_KIND_LABEL, architectureForAgent } from '@/lib/studio/mock/design';
+import type { ArchLayer, ArchNodeData, ArchitectureGraph } from '@/lib/studio/types';
 
 const nodeTypes = { arch: ArchFlowNode };
 
@@ -71,8 +70,16 @@ export default function ArchitecturePage() {
 
 function ArchitectureCanvas() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { setSelection, pushToast } = useWorkbench();
   const { zoomIn, zoomOut, fitView } = useReactFlow();
+
+  /* Each agent is its own principal with its own venues and execution class, so
+     each gets its own graph. A reporting-only agent has no policy, capability or
+     executor node at all. */
+  const agentSlug = searchParams.get('agent') ?? PROJECT.agents[0].slug;
+  const agent = agentBySlug(agentSlug);
+  const graph = architectureForAgent(agentSlug);
 
   const [liveOverlay, setLiveOverlay] = useState(true);
   const [locked, setLocked] = useState(false);
@@ -84,7 +91,7 @@ function ArchitectureCanvas() {
 
   const nodes = useMemo<Node[]>(
     () =>
-      ARCHITECTURE.nodes.map((node) => ({
+      graph.nodes.map((node) => ({
         id: node.id,
         type: 'arch',
         position: node.position,
@@ -92,12 +99,12 @@ function ArchitectureCanvas() {
         data: { ...node.data, liveOverlay, dimmed: !isLayerOn(node.data.layers) },
       })),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [liveOverlay, activeLayers, selectedId],
+    [graph, liveOverlay, activeLayers, selectedId],
   );
 
   const edges = useMemo<Edge[]>(
     () =>
-      ARCHITECTURE.edges.map((edge) => {
+      graph.edges.map((edge) => {
         const visible = isLayerOn(edge.layers);
         const tone =
           edge.kind === 'EXECUTE' || edge.kind === 'AUTHORIZATION'
@@ -121,24 +128,29 @@ function ArchitectureCanvas() {
             letterSpacing: '0.08em',
             opacity: visible ? 1 : 0.12,
           },
-          labelBgStyle: { fill: '#fdf6e3', fillOpacity: visible ? 0.95 : 0.1 },
+          labelBgStyle: { fill: 'var(--cl-panel)', fillOpacity: visible ? 0.95 : 0.1 },
           labelBgPadding: [4, 2] as [number, number],
         };
       }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [liveOverlay, activeLayers],
+    [graph, liveOverlay, activeLayers],
   );
 
-  const selected = ARCHITECTURE.nodes.find((n) => n.id === selectedId) ?? null;
+  const selected = graph.nodes.find((n) => n.id === selectedId) ?? null;
 
   const selectNode = useCallback(
     (id: string | null) => {
       setSelectedId(id);
-      const node = ARCHITECTURE.nodes.find((n) => n.id === id);
+      const node = graph.nodes.find((n) => n.id === id);
       setSelection(node ? { kind: 'architecture-node', id: node.id, label: node.data.label } : null);
     },
-    [setSelection],
+    [graph, setSelection],
   );
+
+  /* A node id selected on one agent's graph may not exist on another's. */
+  useEffect(() => {
+    setSelectedId(null);
+  }, [agentSlug]);
 
   const toggleLayer = (layer: ArchLayer) =>
     setActiveLayers((prev) => (prev.includes(layer) ? prev.filter((l) => l !== layer) : [...prev, layer]));
@@ -153,7 +165,9 @@ function ArchitectureCanvas() {
           <span className="cl-page-title" style={{ fontSize: 22, marginRight: 8 }}>
             Architecture
           </span>
-          <Badge tone="neutral">Blueprint r{ARCHITECTURE.revision}</Badge>
+          <Badge tone="neutral">{agent.name}</Badge>
+          <Badge tone="neutral">Blueprint r{graph.revision}</Badge>
+          {agent.executionClass === 'REPORTING_ONLY' ? <Badge tone="blocked">EXECUTION: NONE</Badge> : null}
           {liveOverlay ? <Badge tone="pass">Live overlay · observed state</Badge> : <Badge tone="neutral">Configured state</Badge>}
           <span className="cl-spacer" />
 
@@ -238,6 +252,15 @@ function ArchitectureCanvas() {
         </div>
       }
     >
+      {agent.executionClass === 'REPORTING_ONLY' ? (
+        <div style={{ padding: '0 16px 12px' }}>
+          <BlockerBanner tone="neutral" title="This agent has no execution path">
+            {agent.name} is a reporting-only principal. There is no policy, capability issuer or executor in its
+            architecture, because none exists for it — the absence of authority is structural, not a setting.
+          </BlockerBanner>
+        </div>
+      ) : null}
+
       <div style={{ display: 'flex', flex: '1 1 auto', minHeight: 0, borderTop: '1px solid var(--cl-line)' }}>
         {/* accessible alternate node list (spec §45) */}
         {listOpen ? (
@@ -261,7 +284,7 @@ function ArchitectureCanvas() {
               </button>
             </div>
             <ul>
-              {ARCHITECTURE.nodes.map((node) => (
+              {graph.nodes.map((node) => (
                 <li key={node.id}>
                   <button
                     type="button"
@@ -299,15 +322,10 @@ function ArchitectureCanvas() {
             onPaneClick={() => selectNode(null)}
             style={{ background: 'var(--cl-canvas)' }}
           >
-            <Background variant={BackgroundVariant.Dots} gap={22} size={1} color="rgba(0,66,175,0.16)" />
-            <Controls showInteractive={false} position="bottom-left" />
-            <MiniMap
-              pannable
-              zoomable
-              style={{ background: 'var(--cl-panel)', border: '1px solid var(--cl-line)' }}
-              maskColor="rgba(1,13,110,0.08)"
-              nodeColor={() => '#2451b5'}
-            />
+            {/* No MiniMap or built-in Controls: at this graph's scale the minimap
+                rendered as an empty grey rectangle, and Fit / Zoom / Lock already
+                live in the page toolbar where they are labelled. */}
+            <Background variant={BackgroundVariant.Dots} gap={22} size={1} color="var(--cl-line)" />
           </ReactFlow>
         </div>
 
@@ -331,6 +349,7 @@ function ArchitectureCanvas() {
               <NodeInspector
                 nodeId={selected.id}
                 data={selected.data}
+                graph={graph}
                 liveOverlay={liveOverlay}
                 onOpen={(segment, hash) =>
                   router.push(`/projects/${PROJECT.id}/${segment}${hash ? `#${hash}` : ''}`)
@@ -347,18 +366,20 @@ function ArchitectureCanvas() {
 function NodeInspector({
   nodeId,
   data,
+  graph,
   liveOverlay,
   onOpen,
 }: {
   nodeId: string;
   data: ArchNodeData;
+  graph: ArchitectureGraph;
   liveOverlay: boolean;
   onOpen: (segment: string, hash?: string) => void;
 }) {
   const status = liveOverlay ? (data.liveStatus ?? data.status) : data.status;
-  const labelFor = (id: string) => ARCHITECTURE.nodes.find((n) => n.id === id)?.data.label ?? id;
-  const outgoing = ARCHITECTURE.edges.filter((e) => e.source === nodeId);
-  const incoming = ARCHITECTURE.edges.filter((e) => e.target === nodeId);
+  const labelFor = (id: string) => graph.nodes.find((n) => n.id === id)?.data.label ?? id;
+  const outgoing = graph.edges.filter((e) => e.source === nodeId);
+  const incoming = graph.edges.filter((e) => e.target === nodeId);
 
   return (
     <div className="cl-col" style={{ gap: 14 }}>

@@ -12,7 +12,7 @@ import { useRouter } from 'next/navigation';
 import { ArrowDownToLine, Copy, Eraser, Maximize2, Minimize2, PlayCircle, X } from 'lucide-react';
 import { StatusBadge, SeverityBadge, Timestamp } from '../primitives';
 import { useWorkbench } from '@/lib/studio/workbench';
-import { OUTPUT_LOG, PROBLEMS, TEST_RESULTS } from '@/lib/studio/mock/core';
+import { OUTPUT_LOG, PROBLEMS, TEST_RESULTS, logAsText } from '@/lib/studio/mock/core';
 import type { BottomPanelTab, RuntimeEvent } from '@/lib/studio/types';
 
 export function BottomPanel({ projectId, events }: { projectId: string; events: RuntimeEvent[] }) {
@@ -47,7 +47,7 @@ export function BottomPanel({ projectId, events }: { projectId: string; events: 
   const downloadLog = () => {
     // Sanitized: the mock log carries no secrets; a real backend serves the
     // scrubbed artifact rather than the browser assembling one.
-    const body = OUTPUT_LOG.join('\n');
+    const body = logAsText(OUTPUT_LOG);
     const blob = new Blob([body], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -166,9 +166,17 @@ export function BottomPanel({ projectId, events }: { projectId: string; events: 
         ) : null}
 
         {bottomTab === 'output' ? (
-          <pre className="cl-mono" style={{ margin: 0, whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>
-            {cleared.output ? '' : OUTPUT_LOG.join('\n')}
-          </pre>
+          <div className="cl-log">
+            {cleared.output
+              ? null
+              : OUTPUT_LOG.map((line, i) => (
+                  <div className="cl-log-line" data-level={line.level} key={`${line.time}-${i}`}>
+                    <span className="cl-log-time">{line.time}</span>
+                    <span className="cl-log-scope">{line.scope}</span>
+                    <span className="cl-log-msg">{line.message}</span>
+                  </div>
+                ))}
+          </div>
         ) : null}
 
         {bottomTab === 'tests' ? (

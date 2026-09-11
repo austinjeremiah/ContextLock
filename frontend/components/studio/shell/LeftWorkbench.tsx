@@ -109,9 +109,11 @@ export function ProjectExplorer({
 
   return (
     <aside className="cl-explorer" aria-label="Project explorer">
+      {/* The header names the project; the groups below name themselves. Showing
+          the rail view's label here repeated it verbatim ("TEST" over "TEST"). */}
       <div className="cl-explorer-head">
         <span className="cl-label cl-truncate" title={projectName}>
-          {view.label}
+          {projectName}
         </span>
         <button
           type="button"

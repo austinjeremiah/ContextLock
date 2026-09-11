@@ -131,8 +131,19 @@ export function TitleBar({
       </Popover>
 
       {/* revision chip (spec §4.3) */}
-      <button type="button" className="cl-chip" onClick={onOpenRevisions} title="Open revision drawer">
-        {formatRevisionChip(revisions)}
+      <button
+        type="button"
+        className="cl-rev-chip"
+        onClick={onOpenRevisions}
+        title="Open the revision drawer"
+        aria-label="Current revisions"
+      >
+        {revisionSegments(revisions).map((seg) => (
+          <span className="cl-rev-seg" key={seg.label} data-stale={seg.stale}>
+            <span className="cl-rev-seg-label">{seg.label}</span>
+            <span className="cl-rev-seg-value">{seg.value}</span>
+          </span>
+        ))}
       </button>
 
       {/* environment badge (spec §4.4) — always present */}
@@ -295,13 +306,20 @@ export function TitleBar({
   );
 }
 
-export function formatRevisionChip(r: RevisionSet): string {
-  const parts = [
-    r.blueprint !== null ? `Blueprint r${r.blueprint}` : 'Blueprint —',
-    r.deployment !== null ? `Deploy r${r.deployment}` : 'Deploy —',
-    r.runtime !== null ? `Runtime r${r.runtime}` : 'Runtime —',
+/**
+ * The three revisions an operator checks most: what is authored, what is
+ * deployed, what is running. A trailing revision is marked stale so the gap
+ * between design and the live deployment is visible at a glance.
+ */
+export function revisionSegments(r: RevisionSet): { label: string; value: string; stale: boolean }[] {
+  const rev = (n: number | null) => (n === null ? '—' : `r${n}`);
+  const behind = (n: number | null) => n !== null && r.blueprint !== null && n < r.blueprint;
+
+  return [
+    { label: 'Blueprint', value: rev(r.blueprint), stale: false },
+    { label: 'Deploy', value: rev(r.deployment), stale: behind(r.deployment) },
+    { label: 'Runtime', value: rev(r.runtime), stale: behind(r.runtime) },
   ];
-  return parts.join(' · ');
 }
 
 /** Revision drawer contents (spec §4.3). */

@@ -623,6 +623,173 @@ const EDGES: ArchEdge[] = [
 
 export const ARCHITECTURE: ArchitectureGraph = { revision: 8, nodes: NODES, edges: EDGES };
 
+/* ---------------------------------------------------------------------------
+   Per-agent graphs.
+
+   Each agent is a distinct principal with its own venues and its own execution
+   class, so the architecture must differ. In particular a reporting-only agent
+   has no policy, no capability issuance and no executor at all — drawing it the
+   same path as a write-capable agent would contradict what Permissions and
+   Organization say about it.
+   --------------------------------------------------------------------------- */
+
+function pick(ids: string[]): ArchNode[] {
+  return ids
+    .map((id) => NODES.find((n) => n.id === id))
+    .filter((n): n is ArchNode => Boolean(n));
+}
+
+function edgesAmong(nodes: ArchNode[]): ArchEdge[] {
+  const ids = new Set(nodes.map((n) => n.id));
+  return EDGES.filter((e) => ids.has(e.source) && ids.has(e.target));
+}
+
+/** Rebalancer trades on Uniswap rather than Aave, and its runtime is paused. */
+const REBALANCER_NODES: ArchNode[] = [
+  ...pick(['operator', 'ens', 'chainlink', 'reality', 'broker', 'runtime', 'cre', 'policy', 'ledger', 'capability', 'executor', 'treasury']).map(
+    (node) =>
+      node.id === 'runtime'
+        ? {
+            ...node,
+            data: {
+              ...node.data,
+              label: 'Agent Runtime',
+              version: 'r2',
+              status: 'PAUSED' as const,
+              liveStatus: 'PAUSED' as const,
+              purpose: 'Runs the rebalancing strategy. Currently paused, so it proposes nothing.',
+            },
+          }
+        : node,
+  ),
+  {
+    id: 'uniswap',
+    position: { x: 1840, y: 130 },
+    data: {
+      kind: 'uniswap',
+      label: 'Uniswap v3 Pool',
+      purpose: 'The only venue this agent may trade through: the approved USDC/WETH pool.',
+      adapter: 'uniswap-v3',
+      version: '3.0.2',
+      networkRole: 'EXECUTION_TESTNET',
+      status: 'HEALTHY',
+      liveStatus: 'HEALTHY',
+      freshness: fresh('Uniswap v3 · Sepolia', 8),
+      ref: {
+        label: 'USDC/WETH 0.05%',
+        value: '0x3289680dD4d6C10bb19b899729cda5eEF58AEfF1',
+        kind: 'address',
+        network: 'Ethereum Sepolia',
+      },
+      layers: ['execution'],
+      blueprintSection: 'protocols',
+      codePath: 'adapters/uniswap.ts',
+    },
+  },
+];
+
+const REBALANCER_EDGES: ArchEdge[] = [
+  ...edgesAmong(REBALANCER_NODES).filter((e) => e.target !== 'aave' && e.source !== 'aave'),
+  { id: 'e_executor_uniswap', source: 'executor', target: 'uniswap', kind: 'EXECUTE', label: 'EXECUTE', layers: ['execution'] },
+  { id: 'e_uniswap_chainlink', source: 'uniswap', target: 'chainlink', kind: 'READ', label: 'READ', layers: ['data'] },
+];
+
+/**
+ * Reporter holds no execution authority. The graph therefore stops at the
+ * runtime: there is no policy node, no capability, no executor and no treasury,
+ * because no such path exists for this principal.
+ */
+const REPORTER_NODES: ArchNode[] = [
+  ...pick(['operator', 'ens', 'graph', 'reality', 'broker']),
+  {
+    id: 'mainnet-rpc',
+    position: { x: 300, y: -60 },
+    data: {
+      kind: 'chainlink-feed',
+      label: 'Mainnet RPC',
+      purpose: 'Read-only chain access used to compose position summaries.',
+      adapter: 'mainnet-read',
+      version: '1.0.0',
+      trustClass: 'READ_ONLY',
+      networkRole: 'MAINNET_READ_ONLY',
+      status: 'HEALTHY',
+      liveStatus: 'HEALTHY',
+      freshness: fresh('Mainnet RPC', 11, 60),
+      layers: ['data'],
+      blueprintSection: 'data-requirements',
+      codePath: 'adapters/mainnet-rpc.ts',
+    },
+  },
+  {
+    id: 'runtime',
+    position: { x: 620, y: 130 },
+    data: {
+      kind: 'agent-runtime',
+      label: 'Reporter Runtime',
+      purpose:
+        'Composes read-only treasury summaries. It has no capability-issuing path, so it can never submit a transaction.',
+      version: '—',
+      networkRole: 'NONE',
+      status: 'READY',
+      liveStatus: 'READY',
+      freshness: fresh('Runtime supervisor', 9),
+      layers: ['runtime'],
+      blueprintSection: 'generated-modules',
+      codePath: 'agent/report.ts',
+    },
+  },
+  {
+    id: 'report-output',
+    position: { x: 940, y: 130 },
+    data: {
+      kind: 'ledger',
+      label: 'Report Output',
+      purpose: 'Sanitized summaries. The terminal node for this agent — nothing downstream can move funds.',
+      networkRole: 'NONE',
+      status: 'READY',
+      liveStatus: 'READY',
+      layers: ['runtime'],
+      blueprintSection: 'confidential-policy',
+    },
+  },
+];
+
+const REPORTER_EDGES: ArchEdge[] = [
+  { id: 'r_op_ens', source: 'operator', target: 'ens', kind: 'AUTHORIZATION', label: 'AUTHORIZATION', layers: ['identity'] },
+  { id: 'r_ens_runtime', source: 'ens', target: 'runtime', kind: 'CONTEXT', label: 'CONTEXT', layers: ['identity', 'runtime'] },
+  { id: 'r_rpc_broker', source: 'mainnet-rpc', target: 'broker', kind: 'READ', label: 'READ', layers: ['data'] },
+  {
+    id: 'r_graph_broker',
+    source: 'graph',
+    target: 'broker',
+    kind: 'READ',
+    label: 'READ',
+    layers: ['data'],
+    note: 'Currently unavailable — no substitute is used.',
+  },
+  { id: 'r_reality_broker', source: 'reality', target: 'broker', kind: 'CONTEXT', label: 'CONTEXT', layers: ['data'] },
+  { id: 'r_broker_runtime', source: 'broker', target: 'runtime', kind: 'CONTEXT', label: 'CONTEXT', layers: ['data', 'runtime'] },
+  {
+    id: 'r_runtime_output',
+    source: 'runtime',
+    target: 'report-output',
+    kind: 'CONTEXT',
+    label: 'CONTEXT',
+    layers: ['runtime'],
+    note: 'The path ends here. No policy, capability or executor exists for this principal.',
+  },
+];
+
+const GRAPHS: Record<string, ArchitectureGraph> = {
+  guardian: { revision: 8, nodes: NODES, edges: EDGES },
+  rebalancer: { revision: 7, nodes: REBALANCER_NODES, edges: REBALANCER_EDGES },
+  reporter: { revision: 5, nodes: REPORTER_NODES, edges: REPORTER_EDGES },
+};
+
+export function architectureForAgent(slug: string): ArchitectureGraph {
+  return GRAPHS[slug] ?? GRAPHS.guardian;
+}
+
 export const EDGE_KIND_LABEL: Record<string, string> = {
   READ: 'Reads data from',
   CONTEXT: 'Supplies context to',

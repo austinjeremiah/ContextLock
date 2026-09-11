@@ -301,18 +301,48 @@ export const TEST_RESULTS: TestResult[] = [
   { id: 'tst_8', suite: 'network', name: 'refuses mainnet write target', status: 'PASS', durationMs: 33 },
 ];
 
-export const OUTPUT_LOG: string[] = [
-  '[10:31:02] build r7 · resolving blueprint r8',
-  '[10:31:03] build r7 · generating agent modules (6 files)',
-  '[10:31:05] build r7 · generating contextlock policy module',
-  '[10:31:07] build r7 · generating adapter bindings: chainlink-data-feeds, aave-v3, sepolia-rpc',
-  '[10:31:09] build r7 · compiling CRE workflow to wasm',
-  '[10:31:14] build r7 · wasm hash 0x6b1f83c4…f4a7c0e',
-  '[10:31:15] build r7 · running mandatory security regression (24 scenarios)',
-  '[10:31:41] build r7 · 23 passed · 1 failed (DATA_SOURCE_UNAVAILABLE)',
-  '[10:31:41] build r7 · artifact retained; deployment gate requires a clean security regression',
-  '[10:31:41] build r7 · BUILD COMPLETE with findings',
+/** Log severity, so the output panel can read as a log rather than a wall of one colour. */
+export type LogLevel = 'info' | 'step' | 'pass' | 'fail' | 'warn';
+
+export interface LogLine {
+  time: string;
+  scope: string;
+  message: string;
+  level: LogLevel;
+}
+
+export const OUTPUT_LOG: LogLine[] = [
+  { time: '10:31:02', scope: 'build r7', message: 'resolving blueprint r8', level: 'step' },
+  { time: '10:31:03', scope: 'build r7', message: 'generating agent modules (6 files)', level: 'step' },
+  { time: '10:31:05', scope: 'build r7', message: 'generating contextlock policy module', level: 'step' },
+  {
+    time: '10:31:07',
+    scope: 'build r7',
+    message: 'generating adapter bindings: chainlink-data-feeds, aave-v3, sepolia-rpc',
+    level: 'step',
+  },
+  { time: '10:31:09', scope: 'build r7', message: 'compiling CRE workflow to wasm', level: 'step' },
+  { time: '10:31:14', scope: 'build r7', message: 'wasm hash 0x6b1f83c4…f4a7c0e', level: 'info' },
+  {
+    time: '10:31:15',
+    scope: 'build r7',
+    message: 'running mandatory security regression (24 scenarios)',
+    level: 'step',
+  },
+  { time: '10:31:41', scope: 'build r7', message: '23 passed · 1 failed (DATA_SOURCE_UNAVAILABLE)', level: 'fail' },
+  {
+    time: '10:31:41',
+    scope: 'build r7',
+    message: 'artifact retained; deployment gate requires a clean security regression',
+    level: 'warn',
+  },
+  { time: '10:31:41', scope: 'build r7', message: 'BUILD COMPLETE with findings', level: 'warn' },
 ];
+
+/** Flat text form, used for copy and for the sanitized log download. */
+export function logAsText(lines: LogLine[]): string {
+  return lines.map((l) => `[${l.time}] ${l.scope} · ${l.message}`).join('\n');
+}
 
 /* ------------------------------------------------------------------ settings */
 
