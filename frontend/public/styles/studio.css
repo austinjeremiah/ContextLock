@@ -704,12 +704,16 @@ body.cl-resizing-v, body.cl-resizing-v * { cursor: row-resize !important; user-s
   .cl-kv dt { margin-top: 9px; }
   .cl-kv dt:first-child { margin-top: 0; }
 }
+/* Wraps rather than clips: a header row of three "Open …" buttons is wider
+   than a narrow centre pane, and a non-wrapping head hid the last button
+   behind the card edge instead of dropping it to a second line. */
 .cl-card-head {
-  display: flex; align-items: center; gap: 10px;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
   padding: 11px 14px; border-bottom: 1px solid var(--cl-line);
   background: var(--cl-panel-2);
 }
-.cl-card-title { flex: 1 1 auto; font-family: var(--medium); font-size: 13.5px; color: var(--cl-ink-heading); }
+.cl-card-head > .cl-row { flex-wrap: wrap; justify-content: flex-end; }
+.cl-card-title { flex: 1 1 auto; min-width: 0; font-family: var(--medium); font-size: 13.5px; color: var(--cl-ink-heading); }
 .cl-card-body { padding: 14px; }
 .cl-card-body-flush { padding: 0; }
 
@@ -723,6 +727,19 @@ body.cl-resizing-v, body.cl-resizing-v * { cursor: row-resize !important; user-s
 .cl-grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .cl-grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .cl-grid-auto { grid-template-columns: repeat(auto-fill, minmax(275px, 1fr)); }
+/* Status tiles hold a label, a badge and a freshness stamp — narrower than a
+   card, so they get their own track size and sit five across at full width. */
+.cl-grid-tiles { grid-template-columns: repeat(auto-fit, minmax(196px, 1fr)); }
+
+/* Inline navigation inside prose: reads as a link, not a control. */
+.cl-link {
+  color: var(--cl-ink);
+  font-family: var(--medium);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+.cl-link:hover { color: var(--cl-ink-2); }
 .cl-grid-wide-narrow { grid-template-columns: minmax(0, 1.85fr) minmax(0, 1fr); }
 @container cl-pane (max-width: 780px) {
   .cl-grid-wide-narrow { grid-template-columns: minmax(0, 1fr); }
@@ -1143,8 +1160,8 @@ body.cl-resizing-v, body.cl-resizing-v * { cursor: row-resize !important; user-s
   margin: -8px -12px -14px;
   padding: 12px 14px 16px;
   min-height: 100%;
-  background: #05060a;
-  color: #c9d3e4;
+  background: #182034;
+  color: #ccd6e8;
   font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
   font-size: 12.5px;
   line-height: 1.65;
@@ -1171,18 +1188,28 @@ body.cl-resizing-v, body.cl-resizing-v * { cursor: row-resize !important; user-s
 /* ============================================================================
    Console (bottom panel)
    ----------------------------------------------------------------------------
-   Problems, Output, Tests, Events and Terminal all live on a midnight ground.
+   Problems, Output, Tests, Events and Terminal all live on a dark ground.
    The dark token block does the work, so tables, badges and logs inside follow
-   automatically; these overrides just push the surfaces darker than the editor
-   theme, which is a touch lighter.
+   automatically; these overrides tint the surfaces towards ink navy rather than
+   true black — against a cream page a pure-black panel reads as a hole punched
+   in the layout, where a deep blue reads as the same palette turned down.
    ========================================================================== */
 .cl-bottom.cl-console {
-  --cl-canvas: #05060a;
-  --cl-panel: #080a11;
-  --cl-panel-2: #0c0f18;
-  --cl-raised: #141924;
+  --cl-canvas: #141b2c;
+  --cl-panel: #182034;
+  --cl-panel-2: #1e2740;
+  --cl-raised: #28314a;
   --cl-line: rgba(150, 175, 225, 0.14);
   --cl-line-strong: rgba(150, 175, 225, 0.26);
+
+  /* The dark block's ink is neutral grey, tuned for the jet editor. On a navy
+     ground it reads muddy, so the console takes the same greys pulled towards
+     blue. All four clear AA on both console surfaces. */
+  --cl-ink-heading: #eaf0fb;
+  --cl-ink: #d8e2f2;
+  --cl-ink-2: #a9b8d4;
+  --cl-ink-3: #8b9ab8;
+  --cl-ink-inv: #d8e2f2;
 
   background: var(--cl-panel);
   border-top: 1px solid rgba(150, 175, 225, 0.22);

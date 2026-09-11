@@ -134,9 +134,13 @@ export default function OverviewPage() {
         ) : null
       }
     >
-      {/* status strip — every tile carries its own freshness */}
+      {/* Status strip — every tile carries its own freshness.
+          Five tiles, not seven: revision and alert count are already permanent
+          fixtures of the title bar, and an open alert additionally raises the
+          banner above. A tile that repeats chrome the user is already looking
+          at costs a row of attention and returns nothing. */}
       <Section label="Observed state">
-        <div className="cl-grid cl-grid-4">
+        <div className="cl-grid cl-grid-tiles">
           <Tile label="Policy" value={<StatusBadge status={POLICY.observed} large />} freshness={POLICY.onChain.freshness} onClick={() => go('policies')} />
           <Tile label="Runtime" value={<StatusBadge status={RUNTIME.state} large />} freshness={RUNTIME.heartbeat} onClick={() => go('runtime')} />
           <Tile
@@ -161,28 +165,27 @@ export default function OverviewPage() {
             freshness={ADAPTERS[0].freshness}
             onClick={() => go('integrations')}
           />
-          <Tile
-            label="Current revision"
-            value={<Badge tone="neutral" large>{`Deploy r${PROJECT.revisions.deployment} · Blueprint r${PROJECT.revisions.blueprint}`}</Badge>}
-            freshness={POLICY.onChain.freshness}
-            onClick={() => go('deployments')}
-          />
-          <Tile
-            label="Alerts"
-            value={
-              openAlerts.length > 0 ? (
-                <Badge tone="deny" large>{`${openAlerts.length} open`}</Badge>
-              ) : (
-                <Badge tone="pass" large>None open</Badge>
-              )
-            }
-            freshness={POLICY.onChain.freshness}
-            onClick={() => go('control-plane')}
-          />
         </div>
         <p className="cl-meta" style={{ marginTop: 10 }}>
           The deployed revision is r{PROJECT.revisions.deployment}. Blueprint r{PROJECT.revisions.blueprint} exists but
-          is not what is running — a draft never replaces the observed live revision here.
+          is not what is running — a draft never replaces the observed live revision here.{' '}
+          {openAlerts.length > 0 ? (
+            <>
+              {openAlerts.length} alert {openAlerts.length === 1 ? 'is' : 'are'} open; see the banner above or the{' '}
+              <button type="button" className="cl-link" onClick={() => go('control-plane')}>
+                Control Plane
+              </button>
+              .
+            </>
+          ) : (
+            <>
+              No alerts are open.{' '}
+              <button type="button" className="cl-link" onClick={() => go('deployments')}>
+                Deployment history
+              </button>{' '}
+              carries the full revision trail.
+            </>
+          )}
         </p>
       </Section>
 
