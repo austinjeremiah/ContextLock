@@ -264,3 +264,33 @@
   display: block;
   filter: drop-shadow(0 0 26px rgba(8, 18, 74, 0.55));
 }
+
+/* ============================================================================
+   Marks inside the pendulum balls
+   ----------------------------------------------------------------------------
+   The balls are bordered discs with their texture sized to fill edge to edge.
+   A logo cannot fill a circle the same way — square it off and it gets clipped
+   at the curve — so each mark is inset and centred instead.
+
+   The wrappers keep their classes untouched: the engine collects
+   .pendulum__ball__img with querySelectorAll and animates opacity on them, so
+   the swing and fade are unchanged.
+   ========================================================================== */
+.pendulum__ball__img {
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.cl-pend-mark {
+  display: block;
+  height: auto;
+  object-fit: contain;
+}
+
+/* Sized per mark: the Chainlink hexagon is near-square, Ledger is a 3:1
+   wordmark, and ENS sits between the two. Each gets the width that leaves a
+   comfortable margin inside the disc rather than one shared value. */
+.cl-pend-mark--chain  { width: 46%; }
+.cl-pend-mark--ens    { width: 58%; }
+.cl-pend-mark--ledger { width: 66%; }
