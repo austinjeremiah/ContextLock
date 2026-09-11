@@ -237,3 +237,30 @@
   font-size: clamp(1.8rem, 1.45vw, 2.9rem);
   line-height: 1.45;
 }
+
+/* ============================================================================
+   Ledger mark at the centre of the clock
+   ----------------------------------------------------------------------------
+   The slot was a 5.2rem circle with a border and overflow:hidden, built to clip
+   a round texture. A wordmark is 3:1, so the circle has to be undone entirely —
+   clipping it to a disc would crop the word.
+   ========================================================================== */
+.onclock__spiral__center.cl-ledger-center {
+  width: clamp(150px, 20vw, 330px);
+  aspect-ratio: auto;
+  border: none;
+  border-radius: 0;
+  overflow: visible;
+  display: grid;
+  place-items: center;
+  /* The ring's radiating lines converge here, so the mark needs to sit above
+     them rather than be threaded through. */
+  z-index: 3;
+}
+
+.cl-ledger {
+  width: 100%;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 0 26px rgba(8, 18, 74, 0.55));
+}
