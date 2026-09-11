@@ -103,20 +103,36 @@ Trust class is treated as a property of the source throughout: a Blueprint that
 requires a verified oracle will not accept an indexed source in its place, and
 no control on this page can raise a source's trust class.
 
-## ⬜ Remaining phases — 4 phases plus landing polish
+## ✅ Phase FE-6 — Deployment
+
+| Page | Spec | What landed |
+|---|---|---|
+| Deploy / Preflight | §20 | Nine-step preflight whose **wallet step reflects the live connection**, not a stored value; deployment summary with both revisions, contract reuse/deploy counts, image digest, CRE mode and workflow hash; **cost kept in five separate sections** — deployment gas, per-action execution, model usage, runtime hosting and CRE — with an explicit note that they are not added together because they are paid in different currencies at different times; deployment plan showing which contracts are deployed and which reused; artifact hashes; confirmation stating network, transaction count, balance requirement, revisions, `Policy: DISABLED`, CRE mode, image digest and `Production-chain execution: DISABLED`, with a button that names itself rather than a bare Confirm; progress that **persists across a reload** and ends at READY TO ACTIVATE; Run Preflight / Refresh Estimate / Connect Testnet Wallet / Fund Testnet Wallet / Run CRE Simulation / View artifact hashes / Review Deployment Plan / Deploy / Cancel |
+| Deployments | §20 | History with per-deployment status, revisions, network, CRE mode and security status; receipt showing contracts, addresses, verification and recorded progress; states that the active deployment stays on its revision regardless of how far the Blueprint has moved |
+
+**Deployment is currently BLOCKED, on purpose.** One mandatory security scenario
+fails (`sim_graph_unavailable`), and the gate requires a clean regression, so
+Deploy is disabled and names exactly why rather than offering a green path. This
+is the product behaving correctly, not an unfinished screen.
+
+**The wallet lands here**, mounted by `deploy/layout.tsx` rather than the
+workbench layout. The build confirms the scoping: `/deploy` is 350 kB first-load
+while every other route stays around 135 kB. Connecting on a production chain is
+reported as a wrong network rather than silently accepted, and faucet links are
+labelled as third-party with no promise that funds will arrive.
+
+## ⬜ Remaining phases — 3 phases plus landing polish
 
 | Phase | Scope | Pages |
 |---|---|---|
-| **FE-6** ← next | Deployment | Preflight, cost estimate, deployment progress (§20) — **wallet connect lands here** |
-| **FE-7** | Live operations | Overview (§21), Activity (§22), Policies (§23), Runtime (§24), Control Plane (§25), Chainlink CRE (§26), Identity/ENS (§27) |
+| **FE-7** ← next | Live operations | Overview (§21), Activity (§22), Policies (§23), Runtime (§24), Control Plane (§25), Chainlink CRE (§26), Identity/ENS (§27) |
 | **FE-8** | Context Agent | page context envelopes, selections and proposed patches across every page (§39) |
 | **FE-9** | Output + polish | Safety Reports (§28), Settings (§29), a11y (§45), responsive monitoring mode (§46) |
 | **Landing** | Polish pass | last, by explicit decision |
 
-**Current page count:** 13 built (Projects, New project, Composer, Organization,
-Blueprint, Architecture, Permissions, Simulation, Reality Lab, Attack Lab, Code,
-Integrations) · 10 navigable but not yet built, each rendering the shared
-`PendingSurface`.
+**Current page count:** 15 built · 8 navigable but not yet built, each rendering
+the shared `PendingSurface`. The eight remaining are the seven live-operations
+surfaces (FE-7) plus Reports and Settings (FE-9).
 
 ---
 
