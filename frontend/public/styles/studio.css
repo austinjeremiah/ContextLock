@@ -1160,7 +1160,7 @@ body.cl-resizing-v, body.cl-resizing-v * { cursor: row-resize !important; user-s
   margin: -8px -12px -14px;
   padding: 12px 14px 16px;
   min-height: 100%;
-  background: #182034;
+  background: #0b0f18;
   color: #ccd6e8;
   font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
   font-size: 12.5px;
@@ -1190,15 +1190,17 @@ body.cl-resizing-v, body.cl-resizing-v * { cursor: row-resize !important; user-s
    ----------------------------------------------------------------------------
    Problems, Output, Tests, Events and Terminal all live on a dark ground.
    The dark token block does the work, so tables, badges and logs inside follow
-   automatically; these overrides tint the surfaces towards ink navy rather than
-   true black — against a cream page a pure-black panel reads as a hole punched
-   in the layout, where a deep blue reads as the same palette turned down.
+   automatically; these overrides keep the surfaces near-black but carrying a
+   blue cast rather than true neutral black — against a cream page a pure-black
+   panel reads as a hole punched in the layout, where a blue-tinted near-black
+   reads as the same palette turned all the way down. Depth first, tint second:
+   a mid navy lost the contrast the console needs to read as a console.
    ========================================================================== */
 .cl-bottom.cl-console {
-  --cl-canvas: #141b2c;
-  --cl-panel: #182034;
-  --cl-panel-2: #1e2740;
-  --cl-raised: #28314a;
+  --cl-canvas: #080b12;
+  --cl-panel: #0b0f18;
+  --cl-panel-2: #101623;
+  --cl-raised: #18202f;
   --cl-line: rgba(150, 175, 225, 0.14);
   --cl-line-strong: rgba(150, 175, 225, 0.26);
 
