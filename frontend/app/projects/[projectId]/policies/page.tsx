@@ -1,7 +1,402 @@
 'use client';
 
-import { PendingSurface } from '@/components/studio/PendingSurface';
+/**
+ * Policies (spec §23).
+ *
+ * View and safely revise the current ContextLock financial authority state.
+ *
+ * Rules encoded here:
+ *  - The header reports the *observed* chain state with its freshness. A
+ *    successful submission is never treated as proof of on-chain state.
+ *  - After a disable is submitted the UI reads DISABLING until a fresh chain
+ *    read proves the new state.
+ *  - Enable is stricter than disable: every precondition must pass, and the
+ *    dialog lists them with their real status.
+ */
+import { useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { GitCompare, Play, RefreshCw, ShieldCheck, ShieldOff } from 'lucide-react';
+import { StudioPage } from '@/components/studio/PageScaffold';
+import {
+  Badge,
+  BlockchainRef,
+  BlockerBanner,
+  Card,
+  FreshnessBadge,
+  KeyValue,
+  Section,
+  SeverityBadge,
+  StatusBadge,
+  VerdictBadge,
+} from '@/components/studio/primitives';
+import { Modal, SecurityConfirmation } from '@/components/studio/dialogs';
+import { useWorkbench } from '@/lib/studio/workbench';
+import { useControlRequest } from '@/lib/studio/control-bridge';
+import { PROJECT, agentBySlug } from '@/lib/studio/mock/core';
+import { POLICY } from '@/lib/studio/mock/operate';
+import type { Status } from '@/lib/studio/types';
 
-export default function Page() {
-  return <PendingSurface segment="policies" />;
+export default function PoliciesPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { pushToast } = useWorkbench();
+
+  const agentSlug = searchParams.get('agent') ?? PROJECT.agents[0].slug;
+  const agent = agentBySlug(agentSlug);
+
+  const [observed, setObserved] = useState<Status>(POLICY.observed);
+  const [transitional, setTransitional] = useState<Status | null>(null);
+  const [disableOpen, setDisableOpen] = useState(false);
+  const [enableOpen, setEnableOpen] = useState(false);
+  const [compareOpen, setCompareOpen] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+
+  useControlRequest('DISABLE_POLICY', () => setDisableOpen(true));
+  useControlRequest('ACTIVATE_TESTNET_POLICY', () => setEnableOpen(true));
+
+  const failingPreconditions = POLICY.enablePreconditions.filter((p) => p.status !== 'PASS');
+  const canEnable = failingPreconditions.length === 0;
+  const drifted = POLICY.drift.filter((d) => d.drifted);
+
+  const refreshChainState = () => {
+    setRefreshing(true);
+    window.setTimeout(() => {
+      setRefreshing(false);
+      // A fresh read is what resolves a transitional state — not the submission.
+      if (transitional) {
+        setObserved(transitional === 'DISABLING' ? 'DISABLED' : 'ENABLED');
+        setTransitional(null);
+        pushToast('Fresh chain read confirms the new state');
+      } else {
+        pushToast('Chain state refreshed');
+      }
+    }, 900);
+  };
+
+  return (
+    <StudioPage
+      segment="policies"
+      live
+      title="ContextLock Policy"
+      subtitle="The deterministic financial authority boundary for this agent."
+      badges={
+        <>
+          <Badge tone="neutral">{agent.name}</Badge>
+          <span className="cl-row" style={{ gap: 7 }}>
+            <span className="cl-meta">Observed:</span>
+            <StatusBadge status={transitional ?? observed} large />
+          </span>
+          <FreshnessBadge freshness={POLICY.onChain.freshness} />
+          <Badge tone="neutral">Policy version {POLICY.version}</Badge>
+          <Badge tone="sim">{POLICY.network}</Badge>
+        </>
+      }
+      actions={
+        <>
+          <button type="button" className="cl-btn" onClick={refreshChainState} disabled={refreshing}>
+            <RefreshCw size={13} aria-hidden />
+            {refreshing ? 'Reading…' : 'Refresh Chain State'}
+          </button>
+          <button
+            type="button"
+            className="cl-btn"
+            onClick={() => router.push(`/projects/${PROJECT.id}/blueprint?agent=${agentSlug}`)}
+          >
+            Create Policy Revision
+          </button>
+          <button type="button" className="cl-btn" onClick={() => setCompareOpen(true)}>
+            <GitCompare size={13} aria-hidden />
+            Compare Policy
+          </button>
+          <button
+            type="button"
+            className="cl-btn"
+            onClick={() => router.push(`/projects/${PROJECT.id}/simulation?agent=${agentSlug}&group=policy-boundaries`)}
+          >
+            <Play size={13} aria-hidden />
+            Run Policy Simulations
+          </button>
+          {observed === 'ENABLED' ? (
+            <button type="button" className="cl-btn cl-btn-danger" onClick={() => setDisableOpen(true)}>
+              <ShieldOff size={13} aria-hidden />
+              Disable Policy
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="cl-btn cl-btn-primary"
+              onClick={() => setEnableOpen(true)}
+              disabled={!canEnable || transitional !== null}
+              title={
+                canEnable
+                  ? undefined
+                  : `Blocked: ${failingPreconditions.map((p) => p.label).join(', ')}`
+              }
+            >
+              <ShieldCheck size={13} aria-hidden />
+              Enable Policy
+            </button>
+          )}
+        </>
+      }
+      banners={
+        <>
+          {transitional ? (
+            <BlockerBanner
+              tone="warn"
+              title={`${transitional} — awaiting confirmation`}
+              actions={
+                <button type="button" className="cl-btn cl-btn-sm" onClick={refreshChainState} disabled={refreshing}>
+                  Refresh Chain State
+                </button>
+              }
+            >
+              The transaction was submitted. This still reads {transitional} rather than the requested state, because a
+              successful submission is not proof of on-chain state — only a fresh chain read is.
+            </BlockerBanner>
+          ) : null}
+
+          {!canEnable && observed !== 'ENABLED' ? (
+            <BlockerBanner tone="blocked" title="Enable Policy is unavailable">
+              {failingPreconditions.length} precondition
+              {failingPreconditions.length === 1 ? '' : 's'} not met:{' '}
+              {failingPreconditions.map((p) => p.label).join(', ')}. Financial authority is not enabled while any of
+              them fails.
+            </BlockerBanner>
+          ) : null}
+
+          {drifted.length > 0 ? (
+            <BlockerBanner
+              tone="warn"
+              title={`${drifted.length} field has drifted from the deployment's expectation`}
+              actions={
+                <button
+                  type="button"
+                  className="cl-btn cl-btn-sm"
+                  onClick={() => router.push(`/projects/${PROJECT.id}/control-plane?agent=${agentSlug}`)}
+                >
+                  Open Control Plane
+                </button>
+              }
+            >
+              {drifted.map((d) => `${d.field}: expected ${d.expected}, observed ${d.observed}`).join(' · ')}
+            </BlockerBanner>
+          ) : null}
+        </>
+      }
+    >
+      {/* authority matrix */}
+      <Section label="Current authority matrix">
+        <Card flush>
+          <div className="cl-table-scroll">
+            <table className="cl-table" style={{ minWidth: 1040 }}>
+              <thead>
+                <tr>
+                  <th style={{ minWidth: 190 }}>Action</th>
+                  <th style={{ width: 160 }}>Limit</th>
+                  <th style={{ width: 180 }}>Recipients</th>
+                  <th style={{ width: 140 }}>Targets</th>
+                  <th style={{ width: 180 }}>Trust / freshness</th>
+                  <th style={{ width: 190 }}>Expiry / nonce</th>
+                  <th style={{ width: 170 }}>Escalation</th>
+                  <th style={{ width: 120 }}>Verdict</th>
+                </tr>
+              </thead>
+              <tbody>
+                {POLICY.matrix.map((row, i) => (
+                  <tr key={`${row.action}-${i}`}>
+                    <td className="cl-strong">{row.action}</td>
+                    <td>{row.limit}</td>
+                    <td className="cl-meta">{row.recipients}</td>
+                    <td className="cl-mono" style={{ fontSize: 11.5 }}>
+                      {row.targets}
+                    </td>
+                    <td className="cl-meta">{row.trustFreshness}</td>
+                    <td className="cl-meta">{row.expiryNonce}</td>
+                    <td className="cl-meta">{row.escalation}</td>
+                    <td>
+                      <VerdictBadge verdict={row.verdict} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      </Section>
+
+      <div className="cl-grid cl-grid-2">
+        {/* on-chain state */}
+        <Section label="On-chain state">
+          <Card>
+            <KeyValue
+              rows={[
+                { label: 'Enabled', value: <StatusBadge status={transitional ?? observed} /> },
+                { label: 'Policy hash', value: <BlockchainRef value={POLICY.onChain.policyHash} kind="hash" /> },
+                {
+                  label: 'Admin',
+                  value: <BlockchainRef value={POLICY.onChain.admin} network={POLICY.network} />,
+                },
+                ...POLICY.onChain.contracts.map((contract) => ({
+                  label: contract.label,
+                  value: <BlockchainRef value={contract.address} network={POLICY.network} />,
+                })),
+                { label: 'Last verified block', value: POLICY.onChain.lastVerifiedBlock.toLocaleString('en-US'), mono: true },
+              ]}
+            />
+            <div style={{ marginTop: 12 }}>
+              <FreshnessBadge freshness={POLICY.onChain.freshness} />
+            </div>
+          </Card>
+        </Section>
+
+        {/* drift */}
+        <Section label="Drift">
+          <Card flush>
+            <table className="cl-table">
+              <thead>
+                <tr>
+                  <th>Field</th>
+                  <th style={{ width: 150 }}>Expected</th>
+                  <th style={{ width: 170 }}>Observed</th>
+                  <th style={{ width: 100 }}>Drift</th>
+                </tr>
+              </thead>
+              <tbody>
+                {POLICY.drift.map((row) => (
+                  <tr key={row.field}>
+                    <td className="cl-strong">{row.field}</td>
+                    <td className="cl-mono" style={{ fontSize: 11.5 }}>
+                      {row.expected}
+                    </td>
+                    <td className="cl-mono" style={{ fontSize: 11.5, color: row.drifted ? 'var(--cl-warn)' : undefined }}>
+                      {row.observed}
+                    </td>
+                    <td>{row.drifted ? <SeverityBadge severity={row.severity} /> : <StatusBadge status="PASS" />}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </Card>
+        </Section>
+      </div>
+
+      {/* preconditions */}
+      <Section label="Enable preconditions">
+        <div className="cl-path">
+          {POLICY.enablePreconditions.map((precondition) => (
+            <div className="cl-path-step" key={precondition.id}>
+              <span className="cl-path-step-name">{precondition.label}</span>
+              <StatusBadge status={precondition.status} />
+              <span className="cl-path-step-detail">{precondition.detail}</span>
+            </div>
+          ))}
+        </div>
+        <p className="cl-meta" style={{ marginTop: 10 }}>
+          Enabling financial authority is stricter than disabling it. Every precondition must pass; disabling has no
+          preconditions at all, because reducing authority is always permitted.
+        </p>
+      </Section>
+
+      {/* disable */}
+      <SecurityConfirmation
+        open={disableOpen}
+        onClose={() => setDisableOpen(false)}
+        onConfirm={() => {
+          setDisableOpen(false);
+          setTransitional('DISABLING');
+          pushToast('Disable submitted — state stays DISABLING until a fresh chain read confirms it');
+        }}
+        action="Disable financial authority"
+        currentState={<StatusBadge status={observed} />}
+        requestedState={<StatusBadge status="DISABLED" />}
+        network={POLICY.network}
+        resource={<BlockchainRef label="Policy Registry" value={POLICY.onChain.contracts[0].address} network={POLICY.network} />}
+        extraRows={[
+          { label: 'Signer', value: <BlockchainRef value={POLICY.onChain.admin} network={POLICY.network} /> },
+          { label: 'Estimated gas', value: '~48,200 · ~0.00007 SepoliaETH' },
+        ]}
+        consequence="No new capability can be issued, so no new execution can be authorized. Capabilities already issued remain valid until they expire."
+        actionLabel="Disable Financial Authority"
+      />
+
+      {/* enable — stricter */}
+      <SecurityConfirmation
+        open={enableOpen}
+        onClose={() => setEnableOpen(false)}
+        onConfirm={() => {
+          setEnableOpen(false);
+          setTransitional('ENABLING');
+          pushToast('Enable submitted — state stays ENABLING until a fresh chain read confirms it');
+        }}
+        action="Enable testnet financial authority"
+        currentState={<StatusBadge status={observed} />}
+        requestedState={<StatusBadge status="ENABLED" />}
+        network={POLICY.network}
+        resource={<BlockchainRef label="Policy Registry" value={POLICY.onChain.contracts[0].address} network={POLICY.network} />}
+        extraRows={[
+          { label: 'Signer', value: <BlockchainRef value={POLICY.onChain.admin} network={POLICY.network} /> },
+          { label: 'Policy version', value: String(POLICY.version) },
+        ]}
+        preconditions={POLICY.enablePreconditions}
+        consequence="The agent becomes able to obtain capabilities and execute within the authority matrix above, on the testnet only."
+        actionLabel="Enable Testnet Financial Authority"
+        disabled={!canEnable}
+        disabledReason={canEnable ? undefined : 'One or more preconditions are not met.'}
+      />
+
+      {/* compare */}
+      <Modal
+        open={compareOpen}
+        onClose={() => setCompareOpen(false)}
+        title="Compare policy revisions"
+        wide
+        footer={
+          <button type="button" className="cl-btn cl-btn-primary" onClick={() => setCompareOpen(false)}>
+            Close
+          </button>
+        }
+      >
+        <table className="cl-table">
+          <thead>
+            <tr>
+              <th>Field</th>
+              <th style={{ width: 170 }}>Version 7</th>
+              <th style={{ width: 190 }}>Version 8 · current</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td className="cl-strong">Autonomous limit</td>
+              <td className="cl-mono">$750</td>
+              <td className="cl-mono" style={{ color: 'var(--cl-warn)' }}>
+                $1,000
+              </td>
+            </tr>
+            <tr>
+              <td className="cl-strong">Escalation band</td>
+              <td className="cl-mono">$750 – $5,000</td>
+              <td className="cl-mono">$1,000 – $5,000</td>
+            </tr>
+            <tr>
+              <td className="cl-strong">Hard ceiling</td>
+              <td className="cl-mono">$5,000</td>
+              <td className="cl-mono">$5,000</td>
+            </tr>
+            <tr>
+              <td className="cl-strong">Max price age</td>
+              <td className="cl-mono">90s</td>
+              <td className="cl-mono" style={{ color: 'var(--cl-pass)' }}>
+                60s
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <p className="cl-meta" style={{ marginTop: 12 }}>
+          Version 8 widened the autonomous limit and tightened the freshness requirement. A widening change is the one
+          that needs scrutiny: it increases what happens without a human.
+        </p>
+      </Modal>
+    </StudioPage>
+  );
 }

@@ -63,7 +63,7 @@ export default function DeploymentsPage() {
             <table className="cl-table" style={{ minWidth: 940 }}>
               <thead>
                 <tr>
-                  <th style={{ width: 110 }}>Deployment</th>
+                  <th style={{ width: 150 }}>Deployment</th>
                   <th style={{ width: 130 }}>Status</th>
                   <th style={{ width: 150 }}>Blueprint / build</th>
                   <th style={{ width: 170 }}>Network</th>
@@ -83,13 +83,17 @@ export default function DeploymentsPage() {
                       setSelection({ kind: 'deployment', id: deployment.id, label: `Deployment ${deployment.revision}` });
                     }}
                   >
-                    <td className="cl-strong">
-                      r{deployment.revision}
-                      {deployment.revision === current ? (
-                        <Badge tone="pass" title="Currently deployed">
-                          active
-                        </Badge>
-                      ) : null}
+                    <td>
+                      {/* text and badge need a row with a gap; placed adjacent
+                          they collide once the column is narrow */}
+                      <span className="cl-row cl-row-wrap" style={{ gap: 7 }}>
+                        <span className="cl-strong">r{deployment.revision}</span>
+                        {deployment.revision === current ? (
+                          <Badge tone="pass" title="Currently deployed">
+                            active
+                          </Badge>
+                        ) : null}
+                      </span>
                     </td>
                     <td>
                       <StatusBadge status={deployment.status} />

@@ -121,18 +121,27 @@ while every other route stays around 135 kB. Connecting on a production chain is
 reported as a wrong network rather than silently accepted, and faucet links are
 labelled as third-party with no promise that funds will arrive.
 
-## ⬜ Remaining phases — 3 phases plus landing polish
+## ✅ Phase FE-7 — Live operations
+
+| Page | Spec | What landed |
+|---|---|---|
+| Overview | §21 | Header states execution network, read-only market source, CRE mode and `Production-chain execution: DISABLED` — **never "LIVE" unqualified**; seven status tiles each carrying their own last-verified time; authority usage with limit, window consumption, escalation band and hard ceiling; compact live architecture strip on observed state; recent decisions with verdicts and reason codes; Open Activity / Run Simulation / Attack Test / Pause Runtime / Disable Policy / Emergency Lock |
+| Activity | §22 | Filter bar over source, verdict and free text; timeline table; event drawer with RuntimeEvent schema, reason code, capability, CRE execution, revisions and source freshness; **confidential payloads are not rendered**, only public metadata; correlation trace of the whole run back to its trigger; `Open transaction` appears only for a real testnet transaction — a local-fork transaction never gets a public explorer link |
+| Policies | §23 | Observed chain state with freshness, authority matrix, on-chain state, drift; **a submission is never treated as proof** — after disable the state reads DISABLING until a fresh chain read confirms it; Enable is gated on seven preconditions and is unavailable while any fails; Refresh Chain State / Create Policy Revision / Compare Policy / Run Policy Simulations / Disable / Enable |
+| Runtime | §24 | Status, resource metrics, health dependencies where **a running process with a broken dependency is DEGRADED, never HEALTHY**; runtime revisions with rollback gated on compatibility; credential fencing shown as a verified result rather than assumed; every stop-type control states that it does **not** disable on-chain financial authority |
+| Control Plane | §25 | Ten-component topology with current, expected, drift, freshness and last failure; reconciliation where observed is treated as the truth; alerts that can only be resolved after acknowledgement and evidence; four control groups; **Emergency Lock attempts the financial policy first and reports each step separately**, so a partial result reads `EMERGENCY_LOCK_PARTIAL` rather than being rounded up to success |
+| Chainlink CRE | §26 | **Four truth labels stated separately** — official simulation YES, real DON NO, DON consensus NO, hardware TEE NO — each set only by evidence; a simulator never renders a DON badge and a fixture simulation id is labelled as not a workflow id; three mode cards with exact blockers; connect flow that **never asks for a password or OTP**, authenticating through the official CRE login with only a sanitized status returned; promotion that moves the exact approved artifact and never silently rebuilds |
+| Identity / ENS | §27 | Identity card, organization namespace, records and lifecycle; states plainly that **ENS identifies and revokes agents while ContextLock policy defines their financial permissions**, and no spending limit is stored as a name record; revoke confirmation spelling out sibling impact, capability impact, that the policy state is unaffected, and that a fresh ENS read must confirm it |
+
+## ⬜ Remaining phases — 2 phases plus landing polish
 
 | Phase | Scope | Pages |
 |---|---|---|
-| **FE-7** ← next | Live operations | Overview (§21), Activity (§22), Policies (§23), Runtime (§24), Control Plane (§25), Chainlink CRE (§26), Identity/ENS (§27) |
-| **FE-8** | Context Agent | page context envelopes, selections and proposed patches across every page (§39) |
+| **FE-8** ← next | Context Agent | page context envelopes, selections and proposed patches across every page (§39) |
 | **FE-9** | Output + polish | Safety Reports (§28), Settings (§29), a11y (§45), responsive monitoring mode (§46) |
 | **Landing** | Polish pass | last, by explicit decision |
 
-**Current page count:** 15 built · 8 navigable but not yet built, each rendering
-the shared `PendingSurface`. The eight remaining are the seven live-operations
-surfaces (FE-7) plus Reports and Settings (FE-9).
+**Current page count:** 22 built. Only Reports and Settings remain, both in FE-9.
 
 ---
 
