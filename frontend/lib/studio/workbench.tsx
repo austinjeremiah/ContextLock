@@ -1,0 +1,348 @@
+'use client';
+
+/**
+ * Workbench UI state.
+ *
+ * Local UI concerns only (spec §38): panel sizes, open tabs, selection, bottom
+ * panel, theme/density, draft input. Authoritative policy / deployment / runtime
+ * state never lives here — those are server state read through the data layer.
+ */
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react';
+import type { BottomPanelTab, EditorTab, PageKind } from './types';
+import type { RailViewId } from './nav';
+
+export interface SelectedEntity {
+  kind: string;
+  id: string;
+  label: string;
+}
+
+export interface Toast {
+  id: string;
+  message: string;
+}
+
+export interface PanelSizes {
+  explorer: number;
+  agent: number;
+  bottom: number;
+}
+
+const DEFAULT_SIZES: PanelSizes = { explorer: 224, agent: 380, bottom: 220 };
+
+export const PANEL_LIMITS = {
+  explorer: { min: 180, max: 340, default: 224 },
+  agent: { min: 300, max: 520, default: 380 },
+  bottom: { min: 120, default: 220 },
+};
+
+const STORAGE_KEY = 'ctxlock.workbench.v1';
+
+interface PersistedState {
+  sizes: PanelSizes;
+  explorerOpen: boolean;
+  agentOpen: boolean;
+  bottomOpen: boolean;
+  bottomTab: BottomPanelTab;
+  rail: RailViewId;
+  tabs: EditorTab[];
+  developerMode: boolean;
+}
+
+interface WorkbenchValue {
+  /* layout */
+  sizes: PanelSizes;
+  setPanelSize: (panel: keyof PanelSizes, value: number) => void;
+  resetPanelSize: (panel: keyof PanelSizes) => void;
+  explorerOpen: boolean;
+  toggleExplorer: () => void;
+  agentOpen: boolean;
+  toggleAgent: () => void;
+  agentDrawer: boolean;
+  bottomOpen: boolean;
+  toggleBottom: () => void;
+  bottomMaximized: boolean;
+  toggleBottomMaximized: () => void;
+  bottomTab: BottomPanelTab;
+  setBottomTab: (tab: BottomPanelTab) => void;
+  openBottom: (tab: BottomPanelTab) => void;
+
+  /* rail + tabs */
+  rail: RailViewId;
+  setRail: (rail: RailViewId) => void;
+  tabs: EditorTab[];
+  activeTabId: string | null;
+  openTab: (tab: Omit<EditorTab, 'preview'> & { preview?: boolean }) => void;
+  pinTab: (id: string) => void;
+  closeTab: (id: string) => void;
+  closeOtherTabs: (id: string) => void;
+
+  /* agent sidebar */
+  selection: SelectedEntity | null;
+  setSelection: (selection: SelectedEntity | null) => void;
+  pageKind: PageKind;
+  setPageKind: (kind: PageKind) => void;
+  agentDraft: string;
+  setAgentDraft: (value: string) => void;
+  focusAgentInput: () => void;
+  registerAgentInput: (el: HTMLTextAreaElement | null) => void;
+
+  /* command palette */
+  paletteOpen: boolean;
+  setPaletteOpen: (open: boolean) => void;
+
+  /* toasts (lightweight feedback only, spec §48) */
+  toasts: Toast[];
+  pushToast: (message: string) => void;
+
+  /* developer mode (spec §29) */
+  developerMode: boolean;
+  setDeveloperMode: (on: boolean) => void;
+
+  /* viewport class (spec §46) */
+  viewport: 'wide' | 'medium' | 'narrow' | 'monitor';
+}
+
+const WorkbenchContext = createContext<WorkbenchValue | null>(null);
+
+export function useWorkbench(): WorkbenchValue {
+  const ctx = useContext(WorkbenchContext);
+  if (!ctx) throw new Error('useWorkbench must be used inside <WorkbenchProvider>');
+  return ctx;
+}
+
+function readPersisted(): Partial<PersistedState> | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    return raw ? (JSON.parse(raw) as Partial<PersistedState>) : null;
+  } catch {
+    return null;
+  }
+}
+
+export function WorkbenchProvider({ children }: { children: ReactNode }) {
+  const [sizes, setSizes] = useState<PanelSizes>(DEFAULT_SIZES);
+  const [explorerOpen, setExplorerOpen] = useState(true);
+  const [agentOpen, setAgentOpen] = useState(true);
+  const [bottomOpen, setBottomOpen] = useState(false);
+  const [bottomMaximized, setBottomMaximized] = useState(false);
+  const [bottomTab, setBottomTab] = useState<BottomPanelTab>('problems');
+  const [rail, setRail] = useState<RailViewId>('operate');
+  const [tabs, setTabs] = useState<EditorTab[]>([]);
+  const [activeTabId, setActiveTabId] = useState<string | null>(null);
+  const [selection, setSelection] = useState<SelectedEntity | null>(null);
+  const [pageKind, setPageKind] = useState<PageKind>('overview');
+  const [agentDraft, setAgentDraft] = useState('');
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  const [toasts, setToasts] = useState<Toast[]>([]);
+  const [developerMode, setDeveloperMode] = useState(false);
+  const [viewport, setViewport] = useState<WorkbenchValue['viewport']>('wide');
+  const [hydrated, setHydrated] = useState(false);
+  const agentInputRef = useRef<HTMLTextAreaElement | null>(null);
+
+  /* restore persisted layout after mount so SSR markup stays deterministic */
+  useEffect(() => {
+    const saved = readPersisted();
+    if (saved) {
+      if (saved.sizes) setSizes({ ...DEFAULT_SIZES, ...saved.sizes });
+      if (typeof saved.explorerOpen === 'boolean') setExplorerOpen(saved.explorerOpen);
+      if (typeof saved.agentOpen === 'boolean') setAgentOpen(saved.agentOpen);
+      if (typeof saved.bottomOpen === 'boolean') setBottomOpen(saved.bottomOpen);
+      if (saved.bottomTab) setBottomTab(saved.bottomTab);
+      if (saved.rail) setRail(saved.rail);
+      if (saved.tabs?.length) {
+        setTabs(saved.tabs);
+        setActiveTabId(saved.tabs[saved.tabs.length - 1]?.id ?? null);
+      }
+      if (typeof saved.developerMode === 'boolean') setDeveloperMode(saved.developerMode);
+    }
+    setHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    const payload: PersistedState = {
+      sizes,
+      explorerOpen,
+      agentOpen,
+      bottomOpen,
+      bottomTab,
+      rail,
+      tabs,
+      developerMode,
+    };
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+    } catch {
+      /* storage unavailable — layout simply resets next session */
+    }
+  }, [hydrated, sizes, explorerOpen, agentOpen, bottomOpen, bottomTab, rail, tabs, developerMode]);
+
+  /* viewport classes from spec §46 */
+  useEffect(() => {
+    const compute = () => {
+      const w = window.innerWidth;
+      setViewport(w >= 1440 ? 'wide' : w >= 1180 ? 'medium' : w >= 900 ? 'narrow' : 'monitor');
+    };
+    compute();
+    window.addEventListener('resize', compute, { passive: true });
+    return () => window.removeEventListener('resize', compute);
+  }, []);
+
+  const setPanelSize = useCallback((panel: keyof PanelSizes, value: number) => {
+    setSizes((prev) => (prev[panel] === value ? prev : { ...prev, [panel]: value }));
+  }, []);
+
+  const resetPanelSize = useCallback((panel: keyof PanelSizes) => {
+    setSizes((prev) => ({ ...prev, [panel]: DEFAULT_SIZES[panel] }));
+  }, []);
+
+  const openTab = useCallback((tab: Omit<EditorTab, 'preview'> & { preview?: boolean }) => {
+    const preview = tab.preview ?? true;
+    setTabs((prev) => {
+      const existing = prev.find((t) => t.id === tab.id);
+      if (existing) {
+        return prev.map((t) => (t.id === tab.id ? { ...t, ...tab, preview: existing.preview && preview } : t));
+      }
+      // single-click navigation reuses the current preview tab (spec §3.3)
+      const withoutPreview = preview ? prev.filter((t) => !t.preview) : prev;
+      return [...withoutPreview, { ...tab, preview }];
+    });
+    setActiveTabId(tab.id);
+  }, []);
+
+  const pinTab = useCallback((id: string) => {
+    setTabs((prev) => prev.map((t) => (t.id === id ? { ...t, preview: false } : t)));
+  }, []);
+
+  const closeTab = useCallback((id: string) => {
+    setTabs((prev) => {
+      const next = prev.filter((t) => t.id !== id);
+      setActiveTabId((current) => {
+        if (current !== id) return current;
+        const idx = prev.findIndex((t) => t.id === id);
+        const fallback = next[idx] ?? next[idx - 1] ?? next[next.length - 1];
+        return fallback?.id ?? null;
+      });
+      return next;
+    });
+  }, []);
+
+  const closeOtherTabs = useCallback((id: string) => {
+    setTabs((prev) => prev.filter((t) => t.id === id));
+    setActiveTabId(id);
+  }, []);
+
+  const toggleExplorer = useCallback(() => setExplorerOpen((v) => !v), []);
+  const toggleAgent = useCallback(() => setAgentOpen((v) => !v), []);
+  const toggleBottom = useCallback(() => setBottomOpen((v) => !v), []);
+  const toggleBottomMaximized = useCallback(() => setBottomMaximized((v) => !v), []);
+
+  const openBottom = useCallback((tab: BottomPanelTab) => {
+    setBottomTab(tab);
+    setBottomOpen(true);
+  }, []);
+
+  const pushToast = useCallback((message: string) => {
+    const id = `toast_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+    setToasts((prev) => [...prev, { id, message }]);
+    window.setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 3200);
+  }, []);
+
+  const registerAgentInput = useCallback((el: HTMLTextAreaElement | null) => {
+    agentInputRef.current = el;
+  }, []);
+
+  const focusAgentInput = useCallback(() => {
+    setAgentOpen(true);
+    window.setTimeout(() => agentInputRef.current?.focus(), 40);
+  }, []);
+
+  const agentDrawer = viewport === 'narrow' || viewport === 'monitor';
+
+  const value = useMemo<WorkbenchValue>(
+    () => ({
+      sizes,
+      setPanelSize,
+      resetPanelSize,
+      explorerOpen,
+      toggleExplorer,
+      agentOpen,
+      toggleAgent,
+      agentDrawer,
+      bottomOpen,
+      toggleBottom,
+      bottomMaximized,
+      toggleBottomMaximized,
+      bottomTab,
+      setBottomTab,
+      openBottom,
+      rail,
+      setRail,
+      tabs,
+      activeTabId,
+      openTab,
+      pinTab,
+      closeTab,
+      closeOtherTabs,
+      selection,
+      setSelection,
+      pageKind,
+      setPageKind,
+      agentDraft,
+      setAgentDraft,
+      focusAgentInput,
+      registerAgentInput,
+      paletteOpen,
+      setPaletteOpen,
+      toasts,
+      pushToast,
+      developerMode,
+      setDeveloperMode,
+      viewport,
+    }),
+    [
+      sizes, setPanelSize, resetPanelSize,
+      explorerOpen, toggleExplorer,
+      agentOpen, toggleAgent, agentDrawer,
+      bottomOpen, toggleBottom, bottomMaximized, toggleBottomMaximized, bottomTab, openBottom,
+      rail, tabs, activeTabId, openTab, pinTab, closeTab, closeOtherTabs,
+      selection, pageKind, agentDraft, focusAgentInput, registerAgentInput,
+      paletteOpen, toasts, pushToast, developerMode, viewport,
+    ],
+  );
+
+  return <WorkbenchContext.Provider value={value}>{children}</WorkbenchContext.Provider>;
+}
+
+/**
+ * Registers the page with the workbench: opens/focuses its editor tab, syncs the
+ * agent page-kind and clears stale selection when the page changes.
+ */
+export function usePageRegistration(opts: {
+  id: string;
+  title: string;
+  href: string;
+  pageKind: PageKind;
+  live?: boolean;
+  stale?: boolean;
+}) {
+  const { openTab, setPageKind, setSelection } = useWorkbench();
+  const { id, title, href, pageKind, live, stale } = opts;
+
+  useEffect(() => {
+    openTab({ id, title, href, pageKind, live, stale });
+    setPageKind(pageKind);
+    setSelection(null);
+  }, [id, title, href, pageKind, live, stale, openTab, setPageKind, setSelection]);
+}

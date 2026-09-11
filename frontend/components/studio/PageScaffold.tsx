@@ -1,0 +1,78 @@
+'use client';
+
+/**
+ * Page scaffold used by every workbench page.
+ *
+ * Registers the page with the shell (opens/focuses its editor tab, sets the
+ * Context Agent page kind, clears stale selection) and renders the standard
+ * page header. Pages supply their own body.
+ */
+import { useSearchParams } from 'next/navigation';
+import type { ReactNode } from 'react';
+import { PageHeader } from './primitives';
+import { metaForSegment } from '@/lib/studio/nav';
+import { usePageRegistration } from '@/lib/studio/workbench';
+import { PROJECT, agentBySlug } from '@/lib/studio/mock/core';
+
+export function useStudioPage(segment: string) {
+  const searchParams = useSearchParams();
+  const agentSlug = searchParams.get('agent') ?? PROJECT.agents[0].slug;
+  const agent = agentBySlug(agentSlug);
+  const meta = metaForSegment(segment);
+  return { agent, agentSlug, meta, project: PROJECT, searchParams };
+}
+
+export function StudioPage({
+  segment,
+  title,
+  subtitle,
+  badges,
+  actions,
+  banners,
+  children,
+  live,
+  stale,
+  /** Full-bleed pages (canvas, split views) skip the padded content column. */
+  bleed,
+}: {
+  segment: string;
+  title?: string;
+  subtitle?: string;
+  badges?: ReactNode;
+  actions?: ReactNode;
+  banners?: ReactNode;
+  children: ReactNode;
+  live?: boolean;
+  stale?: boolean;
+  bleed?: boolean;
+}) {
+  const searchParams = useSearchParams();
+  const agentSlug = searchParams.get('agent') ?? PROJECT.agents[0].slug;
+  const meta = metaForSegment(segment);
+
+  usePageRegistration({
+    id: `${segment}:${agentSlug}`,
+    title: meta.tabTitle,
+    href: `/projects/${PROJECT.id}/${segment}?agent=${agentSlug}`,
+    pageKind: meta.pageKind,
+    live,
+    stale,
+  });
+
+  if (bleed) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
+        {banners ? <div style={{ padding: '12px 16px 0' }}>{banners}</div> : null}
+        {children}
+      </div>
+    );
+  }
+
+  return (
+    <div className="cl-page-pad">
+      {banners}
+      <PageHeader title={title ?? meta.title} subtitle={subtitle ?? meta.purpose} badges={badges} actions={actions} />
+      {children}
+    </div>
+  );
+}
