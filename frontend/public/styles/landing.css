@@ -217,7 +217,22 @@
    spacer's scroll height, so the section no longer occupies the page.
    ========================================================================== */
 .scene-tunnel,
-.scene-woman {
+.scene-woman,
+/* Everything between the pendulum and the closing CTA. The page now runs
+   hero -> the four argument sections -> pendulum -> build -> footer.
+
+   Hidden, never removed: the engine holds most of these by querySelector and
+   dereferences the result immediately (.the-balance, .cycle__wrapper,
+   .solution__hero, .drop-cans__svg, .typog__words), so a null throws and takes
+   the whole 3D runtime with it. Hiding also drops their scroll height, so they
+   no longer lengthen the page. */
+.drop-cans,
+.scene-phone-before,
+.scene-phone,
+.the-balance,
+.scene-lamp,
+.cycle,
+.solution {
   display: none;
 }
 
@@ -294,3 +309,9 @@
 .cl-pend-mark--chain  { width: 46%; }
 .cl-pend-mark--ens    { width: 58%; }
 .cl-pend-mark--ledger { width: 66%; }
+
+/* All three pendulum balls take the white ground the middle one had, so the
+   marks sit on a consistent disc rather than one floating on the page colour. */
+.pendulum__ball__img {
+  background-color: var(--white);
+}
