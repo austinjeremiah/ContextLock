@@ -47,19 +47,21 @@ Dialogs (§31): standard · security (current → requested → network → reso
 consequence) · emergency (ordered steps + typed confirmation) · destructive
 (type the resource name).
 
-## 🔄 Phase FE-3 — Build & Design *(in progress: 2 of 5)*
+## ✅ Phase FE-3 — Build & Design
 
-| Page | Spec | Status |
+Commits `d2420c3`, `<this commit>`.
+
+| Page | Spec | What landed |
 |---|---|---|
-| Composer / Build | §10 | ✅ prompt editor w/ autosave + `/limits` `/protocol` `/data` `/forbid` helpers, DRAFT-labelled requirement parser, live build timeline, Examples / Import / Cancel / Resume |
-| Organization / Agents | §11 | ✅ principal tree, agent detail, `EXECUTION: NONE` for reporting agents, shared-policy CRITICAL blocker, revoke via security confirmation |
-| Blueprint | §12 | ⬜ next |
-| Architecture | §13 | ⬜ |
-| Permissions & Security | §14 | ⬜ |
+| Composer / Build | §10 | Prompt editor with autosave and `/limits` `/protocol` `/data` `/forbid` helpers; parser output held at **DRAFT** until a deterministic artifact exists and a missing ceiling held at **REQUIRED** rather than invented; live build timeline whose stages open the matching bottom panel; Examples / Import Requirements / Cancel Build / Resume Build |
+| Organization / Agents | §11 | Principal tree + agent detail; `EXECUTION: NONE` for reporting-only agents; blocking **CRITICAL — shared policy principal** check; Add / Duplicate as New Agent / Open Blueprint / Architecture / Policy / Revoke (security confirmation stating sibling + capability impact) / Remove Draft |
+| Blueprint | §12 | All 19 canonical sections; editing opens a **draft revision** and never mutates the live one; left-edge change markers; **AUTHORITY EXPANSION** call-outs with the concrete consequence; grouped validation panel with click-to-focus-field; revision comparison listing expansions first plus what goes stale; Raw JSON / Copy / Export; publish action is **Create Revision**, not Save |
+| Architecture | §13 | React Flow canvas, 14 node categories, labelled edges (READ / CONTEXT / TRIGGER / POLICY / AUTHORIZATION / EXECUTE / ESCALATE); **live overlay reuses the same graph**; 7 layer toggles; node inspector opens **inside the center pane** with navigation only — no destructive controls; accessible alternate node list; Fit / Zoom / Lock / Layers / Live Overlay / Export SVG |
+| Permissions & Security | §14 | Posture summary; three-column **ALLOW / ESCALATE / DENY** matrix with per-rule policy refs and proof links; 7 constraint panels (capability bindings, recipients, expiry/nonce, data trust, confidentiality, identity, org aggregate); authority-increase review; Open Policy / Compare / Run boundary simulations / Export / Create policy revision. Deliberately offers **no** enable/disable control |
 
 ## ⬜ Remaining phases
 
-- **FE-4 — Test surfaces:** Simulation Center (§15), Reality Lab (§16), Attack Lab (§17)
+- **FE-4 — Test surfaces:** Simulation Center (§15), Reality Lab (§16), Attack Lab (§17) ← **next**
 - **FE-5 — Engineering:** Code / Monaco (§18), Integrations & Data Sources (§19)
 - **FE-6 — Deployment:** Preflight, cost estimate, deployment progress (§20) — wallet connect lands here
 - **FE-7 — Live operations:** Overview (§21), Activity (§22), Policies (§23), Runtime (§24), Control Plane (§25), Chainlink CRE (§26), Identity/ENS (§27)
