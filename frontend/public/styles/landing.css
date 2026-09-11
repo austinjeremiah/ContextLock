@@ -194,3 +194,15 @@
 .cursor-insight {
   display: none !important;
 }
+
+/* The rotating duration picker that used to sit under "Minimum duration:".
+   With the Chainlink mark in the centre the two overlap, and the ring only
+   needs to say one thing.
+
+   Hidden rather than removed: the engine holds .stats__stats__ul and
+   .stats__stats__number by query and animates them, so the nodes must stay.
+   The ring keeps its size from .stats_stats__pattern, which carries its own
+   width and aspect-ratio, so nothing collapses. */
+.stats__stats__ul {
+  display: none;
+}
