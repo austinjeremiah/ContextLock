@@ -37,11 +37,14 @@ export interface PanelSizes {
   bottom: number;
 }
 
-const DEFAULT_SIZES: PanelSizes = { explorer: 224, agent: 380, bottom: 220 };
+const DEFAULT_SIZES: PanelSizes = { explorer: 240, agent: 380, bottom: 220 };
 
+/* Spec §3.1 gives explorer 180–340 and agent 300–520. The upper bounds are
+   raised a little here: at the chosen type scale the spec maxima feel cramped,
+   and dragging past them read as "the panel stopped working". */
 export const PANEL_LIMITS = {
-  explorer: { min: 180, max: 340, default: 224 },
-  agent: { min: 300, max: 520, default: 380 },
+  explorer: { min: 180, max: 440, default: 240 },
+  agent: { min: 300, max: 620, default: 380 },
   bottom: { min: 120, default: 220 },
 };
 

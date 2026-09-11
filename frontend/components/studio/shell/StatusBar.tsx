@@ -13,6 +13,17 @@ import { useWorkbench } from '@/lib/studio/workbench';
 import type { CreMode, Environment, Freshness, Status } from '@/lib/studio/types';
 import { CRE_MODE_LABEL, statusTone } from '../primitives';
 
+/** Verdict hues re-tuned for the navy chrome bar. */
+const CHROME_DOT: Record<string, string> = {
+  pass: '#4ac68a',
+  warn: '#e8b055',
+  deny: '#f5776d',
+  sim: '#b79cf7',
+  data: '#63c3de',
+  blocked: '#bcc2d4',
+  neutral: '#fef1d0',
+};
+
 export function StatusBar({
   projectId,
   agentSlug,
@@ -55,7 +66,9 @@ export function StatusBar({
       {tone ? (
         <span
           className="cl-badge-dot"
-          style={{ background: `var(--cl-${tone})`, boxShadow: '0 0 0 1px rgba(254,241,208,0.35)' }}
+          /* Light-end hues: the cream-ground verdict palette is too dark to read
+             against the navy status bar. */
+          style={{ background: CHROME_DOT[tone] ?? 'var(--cl-ink-inv)' }}
           aria-hidden
         />
       ) : null}

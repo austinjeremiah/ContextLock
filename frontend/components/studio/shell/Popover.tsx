@@ -51,6 +51,9 @@ export function Popover({
             overflowY: 'auto',
             zIndex: 320,
             background: 'var(--cl-panel)',
+            /* The popover often renders inside a chrome bar, which carries
+               inverted ink. Re-assert panel ink so descendants inherit it. */
+            color: 'var(--cl-ink)',
             border: '1px solid var(--cl-ink)',
             boxShadow: '0 16px 40px rgba(1, 13, 110, 0.24)',
             padding: 4,

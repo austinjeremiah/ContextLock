@@ -11,6 +11,13 @@
    and never uses rem internally.
    ========================================================================== */
 
+/* The landing page sets html { font-size: calc(100vw / 1920 * 10) }, so 1rem is
+   ~7.5px at 1440px wide. The workbench itself is all px, but third-party CSS
+   rendered into portals (RainbowKit's wallet modal) sizes itself in rem and
+   would come out at roughly half scale. Pin a sane root size on pages that host
+   the workbench; the landing page has no .cl-studio and keeps its fluid scale. */
+html:has(.cl-studio) { font-size: 16px; }
+
 .cl-studio {
   /* --- surfaces (cream family) ------------------------------------------- */
   --cl-canvas: #fef1d0;          /* var(--soft) — main workspace ground      */
@@ -95,10 +102,13 @@
   overflow: visible;
 }
 
-.cl-studio button,
-.cl-studio input,
-.cl-studio select,
-.cl-studio textarea {
+/* All element resets use :where() so they sit at .cl-studio specificity (0,1,0)
+   and lose to every component class declared below. Without this a plain
+   `.cl-studio button { color: inherit }` (0,1,1) outranks .cl-btn-primary,
+   .cl-rail-btn and .cl-palette-item, and every button silently inherits its
+   parent's colour instead of its own — cream text on cream menus, blue icons on
+   the blue rail. */
+.cl-studio :where(button, input, select, textarea) {
   font: inherit;
   color: inherit;
   background: transparent;
@@ -106,9 +116,9 @@
   margin: 0;
 }
 
-.cl-studio img { width: auto; height: auto; object-fit: initial; }
-.cl-studio ul, .cl-studio ol { list-style: none; margin: 0; padding: 0; }
-.cl-studio a { color: inherit; text-decoration: none; }
+.cl-studio :where(img) { width: auto; height: auto; object-fit: initial; }
+.cl-studio :where(ul, ol) { list-style: none; margin: 0; padding: 0; }
+.cl-studio :where(a) { color: inherit; text-decoration: none; }
 
 /* webflow.css applies browser-reset typography to bare elements (h1 at 38px,
    headings bold with 20px top margin, label bold + block, ul/ol padded, dd
@@ -169,7 +179,13 @@
   border-bottom: 1px solid var(--cl-line-chrome);
   user-select: none;
 }
-.cl-titlebar * { color: var(--cl-ink-inv); }
+/* Chrome bars carry inverted ink. Colour is inherited rather than forced onto
+   every descendant with `*`, so surfaces rendered inside the bar — popovers,
+   menus, dialogs — can set their own ink and have their children follow. */
+.cl-chrome-bar {
+  background: var(--cl-chrome);
+  color: var(--cl-ink-inv);
+}
 .cl-titlebar-mark {
   font-family: var(--serif);
   font-size: 17px;
@@ -227,6 +243,7 @@
   transition: background 0.15s ease, border-color 0.15s ease;
 }
 .cl-cmd-field:hover { background: rgba(254, 241, 208, 0.14); }
+.cl-cmd-field input::placeholder { color: currentColor; opacity: 0.62; }
 .cl-cmd-kbd {
   margin-left: auto;
   font-size: 10px;
@@ -267,7 +284,7 @@
   height: 44px;
   display: grid;
   place-items: center;
-  color: rgba(254, 241, 208, 0.62);
+  color: rgba(254, 241, 208, 0.78);
   cursor: pointer;
   transition: color 0.15s ease, background 0.15s ease;
 }
@@ -292,6 +309,8 @@
 /* --- left explorer -------------------------------------------------------- */
 .cl-explorer {
   display: flex;
+  flex: 1 1 auto;
+  width: 100%;
   flex-direction: column;
   min-width: 0;
   background: var(--cl-panel);
@@ -387,7 +406,7 @@
 .cl-bottom-body { flex: 1 1 auto; min-height: 0; overflow: auto; padding: 8px 12px 14px; }
 
 /* --- right agent sidebar -------------------------------------------------- */
-.cl-agent { display: flex; flex-direction: column; min-width: 0; min-height: 0; background: var(--cl-panel); border-left: 1px solid var(--cl-line); }
+.cl-agent { display: flex; flex: 1 1 auto; width: 100%; flex-direction: column; min-width: 0; min-height: 0; background: var(--cl-panel); border-left: 1px solid var(--cl-line); }
 .cl-agent-head { flex: 0 0 auto; padding: 8px 10px; border-bottom: 1px solid var(--cl-line); }
 .cl-agent-head-row { display: flex; align-items: center; gap: 6px; }
 .cl-agent-title { flex: 1 1 auto; font-family: var(--medium); font-size: 13.5px; }
@@ -415,7 +434,7 @@
   user-select: none;
 }
 .cl-statusbar::-webkit-scrollbar { height: 0; }
-.cl-statusbar * { color: var(--cl-ink-inv); }
+
 .cl-status-item {
   display: inline-flex; align-items: center; gap: 5px;
   height: 100%; padding: 0 10px; white-space: nowrap; cursor: pointer;
@@ -470,6 +489,18 @@ body.cl-resizing-v, body.cl-resizing-v * { cursor: row-resize !important; user-s
 }
 .cl-btn-emergency:hover:not(:disabled) { background: #8c1a14; border-color: #8c1a14; }
 
+/* Primary action sitting on a chrome bar: inverted so it reads against navy. */
+.cl-btn-invert {
+  background: var(--cl-canvas);
+  border-color: var(--cl-canvas);
+  color: var(--cl-chrome);
+}
+.cl-btn-invert:hover:not(:disabled) {
+  background: #fff;
+  border-color: #fff;
+  color: var(--cl-chrome);
+}
+
 .cl-btn-ghost { background: transparent; border-color: transparent; }
 .cl-btn-ghost:hover:not(:disabled) { background: rgba(0, 66, 175, 0.08); border-color: var(--cl-line); }
 
@@ -515,6 +546,55 @@ body.cl-resizing-v, body.cl-resizing-v * { cursor: row-resize !important; user-s
     transition-duration: 0.001ms !important;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Badges on chrome.
+
+   The verdict palette is tuned for the cream ground, so #9a6300 amber or
+   #14714a green sitting on the navy title/status bar is close to unreadable.
+   On chrome, badges switch to outline form with the light end of each hue.
+   Meaning is unchanged — every badge still carries its text label.
+   --------------------------------------------------------------------------- */
+.cl-titlebar .cl-badge,
+.cl-statusbar .cl-badge,
+.cl-chrome-bar .cl-badge {
+  background: transparent;
+  border-color: currentColor;
+}
+.cl-titlebar .cl-badge[data-tone="pass"],
+.cl-statusbar .cl-badge[data-tone="pass"],
+.cl-chrome-bar .cl-badge[data-tone="pass"] { color: #4ac68a; }
+.cl-titlebar .cl-badge[data-tone="warn"],
+.cl-statusbar .cl-badge[data-tone="warn"],
+.cl-chrome-bar .cl-badge[data-tone="warn"] { color: #e8b055; }
+.cl-titlebar .cl-badge[data-tone="deny"],
+.cl-statusbar .cl-badge[data-tone="deny"],
+.cl-chrome-bar .cl-badge[data-tone="deny"] { color: #f5776d; }
+.cl-titlebar .cl-badge[data-tone="sim"],
+.cl-statusbar .cl-badge[data-tone="sim"],
+.cl-chrome-bar .cl-badge[data-tone="sim"] { color: #b79cf7; }
+.cl-titlebar .cl-badge[data-tone="data"],
+.cl-statusbar .cl-badge[data-tone="data"],
+.cl-chrome-bar .cl-badge[data-tone="data"] { color: #63c3de; }
+.cl-titlebar .cl-badge[data-tone="blocked"],
+.cl-statusbar .cl-badge[data-tone="blocked"],
+.cl-chrome-bar .cl-badge[data-tone="blocked"] { color: #bcc2d4; }
+.cl-titlebar .cl-badge[data-tone="neutral"],
+.cl-statusbar .cl-badge[data-tone="neutral"],
+.cl-chrome-bar .cl-badge[data-tone="neutral"] { color: var(--cl-ink-inv); }
+
+/* A popover rendered inside a chrome bar is a cream panel, so badges within it
+   must keep the normal light-ground palette rather than the chrome variant. */
+[role="menu"] .cl-badge[data-tone="pass"]    { color: var(--cl-pass);    background: var(--cl-pass-bg);    border-color: currentColor; }
+[role="menu"] .cl-badge[data-tone="warn"]    { color: var(--cl-warn);    background: var(--cl-warn-bg);    border-color: currentColor; }
+[role="menu"] .cl-badge[data-tone="deny"]    { color: var(--cl-deny);    background: var(--cl-deny-bg);    border-color: currentColor; }
+[role="menu"] .cl-badge[data-tone="sim"]     { color: var(--cl-sim);     background: var(--cl-sim-bg);     border-color: currentColor; }
+[role="menu"] .cl-badge[data-tone="data"]    { color: var(--cl-data);    background: var(--cl-data-bg);    border-color: currentColor; }
+[role="menu"] .cl-badge[data-tone="blocked"] { color: var(--cl-blocked); background: var(--cl-blocked-bg); border-color: currentColor; }
+[role="menu"] .cl-badge[data-tone="neutral"] { color: var(--cl-ink-2);   background: rgba(0, 66, 175, 0.07); border-color: currentColor; }
+
+/* Status-bar state dots use the same light hues. */
+.cl-statusbar .cl-badge-dot { box-shadow: 0 0 0 1px rgba(254, 241, 208, 0.3); }
 
 /* ============================================================================
    Surfaces: cards, sections, tables, key-value grids
@@ -738,7 +818,7 @@ body.cl-resizing-v, body.cl-resizing-v * { cursor: row-resize !important; user-s
   border: 1px solid var(--cl-line-chrome);
   animation: cl-rise 0.16s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.cl-toast * { color: var(--cl-ink-inv); }
+
 
 /* command palette (doc §4.5) */
 .cl-palette-backdrop { position: fixed; inset: 0; z-index: 450; display: flex; justify-content: center; padding-top: 12vh; background: rgba(1, 13, 110, 0.34); backdrop-filter: blur(2px); animation: cl-fade 0.12s ease-out; }
@@ -791,4 +871,99 @@ body.cl-resizing-v, body.cl-resizing-v * { cursor: row-resize !important; user-s
   .cl-matrix, .cl-grid-2, .cl-grid-3, .cl-grid-4 { grid-template-columns: minmax(0, 1fr); }
   .cl-split { flex-direction: column; }
   .cl-split-side { flex: 0 0 auto; max-height: 42vh; border-right: none; border-bottom: 1px solid var(--cl-line); }
+}
+
+/* ============================================================================
+   Dark editor theme
+   ----------------------------------------------------------------------------
+   The Code surface is the one place the product genuinely is a code editor, so
+   it flips to a dark ground the way an IDE does. This is a token swap only —
+   every component keeps its exact structure, spacing and semantics, and the
+   verdict palette keeps the same meanings, just re-tuned for a dark ground.
+   ========================================================================== */
+.cl-studio .cl-theme-dark,
+.cl-studio.cl-theme-dark {
+  --cl-canvas: #0c1020;
+  --cl-panel: #131829;
+  --cl-panel-2: #171d31;
+  --cl-raised: #1c2338;
+  --cl-chrome: #080b16;
+  --cl-chrome-2: #121829;
+
+  --cl-ink: #dfe6f5;
+  --cl-ink-2: #a8b6d8;
+  --cl-ink-3: #6f7fa6;
+  --cl-ink-inv: #dfe6f5;
+  --cl-accent: #4589f7;
+
+  --cl-line: rgba(159, 183, 232, 0.16);
+  --cl-line-strong: rgba(159, 183, 232, 0.3);
+  --cl-line-chrome: rgba(159, 183, 232, 0.16);
+
+  --cl-pass: #4ac68a;
+  --cl-pass-bg: rgba(74, 198, 138, 0.14);
+  --cl-warn: #e0a33a;
+  --cl-warn-bg: rgba(224, 163, 58, 0.15);
+  --cl-deny: #f0645a;
+  --cl-deny-bg: rgba(240, 100, 90, 0.15);
+  --cl-sim: #a98bf5;
+  --cl-sim-bg: rgba(169, 139, 245, 0.15);
+  --cl-data: #49b6d6;
+  --cl-data-bg: rgba(73, 182, 214, 0.15);
+  --cl-blocked: #8b93a8;
+  --cl-blocked-bg: rgba(139, 147, 168, 0.16);
+
+  color: var(--cl-ink);
+  background: var(--cl-canvas);
+}
+
+/* Serif display text is set in the light cream face; on the dark ground it
+   needs a touch more weight to hold its colour. */
+.cl-theme-dark .cl-page-title,
+.cl-theme-dark .cl-empty-title,
+.cl-theme-dark .cl-modal-title { color: var(--cl-ink); }
+
+.cl-theme-dark .cl-btn-primary {
+  background: var(--cl-accent);
+  border-color: var(--cl-accent);
+  color: #06101f;
+}
+.cl-theme-dark .cl-btn-primary:hover:not(:disabled) {
+  background: #6ba3f9;
+  border-color: #6ba3f9;
+  color: #06101f;
+}
+.cl-theme-dark .cl-skeleton {
+  background: linear-gradient(90deg, rgba(159,183,232,0.07) 25%, rgba(159,183,232,0.14) 37%, rgba(159,183,232,0.07) 63%);
+  background-size: 400% 100%;
+}
+.cl-theme-dark ::-webkit-scrollbar-thumb { background: rgba(159, 183, 232, 0.24); background-clip: padding-box; }
+.cl-theme-dark * { scrollbar-color: rgba(159, 183, 232, 0.28) transparent; }
+
+/* ---------------------------------------------------------------------------
+   Entering the dark surface.
+
+   The landing page's "Enter Site" flood is owned by the Three.js engine, so it
+   cannot be reused directly. This is the same gesture in plain CSS: a deep-blue
+   wipe sweeps across and lifts, revealing the dark editor underneath. Purely
+   decorative, so it is skipped entirely under reduced motion.
+   --------------------------------------------------------------------------- */
+.cl-theme-wipe {
+  position: absolute;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  background: linear-gradient(100deg, var(--dark-blue, #010d6e) 0%, #06101f 55%, #0c1020 100%);
+  transform-origin: left center;
+  animation: cl-wipe 720ms cubic-bezier(0.76, 0, 0.24, 1) forwards;
+}
+
+@keyframes cl-wipe {
+  0%   { clip-path: inset(0 100% 0 0); opacity: 1; }
+  45%  { clip-path: inset(0 0 0 0);    opacity: 1; }
+  100% { clip-path: inset(0 0 0 0);    opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cl-theme-wipe { animation: none; display: none; }
 }

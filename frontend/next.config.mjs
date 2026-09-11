@@ -14,6 +14,15 @@ const nextConfig = {
       }),
     );
 
+    // @metamask/sdk ships one bundle for web and React Native and imports the
+    // RN async-storage package unconditionally. In a browser build that code
+    // path is never taken, so point it at false rather than installing a React
+    // Native dependency into a Next.js app.
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@react-native-async-storage/async-storage': false,
+    };
+
     config.externals = config.externals || [];
     if (Array.isArray(config.externals)) {
       config.externals.push('pino-pretty', 'lokijs', 'encoding');

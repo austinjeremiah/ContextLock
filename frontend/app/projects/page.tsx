@@ -51,38 +51,35 @@ export default function ProjectsHome() {
     <div className="cl-studio" style={{ minHeight: '100vh', background: 'var(--cl-canvas)' }}>
       {/* top area */}
       <header
-        className="cl-row"
+        className="cl-row cl-chrome-bar"
         style={{
           height: 56,
           padding: '0 22px',
-          borderBottom: '1px solid var(--cl-line)',
-          background: 'var(--cl-chrome)',
+          borderBottom: '1px solid var(--cl-line-chrome)',
           gap: 14,
         }}
       >
-        <span style={{ fontFamily: 'var(--serif)', fontSize: 17, color: 'var(--cl-ink-inv)', letterSpacing: '-0.3px' }}>
-          ContextLock Studio
-        </span>
+        <span style={{ fontFamily: 'var(--serif)', fontSize: 18, letterSpacing: '-0.3px' }}>ContextLock Studio</span>
         <span className="cl-env-badge" title="Production-chain execution is disabled across all projects.">
           <span>TESTNET LAB</span>
         </span>
         <span className="cl-spacer" />
         <div className="cl-cmd-field" style={{ width: 300 }}>
-          <Search size={13} aria-hidden style={{ color: 'var(--cl-ink-inv)' }} />
+          <Search size={14} aria-hidden />
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search projects"
             aria-label="Search projects"
-            style={{ flex: 1, background: 'transparent', border: 'none', outline: 'none', color: 'var(--cl-ink-inv)', fontSize: 12 }}
+            style={{ flex: 1, background: 'transparent', border: 'none', outline: 'none', fontSize: 13 }}
           />
         </div>
-        <button type="button" className="cl-btn cl-btn-primary" onClick={() => setNewOpen(true)}>
+        <button type="button" className="cl-btn cl-btn-invert" onClick={() => setNewOpen(true)}>
           <Plus size={13} aria-hidden />
           New Agent
         </button>
         <button type="button" className="cl-icon-btn" aria-label="Account menu" title="operator@treasury">
-          <User size={15} aria-hidden />
+          <User size={16} aria-hidden />
         </button>
       </header>
 
