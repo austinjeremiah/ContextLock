@@ -49,7 +49,8 @@ consequence) · emergency (ordered steps + typed confirmation) · destructive
 
 ## ✅ Phase FE-3 — Build & Design
 
-Commits `d2420c3`, `<this commit>`.
+Commits `d2420c3` (Composer, Organization) and `da8a652` (Blueprint,
+Architecture, Permissions).
 
 | Page | Spec | What landed |
 |---|---|---|
