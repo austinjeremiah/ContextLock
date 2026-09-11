@@ -1376,25 +1376,25 @@ export default function PageBody() {
           <div className="stats__lines-decor" />
           <div data-anima="texts" className="stats__text">
             <div className="stats__text__serif">
-              <div className="title_serif" aria-label="Rebooting">
+              <div className="title_serif" aria-label="Verifying">
                 <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    R
+                    V
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                     e
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    b
+                    r
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    o
+                    i
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    o
+                    f
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    t
+                    y
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                     i
@@ -1409,7 +1409,7 @@ export default function PageBody() {
               </div>
             </div>
             <div className="stats__text__sans">
-              <div className="title_sans" aria-label="The system.">
+              <div className="title_sans" aria-label="The inputs.">
                 <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                     T
@@ -1423,22 +1423,22 @@ export default function PageBody() {
                 </div>
                 <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    s
+                    i
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    y
+                    n
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    s
+                    p
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    u
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                     t
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    e
-                  </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    m
+                    s
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                     .
@@ -1448,7 +1448,7 @@ export default function PageBody() {
             </div>
             <div data-anima="parag" className="stats__text__parag">
               <p className="small-parag" style={{ "opacity": "1" } as React.CSSProperties}>
-                Every night, our brain runs a silent update.It clears cache, rewires creative connections, and reorganizes memories — much like a designer tidying up layers or a developer refactoring messy code.
+                An agent is only ever as sound as what it acted on. Chainlink Data Feeds supply a verified oracle round with a freshness window attached, and the workflow runs inside Chainlink CRE — so a decision rests on evidence anyone can re-check later, not on whatever the model last happened to read.
               </p>
             </div>
           </div>
