@@ -178,7 +178,7 @@ export default function SimulationPage() {
     >
       <div className="cl-split" style={{ borderTop: '1px solid var(--cl-line)' }}>
         {/* scenario list */}
-        <div className="cl-split-side" style={{ flex: '0 0 320px' }}>
+        <div className="cl-split-side" data-lenis-prevent style={{ flex: '0 0 320px' }}>
           {grouped.map((group) => (
             <div key={group.id}>
               <div className="cl-explorer-group" style={{ paddingTop: 12 }}>

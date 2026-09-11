@@ -255,7 +255,7 @@ export function ContextAgentSidebar({
       </div>
 
       {/* conversation */}
-      <div className="cl-agent-scroll" ref={scrollRef}>
+      <div className="cl-agent-scroll" ref={scrollRef} data-lenis-prevent>
         {messages.length === 0 ? (
           <div>
             <p className="cl-meta" style={{ marginBottom: 10 }}>

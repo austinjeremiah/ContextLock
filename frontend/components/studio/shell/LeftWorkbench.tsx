@@ -126,7 +126,8 @@ export function ProjectExplorer({
         </button>
       </div>
 
-      <div className="cl-explorer-scroll">
+      {/* native scroll: Lenis drives the centre pane only */}
+      <div className="cl-explorer-scroll" data-lenis-prevent>
         {groups.map((group) => (
           <div key={group.id}>
             <div className="cl-explorer-group">

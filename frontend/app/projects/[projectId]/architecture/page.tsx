@@ -302,7 +302,9 @@ function ArchitectureCanvas() {
         ) : null}
 
         {/* canvas */}
-        <div style={{ flex: '1 1 auto', minWidth: 0, position: 'relative' }}>
+        {/* React Flow handles its own wheel events for zoom; Lenis must not
+            smooth them or the canvas stops responding to the wheel. */}
+        <div data-lenis-prevent style={{ flex: '1 1 auto', minWidth: 0, position: 'relative' }}>
           <ReactFlow
             nodes={nodes}
             edges={edges}

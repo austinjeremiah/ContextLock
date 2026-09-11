@@ -419,6 +419,12 @@ html:has(.cl-studio) { font-size: 16px; }
 .cl-tab-live { width: 7px; height: 7px; border-radius: 50%; background: var(--cl-pass); box-shadow: 0 0 0 2px var(--cl-pass-bg); }
 
 .cl-page { position: relative; flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; }
+
+/* Lenis needs a content element inside its scroll wrapper. It must still let a
+   full-bleed page (canvas, split view) fill the pane, so it is a flex column
+   whose child grows rather than an auto-height div. */
+.cl-page-content { display: flex; flex-direction: column; min-height: 100%; }
+.cl-page-content > * { flex: 1 1 auto; min-width: 0; }
 .cl-page-pad { padding: 24px 28px 48px; max-width: 1280px; }
 .cl-page-head { display: flex; align-items: flex-start; gap: 16px; padding-bottom: 14px; margin-bottom: 18px; border-bottom: 1px solid var(--cl-line); }
 .cl-page-head-main { flex: 1 1 auto; min-width: 0; }
@@ -941,23 +947,25 @@ body.cl-resizing-v, body.cl-resizing-v * { cursor: row-resize !important; user-s
    ========================================================================== */
 .cl-studio .cl-theme-dark,
 .cl-studio.cl-theme-dark {
-  --cl-canvas: #0c1020;
-  --cl-panel: #131829;
-  --cl-panel-2: #171d31;
-  --cl-raised: #1c2338;
-  --cl-chrome: #080b16;
-  --cl-chrome-2: #121829;
+  /* Jet black ground with the panels lifted just enough to separate — the
+     editor reads near-neutral, not navy. */
+  --cl-canvas: #090909;
+  --cl-panel: #121213;
+  --cl-panel-2: #171718;
+  --cl-raised: #1e1e20;
+  --cl-chrome: #0c0c0d;
+  --cl-chrome-2: #17171a;
 
-  --cl-ink: #dfe6f5;
-  --cl-ink-2: #a8b6d8;
-  --cl-ink-3: #6f7fa6;
-  --cl-ink-inv: #dfe6f5;
+  --cl-ink: #e4e4e7;
+  --cl-ink-2: #a9a9b2;
+  --cl-ink-3: #74747f;
+  --cl-ink-inv: #e4e4e7;
   --cl-accent: #4589f7;
 
-  --cl-line: rgba(159, 183, 232, 0.16);
-  --cl-line-strong: rgba(159, 183, 232, 0.3);
-  --cl-line-chrome: rgba(159, 183, 232, 0.16);
-  --cl-canvas-dot: rgba(159, 183, 232, 0.22);
+  --cl-line: rgba(225, 225, 235, 0.11);
+  --cl-line-strong: rgba(225, 225, 235, 0.2);
+  --cl-line-chrome: rgba(225, 225, 235, 0.1);
+  --cl-canvas-dot: rgba(225, 225, 235, 0.14);
 
   --cl-pass: #4ac68a;
   --cl-pass-bg: rgba(74, 198, 138, 0.14);
@@ -993,11 +1001,11 @@ body.cl-resizing-v, body.cl-resizing-v * { cursor: row-resize !important; user-s
   color: #06101f;
 }
 .cl-theme-dark .cl-skeleton {
-  background: linear-gradient(90deg, rgba(159,183,232,0.07) 25%, rgba(159,183,232,0.14) 37%, rgba(159,183,232,0.07) 63%);
+  background: linear-gradient(90deg, rgba(225,225,235,0.06) 25%, rgba(225,225,235,0.12) 37%, rgba(225,225,235,0.06) 63%);
   background-size: 400% 100%;
 }
-.cl-theme-dark ::-webkit-scrollbar-thumb { background: rgba(159, 183, 232, 0.24); background-clip: padding-box; }
-.cl-theme-dark * { scrollbar-color: rgba(159, 183, 232, 0.28) transparent; }
+.cl-theme-dark ::-webkit-scrollbar-thumb { background: rgba(225, 225, 235, 0.2); background-clip: padding-box; }
+.cl-theme-dark * { scrollbar-color: rgba(225, 225, 235, 0.24) transparent; }
 
 /* ============================================================================
    Output log
@@ -1119,3 +1127,37 @@ body.cl-resizing-v, body.cl-resizing-v * { cursor: row-resize !important; user-s
 
 /* The terminal tab is already midnight; drop its own ground so it inherits. */
 .cl-bottom.cl-console .cl-terminal { background: transparent; }
+
+/* ============================================================================
+   Theme transition
+   ----------------------------------------------------------------------------
+   Moving between the cream workbench and the dark editor swaps every token at
+   once, which snaps. The shell enables this class for the length of the change
+   so the whole interface cross-fades instead.
+
+   It is applied only while the theme is changing: leaving these transitions on
+   permanently would make hover and focus feel sluggish, since they animate the
+   same properties.
+   ========================================================================== */
+.cl-theme-shift,
+.cl-theme-shift *:not(svg):not(path) {
+  transition:
+    background-color 480ms cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 480ms cubic-bezier(0.4, 0, 0.2, 1),
+    color 420ms cubic-bezier(0.4, 0, 0.2, 1),
+    fill 420ms cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 480ms cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cl-theme-shift,
+  .cl-theme-shift *:not(svg):not(path) {
+    transition: none !important;
+  }
+}
+
+/* The console keeps its own ground, so it must not cross-fade with the shell. */
+.cl-theme-shift .cl-bottom.cl-console,
+.cl-theme-shift .cl-bottom.cl-console * {
+  transition: none !important;
+}

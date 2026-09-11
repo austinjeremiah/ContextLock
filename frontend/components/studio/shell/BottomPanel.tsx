@@ -132,7 +132,7 @@ export function BottomPanel({ projectId, events }: { projectId: string; events: 
         </button>
       </div>
 
-      <div className="cl-bottom-body" ref={scrollRef}>
+      <div className="cl-bottom-body" ref={scrollRef} data-lenis-prevent>
         {bottomTab === 'problems' ? (
           PROBLEMS.length === 0 ? (
             <p className="cl-meta">No validation problems, blockers or stale artifacts.</p>

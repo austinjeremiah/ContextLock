@@ -21,6 +21,7 @@ import { StatusBar } from './StatusBar';
 import { ContextAgentSidebar } from './ContextAgentSidebar';
 import { CommandPalette } from './CommandPalette';
 import { Modal } from '../dialogs';
+import { SmoothScroll } from '../SmoothScroll';
 import { PANEL_LIMITS, useWorkbench } from '@/lib/studio/workbench';
 import { useControlBridge } from '@/lib/studio/control-bridge';
 import { SEGMENT_TO_RAIL } from '@/lib/studio/nav';
@@ -137,8 +138,24 @@ export function Workbench({
      pane leaves the shell looking half-broken. */
   const darkSurface = segment === 'code';
 
+  /* Swapping every token at once snaps. Enable the cross-fade only while the
+     theme is actually changing: leaving it on would make hover feel sluggish,
+     since it animates the same properties. */
+  const [themeShifting, setThemeShifting] = useState(false);
+  const previousDark = useRef(darkSurface);
+
+  useEffect(() => {
+    if (previousDark.current === darkSurface) return;
+    previousDark.current = darkSurface;
+    setThemeShifting(true);
+    const handle = window.setTimeout(() => setThemeShifting(false), 520);
+    return () => window.clearTimeout(handle);
+  }, [darkSurface]);
+
   return (
-    <div className={`cl-studio cl-shell${darkSurface ? ' cl-theme-dark' : ''}`}>
+    <div
+      className={`cl-studio cl-shell${darkSurface ? ' cl-theme-dark' : ''}${themeShifting ? ' cl-theme-shift' : ''}`}
+    >
       <TitleBar
         project={project}
         projects={projects}
@@ -193,7 +210,9 @@ export function Workbench({
         {/* center workspace */}
         <div className="cl-center" ref={centerRef}>
           <EditorTabBar />
-          {!bottomMaximized ? <div className="cl-page">{children}</div> : null}
+          {!bottomMaximized ? (
+            <SmoothScroll className="cl-page">{children}</SmoothScroll>
+          ) : null}
           {bottomOpen ? (
             <>
               {!bottomMaximized ? (

@@ -13,6 +13,7 @@
     "@rainbow-me/rainbowkit": "^2.2.11",
     "@tanstack/react-query": "^5.102.8",
     "@xyflow/react": "^12.11.6",
+    "lenis": "^1.3.26",
     "lucide-react": "^1.44.0",
     "next": "15.1.6",
     "react": "19.0.0",

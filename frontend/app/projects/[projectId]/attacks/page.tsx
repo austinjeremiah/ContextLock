@@ -154,7 +154,7 @@ export default function AttackLabPage() {
 
       <div className="cl-split" style={{ borderTop: '1px solid var(--cl-line)' }}>
         {/* catalog */}
-        <div className="cl-split-side" style={{ flex: '0 0 330px' }}>
+        <div className="cl-split-side" data-lenis-prevent style={{ flex: '0 0 330px' }}>
           {grouped.map((category) => (
             <div key={category.id}>
               <div className="cl-explorer-group" style={{ paddingTop: 12 }}>
