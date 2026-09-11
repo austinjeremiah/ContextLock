@@ -32,14 +32,51 @@
    back by half keeps the pair optically centred at every size. */
 .hero__title__h1 { margin-right: calc(clamp(0.7rem, 3vw, 3rem) * -0.5); }
 
+
+/* ============================================================================
+   Word spacing in split headings
+   ----------------------------------------------------------------------------
+   Every animated heading is exploded one <div> per letter, grouped one
+   .js-words per word. In JSX, whitespace between elements on separate lines is
+   stripped, so the scrape lost every word break and the page rendered
+   "SLEEPISNTALUXURY". The original CSS never spaced them because in the live
+   site the split happened at runtime, where the text nodes still carried their
+   spaces.
+
+   A margin on each word after the first restores the gap, scales with the type
+   because it is in em, and does not disturb the per-letter animation.
+   ========================================================================== */
+.js-words + .js-words { margin-left: 0.3em; }
+
+/* Uppercase eyebrows already carry wide letter-spacing, so the same em gap
+   reads as too tight against it. */
+.subtitle__text .js-words + .js-words { margin-left: 0.55em; }
+
+/* ============================================================================
+   Display face for the hero wordmark
+   ========================================================================== */
+@font-face {
+  font-family: "Security Company";
+  src: url("/fonts/Security%20Company.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  /* swap: the wordmark is the first thing painted, so showing it in the
+     fallback beats holding the hero blank while a 735KB face downloads. */
+  font-display: swap;
+}
+
+.hero__title__h1 {
+  font-family: "Security Company", Editorial, Georgia, serif;
+}
+
 /* --- hero call to action -------------------------------------------------- */
 .cl-hero-cta {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 14px;
-  margin-top: 2.4rem;
+  gap: 18px;
+  margin-top: clamp(2.6rem, 6vh, 5rem);
 }
 
 .cl-hero-cta__primary,
@@ -47,9 +84,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.95em 2.1em;
+  padding: 1.05em 2.6em;
   border-radius: 999px;
-  font-size: 1.05rem;
+  font-size: clamp(1.05rem, 1.35vw, 1.45rem);
   letter-spacing: 0.01em;
   text-decoration: none;
   white-space: nowrap;
@@ -92,7 +129,7 @@
 /* The hero is centred and vertically tight on short screens; the CTA gives up
    its top margin first rather than pushing the scroll cue off-screen. */
 @media (max-height: 760px) {
-  .cl-hero-cta { margin-top: 1.5rem; }
+  .cl-hero-cta { margin-top: 1.8rem; }
 }
 
 @media (max-width: 600px) {
@@ -113,13 +150,29 @@
 }
 
 /* --- Chainlink mark inside the stats ring ---------------------------------
-   Sized against the ring rather than in fixed pixels, so it keeps its
-   proportion to the circle at every breakpoint. */
+   The label this replaces was dragged into the ring by two negative offsets
+   tuned to a single line of 1.9rem text (margin-top -4.5rem on the wrapper,
+   top -5.3rem on the paragraph). A block with different dimensions inherits
+   that maths and lands nowhere near the centre — which is exactly what
+   happened: the mark rendered roughly 10rem below the ring.
+
+   .stats__stats is the ring container and is already position:relative, so the
+   wrapper is centred against it directly and the mark's own height stops
+   mattering. */
+.stats__stats__minimum {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
 .cl-stats-mark {
   display: block;
-  width: clamp(64px, 9vw, 132px);
+  width: clamp(110px, 15vw, 250px);
   height: auto;
-  margin: 0 auto;
 }
 
 /* --- retired audio affordances --------------------------------------------
