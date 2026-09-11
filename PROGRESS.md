@@ -92,20 +92,30 @@ Attack applicability is derived from the agent's execution class, so a
 reporting-only principal is not shown green results for attacks that could never
 have run against it.
 
-## ⬜ Remaining phases — 5 phases plus landing polish
+## ✅ Phase FE-5 — Engineering surfaces
+
+| Page | Spec | What landed |
+|---|---|---|
+| Code | §18 | Monaco editor, dynamically imported so it stays out of every other route's graph, themed from the workbench's own dark tokens; file tree across all seven groups with `GENERATED` / `TEMPLATE` / `MODIFIED` / `STALE` / `LOCKED` marks; **generated code is read-only after a successful build** so the artifact still corresponds to its Blueprint; developer mode may open a draft, which marks the file MODIFIED, raises a banner and states that revalidation and a rebuild are required — a hand edit is never invisible to Blueprint validation; Monaco Diff for revision compare; per-file provenance linking to the Blueprint section that generated it and the test that covers it; Rebuild from Blueprint / Run tests / Open Problems / Compare revision / Download project / Copy / Copy path / Download |
+| Integrations & Data Sources | §19 | Four tabs (Adapters, Data Sources, Credentials, Custom/OpenAPI); adapter table with id, version, type, network role, capabilities, trust class, status, lifecycle and used-by, opening an inspector with full provenance; **credential values are never displayed** — only name, scope, storage boundary, status, last verified and what uses them, with the existing value replaceable but never readable; an unavailable source names exactly what is missing and states that nothing of lower trust is substituted; OpenAPI import pinned to a single allowed host, generating an adapter at trust class UNVERIFIED; Add Integration / Import OpenAPI / Configure credential / Rotate / Test connection / View provenance / Run conformance tests / Disable adapter |
+
+Trust class is treated as a property of the source throughout: a Blueprint that
+requires a verified oracle will not accept an indexed source in its place, and
+no control on this page can raise a source's trust class.
+
+## ⬜ Remaining phases — 4 phases plus landing polish
 
 | Phase | Scope | Pages |
 |---|---|---|
-| **FE-5** ← next | Engineering | Code / Monaco editor + file tree + diff (§18), Integrations & Data Sources (§19) |
-| **FE-6** | Deployment | Preflight, cost estimate, deployment progress (§20) — **wallet connect lands here** |
+| **FE-6** ← next | Deployment | Preflight, cost estimate, deployment progress (§20) — **wallet connect lands here** |
 | **FE-7** | Live operations | Overview (§21), Activity (§22), Policies (§23), Runtime (§24), Control Plane (§25), Chainlink CRE (§26), Identity/ENS (§27) |
 | **FE-8** | Context Agent | page context envelopes, selections and proposed patches across every page (§39) |
 | **FE-9** | Output + polish | Safety Reports (§28), Settings (§29), a11y (§45), responsive monitoring mode (§46) |
 | **Landing** | Polish pass | last, by explicit decision |
 
-**Current page count:** 11 built (Projects, New project, Composer, Organization,
-Blueprint, Architecture, Permissions, Simulation, Reality Lab, Attack Lab, Code
-shell) · 12 navigable but not yet built, each rendering the shared
+**Current page count:** 13 built (Projects, New project, Composer, Organization,
+Blueprint, Architecture, Permissions, Simulation, Reality Lab, Attack Lab, Code,
+Integrations) · 10 navigable but not yet built, each rendering the shared
 `PendingSurface`.
 
 ---

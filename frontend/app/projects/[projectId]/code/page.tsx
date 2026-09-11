@@ -4,54 +4,399 @@
  * Code (spec §18).
  *
  * The generated sandbox files behind the agent. This is the one surface that is
- * genuinely a code editor, so the workbench flips to its dark theme here — the
- * shell applies it for this route.
+ * genuinely a code editor, so the workbench runs its dark theme here.
+ *
+ * Editing rules the page enforces:
+ *  - Generated code is read-only after a successful build, so the built artifact
+ *    still corresponds to the Blueprint that produced it.
+ *  - Developer mode may open a draft, but a hand edit marks the file MODIFIED,
+ *    invalidates artifact correspondence, and requires a rebuild before deploy.
+ *    A manual edit is never invisible to Blueprint validation.
  */
+import { useMemo, useState } from 'react';
+import dynamic from 'next/dynamic';
+import { useRouter, useSearchParams } from 'next/navigation';
+import {
+  Columns2,
+  Copy,
+  Download,
+  FileWarning,
+  GitCompare,
+  Hammer,
+  Lock,
+  Play,
+  TriangleAlert,
+} from 'lucide-react';
 import { StudioPage } from '@/components/studio/PageScaffold';
-import { Badge, Card, EmptyState, Section } from '@/components/studio/primitives';
+import { Badge, BlockerBanner, StatusBadge } from '@/components/studio/primitives';
+import { StandardConfirmation } from '@/components/studio/dialogs';
+import { useWorkbench } from '@/lib/studio/workbench';
+import { PROJECT } from '@/lib/studio/mock/core';
+import { BUILD_REVISION, CODE_FILES, CODE_GROUPS, CODE_MARK_LABEL } from '@/lib/studio/mock/engineering';
+import type { CodeFile } from '@/lib/studio/types';
+
+/* Monaco is heavy and browser-only: keep it off every other route's graph. */
+const CodeEditor = dynamic(() => import('@/components/studio/code/CodeEditor').then((m) => m.CodeEditor), {
+  ssr: false,
+  loading: () => <EditorSkeleton />,
+});
+const CodeDiff = dynamic(() => import('@/components/studio/code/CodeEditor').then((m) => m.CodeDiff), {
+  ssr: false,
+  loading: () => <EditorSkeleton />,
+});
 
 export default function CodePage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { developerMode, openBottom, setSelection, pushToast } = useWorkbench();
+
+  const agentSlug = searchParams.get('agent') ?? PROJECT.agents[0].slug;
+  const blueprintRevision = PROJECT.revisions.blueprint ?? 0;
+  const buildIsStale = BUILD_REVISION < blueprintRevision;
+
+  const [selectedPath, setSelectedPath] = useState(CODE_FILES[0].path);
+  const [mode, setMode] = useState<'edit' | 'diff'>('edit');
+  const [drafts, setDrafts] = useState<Record<string, string>>({});
+  const [unlockOpen, setUnlockOpen] = useState(false);
+  const [unlocked, setUnlocked] = useState<string[]>([]);
+
+  const file = CODE_FILES.find((f) => f.path === selectedPath) ?? CODE_FILES[0];
+  const draft = drafts[file.path];
+  const isModified = draft !== undefined && draft !== file.content;
+  const isUnlocked = unlocked.includes(file.path);
+  const readOnly = file.readOnly && !isUnlocked;
+
+  const grouped = useMemo(
+    () =>
+      CODE_GROUPS.map((group) => ({
+        ...group,
+        files: CODE_FILES.filter((f) => f.group === group.id),
+      })).filter((g) => g.files.length > 0),
+    [],
+  );
+
+  const select = (next: CodeFile) => {
+    setSelectedPath(next.path);
+    setMode('edit');
+    setSelection({ kind: 'code-file', id: next.path, label: next.name });
+  };
+
+  const marksFor = (f: CodeFile) => (isModifiedFile(f) ? [...f.marks, 'modified' as const] : f.marks);
+  const isModifiedFile = (f: CodeFile) => drafts[f.path] !== undefined && drafts[f.path] !== f.content;
+
   return (
     <StudioPage
       segment="code"
-      stale
-      badges={
+      bleed
+      stale={buildIsStale}
+      banners={
         <>
-          <Badge tone="neutral">Build r7</Badge>
-          <Badge tone="warn">STALE · Blueprint is r8</Badge>
-          <Badge tone="blocked">Read-only</Badge>
-        </>
-      }
-      actions={
-        <>
-          <button type="button" className="cl-btn">
-            Rebuild from Blueprint
-          </button>
-          <button type="button" className="cl-btn">
-            Run tests
-          </button>
-          <button type="button" className="cl-btn">
-            Compare revision
-          </button>
-          <button type="button" className="cl-btn cl-btn-primary">
-            Download project
-          </button>
+          <div className="cl-row cl-row-wrap" style={{ marginBottom: 12, gap: 8 }}>
+            <span className="cl-page-title" style={{ fontSize: 22, marginRight: 8 }}>
+              Code
+            </span>
+            <Badge tone="neutral">Build r{BUILD_REVISION}</Badge>
+            {buildIsStale ? <Badge tone="warn">STALE · Blueprint is r{blueprintRevision}</Badge> : null}
+            <Badge tone="neutral">{CODE_FILES.length} files</Badge>
+            <span className="cl-spacer" />
+            <div className="cl-btn-group">
+              <button
+                type="button"
+                className="cl-btn cl-btn-sm"
+                onClick={() => pushToast(`Rebuilding from Blueprint r${blueprintRevision}`)}
+              >
+                <Hammer size={11} aria-hidden />
+                Rebuild from Blueprint
+              </button>
+              <button type="button" className="cl-btn cl-btn-sm" onClick={() => openBottom('tests')}>
+                <Play size={11} aria-hidden />
+                Run tests
+              </button>
+              <button type="button" className="cl-btn cl-btn-sm" onClick={() => openBottom('problems')}>
+                <FileWarning size={11} aria-hidden />
+                Open Problems
+              </button>
+              <button
+                type="button"
+                className="cl-btn cl-btn-sm"
+                onClick={() => setMode((m) => (m === 'diff' ? 'edit' : 'diff'))}
+                aria-pressed={mode === 'diff'}
+                disabled={!file.previousContent}
+                title={file.previousContent ? 'Compare with the previous revision' : 'No earlier revision of this file'}
+              >
+                <GitCompare size={11} aria-hidden />
+                Compare revision
+              </button>
+              <button type="button" className="cl-btn cl-btn-sm cl-btn-primary" onClick={() => pushToast('Project archive prepared')}>
+                <Download size={11} aria-hidden />
+                Download project
+              </button>
+            </div>
+          </div>
+
+          {Object.keys(drafts).some((p) => isModifiedFile(CODE_FILES.find((f) => f.path === p)!)) ? (
+            <div style={{ padding: '0 16px 12px' }}>
+              <BlockerBanner
+                tone="warn"
+                title="Generated code has been edited by hand"
+                actions={
+                  <button
+                    type="button"
+                    className="cl-btn cl-btn-sm"
+                    onClick={() => pushToast(`Rebuilding from Blueprint r${blueprintRevision}`)}
+                  >
+                    Rebuild from Blueprint
+                  </button>
+                }
+              >
+                The build no longer corresponds to the Blueprint that produced it. Revalidation and a rebuild are
+                required before this agent can be deployed — a manual edit is never invisible to Blueprint validation.
+              </BlockerBanner>
+            </div>
+          ) : null}
         </>
       }
     >
-      <Section label="Generated files">
-        <Card>
-          <EmptyState
-            title="No file selected"
-            body="Generated code is read-only after a successful build, so the built artifact still corresponds to the Blueprint that produced it. Select a file to read it, or rebuild from the Blueprint to bring the build up to r8."
-            action={
-              <button type="button" className="cl-btn cl-btn-primary">
-                Rebuild from Blueprint
+      <div className="cl-split" style={{ borderTop: '1px solid var(--cl-line)' }}>
+        {/* file tree */}
+        <div className="cl-split-side" data-lenis-prevent style={{ flex: '0 0 268px' }}>
+          {grouped.map((group) => (
+            <div key={group.id}>
+              <div className="cl-explorer-group" style={{ paddingTop: 12 }}>
+                <span className="cl-label">{group.label}</span>
+              </div>
+              <ul>
+                {group.files.map((f) => (
+                  <li key={f.path}>
+                    <button
+                      type="button"
+                      className="cl-nav-item"
+                      data-active={f.path === selectedPath}
+                      onClick={() => select(f)}
+                      title={f.path}
+                    >
+                      <span className="cl-nav-item-label cl-mono" style={{ fontSize: 12.5 }}>
+                        {f.name}
+                      </span>
+                      {marksFor(f)
+                        .filter((m) => m === 'modified' || m === 'stale' || m === 'locked')
+                        .map((mark) => (
+                          <span
+                            key={mark}
+                            className="cl-badge"
+                            data-tone={CODE_MARK_LABEL[mark].tone}
+                            title={CODE_MARK_LABEL[mark].title}
+                            style={{ height: 16, padding: '0 5px', fontSize: 9 }}
+                          >
+                            {CODE_MARK_LABEL[mark].label}
+                          </span>
+                        ))}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+
+        {/* editor */}
+        <div className="cl-split-main" style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+          {/* toolbar */}
+          <div
+            className="cl-row cl-row-wrap"
+            style={{
+              gap: 8,
+              padding: '9px 14px',
+              borderBottom: '1px solid var(--cl-line)',
+              background: 'var(--cl-panel-2)',
+              flex: '0 0 auto',
+            }}
+          >
+            <span className="cl-mono" style={{ fontSize: 12.5 }}>
+              {file.path}
+            </span>
+            <Badge tone="neutral">{file.language}</Badge>
+            <Badge tone="neutral">r{file.revision}</Badge>
+            {readOnly ? (
+              <Badge tone="blocked" title="Generated code is read-only after a successful build">
+                Read-only
+              </Badge>
+            ) : (
+              <Badge tone="warn">Draft · editable</Badge>
+            )}
+            {isModified ? <Badge tone="warn">Modified</Badge> : null}
+            {file.marks
+              .filter((m) => m === 'generated' || m === 'template-owned' || m === 'stale')
+              .map((mark) => (
+                <Badge key={mark} tone={CODE_MARK_LABEL[mark].tone} title={CODE_MARK_LABEL[mark].title}>
+                  {CODE_MARK_LABEL[mark].label}
+                </Badge>
+              ))}
+
+            <span className="cl-spacer" />
+
+            <button
+              type="button"
+              className="cl-btn cl-btn-sm"
+              onClick={() => setMode((m) => (m === 'diff' ? 'edit' : 'diff'))}
+              aria-pressed={mode === 'diff'}
+              disabled={!file.previousContent}
+            >
+              <Columns2 size={11} aria-hidden />
+              Diff
+            </button>
+            <button
+              type="button"
+              className="cl-btn cl-btn-sm"
+              onClick={() => {
+                navigator.clipboard?.writeText(draft ?? file.content);
+                pushToast('File contents copied');
+              }}
+            >
+              <Copy size={11} aria-hidden />
+              Copy
+            </button>
+            <button
+              type="button"
+              className="cl-btn cl-btn-sm"
+              onClick={() => {
+                navigator.clipboard?.writeText(file.path);
+                pushToast('File path copied');
+              }}
+            >
+              Copy path
+            </button>
+            <button
+              type="button"
+              className="cl-btn cl-btn-sm"
+              onClick={() => {
+                const blob = new Blob([draft ?? file.content], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = file.name;
+                a.click();
+                URL.revokeObjectURL(url);
+                pushToast(`${file.name} downloaded`);
+              }}
+            >
+              <Download size={11} aria-hidden />
+              Download
+            </button>
+            {file.readOnly && !isUnlocked ? (
+              <button
+                type="button"
+                className="cl-btn cl-btn-sm"
+                onClick={() => setUnlockOpen(true)}
+                disabled={!developerMode}
+                title={
+                  developerMode
+                    ? 'Open a draft of this generated file'
+                    : 'Editing generated code requires developer mode'
+                }
+              >
+                <Lock size={11} aria-hidden />
+                Edit draft
               </button>
-            }
-          />
-        </Card>
-      </Section>
+            ) : null}
+          </div>
+
+          {/* blueprint provenance */}
+          {file.blueprintSection || file.coveredByTest ? (
+            <div
+              className="cl-row cl-row-wrap"
+              style={{ gap: 10, padding: '7px 14px', borderBottom: '1px solid var(--cl-line)', flex: '0 0 auto' }}
+            >
+              {file.blueprintSection ? (
+                <button
+                  type="button"
+                  className="cl-btn cl-btn-ghost cl-btn-sm"
+                  onClick={() => router.push(`/projects/${PROJECT.id}/blueprint?agent=${agentSlug}`)}
+                >
+                  Generated from Blueprint · {file.blueprintSection.replace(/-/g, ' ')}
+                </button>
+              ) : null}
+              {file.coveredByTest ? (
+                <button
+                  type="button"
+                  className="cl-btn cl-btn-ghost cl-btn-sm"
+                  onClick={() => {
+                    const test = CODE_FILES.find((f) => f.path === file.coveredByTest);
+                    if (test) select(test);
+                  }}
+                >
+                  Covered by {file.coveredByTest}
+                </button>
+              ) : null}
+            </div>
+          ) : null}
+
+          {/* editor surface */}
+          <div style={{ flex: '1 1 auto', minHeight: 0 }} data-lenis-prevent>
+            {mode === 'diff' && file.previousContent ? (
+              <CodeDiff original={file.previousContent} modified={draft ?? file.content} language={file.language} />
+            ) : (
+              <CodeEditor
+                value={draft ?? file.content}
+                language={file.language}
+                readOnly={readOnly}
+                onChange={(next) => setDrafts((prev) => ({ ...prev, [file.path]: next }))}
+              />
+            )}
+          </div>
+
+          {/* status strip */}
+          <div
+            className="cl-row"
+            style={{
+              gap: 10,
+              padding: '6px 14px',
+              borderTop: '1px solid var(--cl-line)',
+              flex: '0 0 auto',
+              fontSize: 12,
+            }}
+          >
+            {readOnly ? (
+              <span className="cl-meta">
+                Read-only. Generated code is locked after a successful build so the artifact still matches its
+                Blueprint.
+              </span>
+            ) : (
+              <span className="cl-row" style={{ gap: 7, color: 'var(--cl-warn)' }}>
+                <TriangleAlert size={12} aria-hidden />
+                Draft open. Saving invalidates artifact correspondence and requires a rebuild before deployment.
+              </span>
+            )}
+            <span className="cl-spacer" />
+            <StatusBadge status={buildIsStale ? 'STALE' : 'READY'} />
+          </div>
+        </div>
+      </div>
+
+      {/* unlock generated file */}
+      <StandardConfirmation
+        open={unlockOpen}
+        onClose={() => setUnlockOpen(false)}
+        onConfirm={() => {
+          setUnlocked((prev) => [...prev, file.path]);
+          setUnlockOpen(false);
+          pushToast(`${file.name} opened as a draft`);
+        }}
+        title="Edit generated code"
+        consequence="This file was generated from the Blueprint. Editing it by hand breaks the correspondence between the build and the Blueprint that produced it, so the agent cannot be deployed until it has been revalidated and rebuilt. The edit is recorded and shown in Problems — it is never invisible to validation."
+        resource={file.path}
+        actionLabel="Open draft"
+      />
     </StudioPage>
+  );
+}
+
+function EditorSkeleton() {
+  return (
+    <div style={{ padding: 16 }} className="cl-col">
+      {[92, 74, 86, 60, 78, 54].map((w, i) => (
+        <div key={i} className="cl-skeleton" style={{ height: 12, width: `${w}%` }} />
+      ))}
+    </div>
   );
 }
