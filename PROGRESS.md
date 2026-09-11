@@ -258,7 +258,8 @@ Never show a healthy or green state for something that does not exist yet.
 - `npm run dev` uses Turbopack; `npm run dev:webpack` is the fallback. After
   switching between them, `rm -rf .next` or the production build fails with
   `Cannot find module for page: /`.
-- **Never `rm -rf .next` while a dev server is running.** It deletes the running
+- **Never `rm -rf .next` — or run `npm run build` — while a dev server is
+  running.** Both write that directory. It deletes the running
   server's Turbopack runtime out from under it; the dev server then throws
   `Cannot find module '../chunks/ssr/[turbopack]_runtime.js'` and has to be
   restarted. Run `tsc --noEmit` to check work instead, or ask before clearing.
