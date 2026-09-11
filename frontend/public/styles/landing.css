@@ -206,3 +206,68 @@
 .stats__stats__ul {
   display: none;
 }
+
+/* ============================================================================
+   The stack, arriving out of the tunnel
+   ----------------------------------------------------------------------------
+   A flat overlay sitting on the engine's tunnel scene. Each mark runs one
+   keyframe on a stagger driven by --i: it starts tiny at the vanishing point,
+   grows toward the viewer and fades as it passes. Five marks sharing a 10s
+   loop means one arrives every two seconds.
+
+   pointer-events:none throughout — the scene underneath still owns the cursor.
+   ========================================================================== */
+.cl-tunnel {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.cl-tunnel__mark {
+  grid-area: 1 / 1;
+  width: clamp(90px, 11vw, 190px);
+  height: auto;
+  opacity: 0;
+  transform: scale(0.08);
+  will-change: transform, opacity;
+  animation: cl-tunnel-fly 10s cubic-bezier(0.55, 0, 0.85, 0.35) infinite;
+  animation-delay: calc(var(--i) * 2s);
+  filter: drop-shadow(0 0 22px rgba(10, 20, 80, 0.45));
+}
+
+/* Marks without a logo file ride the same path as type. */
+.cl-tunnel__word {
+  display: grid;
+  place-items: center;
+  width: auto;
+  white-space: nowrap;
+  font-family: var(--medium), system-ui, sans-serif;
+  font-size: clamp(1.6rem, 3.4vw, 3.4rem);
+  letter-spacing: 0.02em;
+  color: var(--soft, #fef1d0);
+}
+
+@keyframes cl-tunnel-fly {
+  0%   { opacity: 0;    transform: scale(0.08); }
+  8%   { opacity: 1;    transform: scale(0.22); }
+  60%  { opacity: 1;    transform: scale(1);    }
+  78%  { opacity: 0;    transform: scale(1.85); }
+  100% { opacity: 0;    transform: scale(2.4);  }
+}
+
+/* Decorative motion only: under reduced motion the marks simply sit still and
+   legible rather than flying. */
+@media (prefers-reduced-motion: reduce) {
+  .cl-tunnel { grid-auto-flow: column; gap: clamp(14px, 3vw, 42px); }
+  .cl-tunnel__mark {
+    grid-area: auto;
+    animation: none;
+    opacity: 0.9;
+    transform: none;
+    width: clamp(42px, 6vw, 78px);
+  }
+  .cl-tunnel__word { font-size: clamp(0.9rem, 1.5vw, 1.4rem); }
+}
