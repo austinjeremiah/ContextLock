@@ -19,8 +19,6 @@ import { useState, type ReactNode } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { WorkbenchProvider } from '@/lib/studio/workbench';
 import { ControlBridgeProvider } from '@/lib/studio/control-bridge';
-import { WalletSessionProvider } from '@/lib/studio/wallet-session';
-import { WalletProvider } from './wallet/WalletProvider';
 
 export function StudioProviders({ children }: { children: ReactNode }) {
   const [queryClient] = useState(
@@ -41,11 +39,9 @@ export function StudioProviders({ children }: { children: ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
       <WorkbenchProvider>
-        <ControlBridgeProvider>
-          <WalletSessionProvider>
-            <WalletProvider>{children}</WalletProvider>
-          </WalletSessionProvider>
-        </ControlBridgeProvider>
+        {/* The wallet session lives one level up, in app/projects/layout, so
+            the projects list and the workbench share a single connection. */}
+        <ControlBridgeProvider>{children}</ControlBridgeProvider>
       </WorkbenchProvider>
     </QueryClientProvider>
   );

@@ -191,7 +191,11 @@
    into them, so the nodes have to stay in the DOM. display:none also takes
    them out of the accessibility tree, so they are not announced either. */
 .trg-sound,
-.cursor-insight {
+.cursor-insight,
+/* The floating "THE NOTE" trigger. It opened the template author's personal
+   letter; the panel itself stays in the DOM because the engine binds to it,
+   but nothing reaches it any more. */
+.trg-note {
   display: none !important;
 }
 

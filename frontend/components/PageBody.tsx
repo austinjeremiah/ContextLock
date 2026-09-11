@@ -536,7 +536,7 @@ export default function PageBody() {
               sibling is safe.
             */}
             <div className="cl-hero-cta">
-              <a href="/projects" className="cl-hero-cta__primary">
+              <a href="/projects?connect=1" className="cl-hero-cta__primary">
                 Enter Studio
               </a>
               <a href="#introduction" className="cl-hero-cta__secondary">

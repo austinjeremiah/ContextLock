@@ -6,8 +6,8 @@
  * The one place to create or open a project before entering the IDE workbench.
  * Duplicate copies configuration but never active authority; Archive confirms.
  */
-import { useMemo, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Archive, Copy, Download, FolderOpen, Plus, Search, User } from 'lucide-react';
 import {
   Badge,
@@ -17,8 +17,35 @@ import {
 } from '@/components/studio/primitives';
 import { Modal, StandardConfirmation } from '@/components/studio/dialogs';
 import { NewProjectModal } from '@/components/studio/NewProjectModal';
+import { WalletChip } from '@/components/studio/wallet/WalletChip';
+import { useWalletSession } from '@/lib/studio/wallet-session';
 import { PROJECT_LIST, PROJECT_TEMPLATES } from '@/lib/studio/mock/core';
 import type { ProjectSummary } from '@/lib/studio/types';
+
+/**
+ * Opens the wallet modal once when arriving with ?connect=1.
+ *
+ * The landing's Enter Studio sends people here rather than connecting on the
+ * marketing page, which keeps roughly 7,000 modules of wallet stack off a page
+ * most visitors will only read. The connection is made at the threshold, and
+ * everything past it runs on that one session.
+ */
+function ConnectOnEntry() {
+  const params = useSearchParams();
+  const router = useRouter();
+  const { activated, requestConnect } = useWalletSession();
+  const fired = useRef(false);
+
+  useEffect(() => {
+    if (fired.current || params.get('connect') !== '1') return;
+    fired.current = true;
+    // Drop the flag so a refresh does not reopen the modal.
+    router.replace('/projects');
+    if (!activated) requestConnect();
+  }, [params, router, activated, requestConnect]);
+
+  return null;
+}
 
 export default function ProjectsHome() {
   const router = useRouter();
@@ -49,6 +76,11 @@ export default function ProjectsHome() {
 
   return (
     <div className="cl-studio" style={{ minHeight: '100vh', background: 'var(--cl-canvas)' }}>
+      {/* useSearchParams needs a suspense boundary; this renders nothing. */}
+      <Suspense fallback={null}>
+        <ConnectOnEntry />
+      </Suspense>
+
       {/* top area */}
       <header
         className="cl-row cl-chrome-bar"
@@ -73,6 +105,7 @@ export default function ProjectsHome() {
           <span>TESTNET LAB</span>
         </span>
         <span className="cl-spacer" />
+        <WalletChip />
         <div className="cl-cmd-field" style={{ width: 300 }}>
           <Search size={14} aria-hidden />
           <input
