@@ -209,14 +209,15 @@
 
 
 /* ============================================================================
-   Retired tunnel scene
+   Retired scenes
    ----------------------------------------------------------------------------
    display:none rather than removing the node: the engine reads
    querySelector(".scene-tunnel").previousElementSibling, and a null there
    throws and takes the whole 3D runtime with it. Hiding also collapses the
    spacer's scroll height, so the section no longer occupies the page.
    ========================================================================== */
-.scene-tunnel {
+.scene-tunnel,
+.scene-woman {
   display: none;
 }
 
