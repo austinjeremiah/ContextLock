@@ -86,7 +86,7 @@ export default function ProjectsHome() {
         </button>
       </header>
 
-      <main style={{ maxWidth: 1240, margin: '0 auto', padding: '26px 22px 60px' }}>
+      <main style={{ maxWidth: 1320, margin: '0 auto', padding: '30px 24px 64px' }}>
         <div className="cl-row" style={{ alignItems: 'flex-end', marginBottom: 20 }}>
           <div>
             <h1 style={{ fontFamily: 'var(--serif)', fontSize: 30, letterSpacing: '-0.6px', lineHeight: 1.15 }}>
@@ -111,20 +111,20 @@ export default function ProjectsHome() {
               <span className="cl-meta">{items.length} project{items.length === 1 ? '' : 's'}</span>
             </div>
 
-            <div className="cl-card cl-card-body-flush">
+            <div className="cl-card">
               <div className="cl-table-scroll">
-                <table className="cl-table">
+                <table className="cl-table" style={{ minWidth: 940 }}>
                   <thead>
                     <tr>
-                      <th>Project</th>
-                      <th style={{ width: 80 }}>Agents</th>
-                      <th style={{ width: 110 }}>State</th>
-                      <th style={{ width: 110 }}>Last revision</th>
-                      <th style={{ width: 150 }}>Execution network</th>
-                      <th style={{ width: 170 }}>CRE mode</th>
-                      <th style={{ width: 120 }}>Last updated</th>
-                      <th style={{ width: 90 }}>Alerts</th>
-                      <th style={{ width: 250 }} />
+                      <th style={{ minWidth: 230 }}>Project</th>
+                      <th style={{ width: 62 }}>Agents</th>
+                      <th style={{ width: 96 }}>State</th>
+                      <th style={{ width: 86 }}>Revision</th>
+                      <th style={{ width: 140 }}>Execution</th>
+                      <th style={{ width: 128 }}>CRE mode</th>
+                      <th style={{ width: 92 }}>Updated</th>
+                      <th style={{ width: 78 }}>Alerts</th>
+                      <th style={{ width: 216 }} />
                     </tr>
                   </thead>
                   <tbody>

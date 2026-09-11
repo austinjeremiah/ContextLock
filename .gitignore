@@ -5,10 +5,16 @@ node_modules/
 .yarn/install-state.gz
 
 # Next.js
+# NOTE: these are anchored to the repo/app root on purpose. An unanchored
+# "build/" would also match app route segments such as
+# app/projects/[projectId]/build/ and silently drop real source files.
 .next/
-out/
-build/
-dist/
+/out/
+/frontend/out/
+/build/
+/frontend/build/
+/dist/
+/frontend/dist/
 
 # Production
 *.tsbuildinfo
@@ -29,7 +35,8 @@ pnpm-debug.log*
 *.log
 
 # Testing
-coverage/
+/coverage/
+/frontend/coverage/
 
 # Caches
 .turbo/
