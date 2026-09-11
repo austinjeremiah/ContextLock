@@ -164,6 +164,11 @@ html:has(.cl-studio) { font-size: 16px; }
   inset: 0;
   display: grid;
   grid-template-rows: var(--cl-titlebar-h) 1fr var(--cl-statusbar-h);
+  /* Explicit column. Without it the implicit column is `auto`, which sizes to
+     the widest row's max-content — and every title-bar item is nowrap and
+     non-shrinking, so the bar would widen the whole shell past the viewport and
+     push the agent sidebar off screen. */
+  grid-template-columns: minmax(0, 1fr);
   overflow: hidden;
   background: var(--cl-canvas);
 }
@@ -181,6 +186,10 @@ html:has(.cl-studio) { font-size: 16px; }
   color: var(--cl-ink-inv);
   border-bottom: 1px solid var(--cl-line-chrome);
   user-select: none;
+  /* Last line of defence: the bar clips its own contents rather than forcing
+     the shell wider. */
+  min-width: 0;
+  overflow: hidden;
 }
 /* Chrome bars carry inverted ink. Colour is inherited rather than forced onto
    every descendant with `*`, so surfaces rendered inside the bar — popovers,
@@ -196,7 +205,8 @@ html:has(.cl-studio) { font-size: 16px; }
   padding-right: 6px;
   white-space: nowrap;
 }
-.cl-titlebar-spacer { flex: 1 1 auto; min-width: 8px; }
+.cl-titlebar-spacer { flex: 1 1 auto; min-width: 4px; }
+.cl-titlebar > * { flex-shrink: 0; }
 
 .cl-chip {
   display: inline-flex;
@@ -268,7 +278,9 @@ html:has(.cl-studio) { font-size: 16px; }
   display: flex;
   align-items: center;
   gap: 8px;
-  width: clamp(200px, 26vw, 420px);
+  flex: 0 1 auto;
+  width: clamp(150px, 20vw, 380px);
+  min-width: 110px;
   height: 29px;
   padding: 0 11px;
   font-size: 13px;
@@ -1222,4 +1234,28 @@ body.cl-resizing-v, body.cl-resizing-v * { cursor: row-resize !important; user-s
   .cl-theme-shift .cl-card-head {
     transition: none;
   }
+}
+
+/* ---------------------------------------------------------------------------
+   Title bar under pressure
+
+   The bar carries a lot at full width. Rather than let it clip arbitrarily,
+   the least load-bearing parts stand down first: the build status label before
+   the revision labels, and the revision labels before the revision values.
+   --------------------------------------------------------------------------- */
+@media (max-width: 1500px) {
+  .cl-titlebar-build-label { display: none; }
+}
+
+@media (max-width: 1380px) {
+  .cl-rev-seg-label { display: none; }
+  .cl-rev-seg { padding: 0 8px; }
+}
+
+@media (max-width: 1220px) {
+  .cl-titlebar-mark { display: none; }
+}
+
+@media (max-width: 1100px) {
+  .cl-rev-chip .cl-rev-seg + .cl-rev-seg { display: none; }
 }

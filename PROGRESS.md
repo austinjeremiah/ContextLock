@@ -151,6 +151,18 @@ For the same reason, never colour a region with `.region * { color: … }`: it
 captures popovers and dialogs rendered inside that region. Set colour on the
 region and let it inherit, then re-assert it on any surface with its own ground.
 
+### A grid container needs its columns declared
+
+`.cl-shell` set `grid-template-rows` but no `grid-template-columns`. The implicit
+column is `auto`, which sizes to the widest row's **max-content** — so the title
+bar, whose every child is `white-space: nowrap` and non-shrinking, widened the
+entire shell past the viewport and pushed the agent sidebar off screen. It only
+looked fine at 90% browser zoom, where the extra CSS pixels hid it.
+
+Declare `grid-template-columns: minmax(0, 1fr)` on any fixed-size grid, and give
+dense bars `min-width: 0; overflow: hidden` so they clip themselves rather than
+resizing their container.
+
 ### A flex child must be told to fill its wrapper
 
 The shell sizes panels on a wrapper div. A panel that is only

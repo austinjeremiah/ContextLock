@@ -174,7 +174,9 @@ export function TitleBar({
         style={{ gap: 7 }}
       >
         <StatusBadge status={buildStatus.status} icon={false} />
-        {buildStatus.label}
+        {/* Label stands down first when the bar runs short of room; the badge
+            keeps the state visible. */}
+        <span className="cl-titlebar-build-label">{buildStatus.label}</span>
       </button>
 
       {/* blockers / alerts (spec §4) */}
