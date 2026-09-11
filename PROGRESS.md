@@ -14,7 +14,7 @@ Phases follow the spec's own build sequence (§52).
 
 ## ✅ Phase FE-1 — Workbench shell
 
-Commit `63ebe88`.
+Commit `3e4b1bd`.
 
 The persistent three-column IDE frame every page renders inside.
 
@@ -35,7 +35,7 @@ RainbowKit/wagmi **testnet-only** wallet config, route tree for all 21 pages.
 
 ## ✅ Phase FE-2 — Shared domain primitives
 
-Commit `63ebe88`.
+Commit `3e4b1bd`.
 
 `StatusBadge` · `VerdictBadge` · `FreshnessBadge` (§33) · `ReasonCode` with a
 deterministic code catalog (§35) · `BlockchainRef` that **never** emits a public
@@ -49,7 +49,7 @@ consequence) · emergency (ordered steps + typed confirmation) · destructive
 
 ## ✅ Phase FE-3 — Build & Design
 
-Commits `d2420c3` (Composer, Organization) and `da8a652` (Blueprint,
+Commits `0f2f8dc` (Composer, Organization) and `2de608f` (Blueprint,
 Architecture, Permissions).
 
 | Page | Spec | What landed |
