@@ -219,3 +219,20 @@
 .scene-tunnel {
   display: none;
 }
+
+/* ============================================================================
+   Body copy scale
+   ----------------------------------------------------------------------------
+   The template set these in fixed rem against its own longer paragraphs. With
+   the copy cut back there is room to read them at a size that matches the
+   display type around them, instead of a dense block in a narrow column.
+   ========================================================================== */
+.parag {
+  font-size: clamp(1.9rem, 1.55vw, 3.1rem);
+  line-height: 1.45;
+}
+
+.small-parag {
+  font-size: clamp(1.8rem, 1.45vw, 2.9rem);
+  line-height: 1.45;
+}

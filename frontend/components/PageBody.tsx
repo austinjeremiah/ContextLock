@@ -1417,7 +1417,7 @@ export default function PageBody() {
             </div>
             <div data-anima="parag" className="stats__text__parag">
               <p className="small-parag" style={{ "opacity": "1" } as React.CSSProperties}>
-                Every decision reads a verified Chainlink oracle round with a freshness window attached, and the workflow runs inside Chainlink CRE — so the inputs can be re-checked afterwards, not merely trusted.
+                Verified Chainlink rounds in. Chainlink CRE around the run. Inputs you can re-check, not just trust.
               </p>
             </div>
           </div>
@@ -1577,7 +1577,7 @@ export default function PageBody() {
               </div>
             </div>
             <p className="parag importance__text" style={{ "--mask": "linear-gradient(-15deg, transparent -50%, black 0%)" } as React.CSSProperties}>
-              Handing an agent a key promises speed, and removes the one place a mistake could be stopped. It hides the risk; it never bounds it.
+              A key promises speed and removes the one place a mistake could be stopped.
             </p>
           </div>
         </div>
@@ -1810,7 +1810,7 @@ export default function PageBody() {
                 </div>
               </div>
               <p className="parag importance__text" style={{ "--mask": "linear-gradient(-15deg, transparent -50%, black 0%)" } as React.CSSProperties}>
-                A per-action limit sets the tempo for everything downstream. Under it, the agent acts alone. Above it, the action escalates to a human instead of executing. Above the hard ceiling it is refused outright — whatever the market is doing, and whatever the model believes.
+                Under the limit, it acts. Over the limit, a human decides. Over the ceiling, it is refused — whatever the model believes.
               </p>
             </div>
             <div data-anima="parag" className="importance__bottom__right">
@@ -1881,11 +1881,10 @@ export default function PageBody() {
                 </div>
               </div>
               <p className="parag" style={{ "--mask": "linear-gradient(-15deg, transparent -50%, black 0%)" } as React.CSSProperties}>
-                A ceiling alone is not enough — it needs a window. Ten permitted actions of nine hundred dollars is nine thousand dollars, and every one of them passed the per-action check. A rolling budget is what stops correct decisions compounding into
+                Ten permitted actions of $900 is $9,000. Every one passed the per-action check.
                 <em>
-                  fight-or-flight
+                  A window is what stops correct decisions compounding.
                 </em>
-                even in darkness.
               </p>
             </div>
           </div>
@@ -2205,7 +2204,7 @@ export default function PageBody() {
                 </div>
               </div>
               <p className="parag" style={{ "--mask": "linear-gradient(-15deg, transparent -50%, black 0%)" } as React.CSSProperties}>
-                Builders share a trait: we grant access to move faster. One more scope, one more key, one more allowlisted address. Each grant is reasonable alone. Together they are the whole treasury.
+                One more scope. One more key. One more address. Each is reasonable alone — together they are the whole treasury.
               </p>
             </div>
             <div data-anima="parag" className="encounter__bottom__right">
@@ -2285,7 +2284,7 @@ export default function PageBody() {
                 </div>
               </div>
               <p className="parag" style={{ "--mask": "linear-gradient(-15deg, transparent -50%, black 0%)" } as React.CSSProperties}>
-                Over time, permission granted for convenience becomes permission nobody remembers granting. The agent can do far more than anyone intended. “We over-permission our agents. Then wonder why the funds move.”
+                Permission granted for convenience becomes permission nobody remembers granting. “We over-permission our agents. Then wonder why the funds move.”
               </p>
             </div>
           </div>
@@ -2541,7 +2540,7 @@ export default function PageBody() {
                 </div>
               </div>
               <p className="parag" style={{ "--mask": "linear-gradient(-15deg, transparent -50%, black 0%)" } as React.CSSProperties}>
-                Models were never built to be boundaries. Yet teams put the limit in the system prompt and hope the agent keeps reading it. Instructions are advice, and advice can be argued with. Anything that can be talked out of enforcing a rule was never enforcing it. Scope is the true control.
+                Models were never built to be boundaries. A limit in a system prompt is advice, and advice can be argued with. Anything that can be talked out of a rule was never enforcing it.
               </p>
             </div>
             <div data-anima="parag" className="encounter__bottom__right">
@@ -2602,7 +2601,7 @@ export default function PageBody() {
                 </div>
               </div>
               <p className="parag" style={{ "--mask": "linear-gradient(-15deg, transparent -50%, black 0%)" } as React.CSSProperties}>
-                Constraint isn’t the opposite of autonomy; it is what makes autonomy safe to grant. A narrow scope, an allowlist, a capability that expires — each is a statement your agent cannot argue with:
+                Constraint isn’t the opposite of autonomy — it is what makes autonomy safe to grant. A scope it cannot argue with:
                 <em>
                   Bound what it can do, and it no longer matters what it is told. Scope is the true control.
                 </em>
@@ -3474,7 +3473,7 @@ export default function PageBody() {
                 </div>
               </div>
               <p className="parag" style={{ "--mask": "linear-gradient(-15deg, transparent -50%, black 0%)" } as React.CSSProperties}>
-                Your agent listens to data. A stale price still parses, still looks reasonable, still returns a number. To the model, an hour ago looks like now.
+                A stale price still parses, still looks reasonable, still returns a number. To the model, an hour ago looks like now.
               </p>
             </div>
             <div data-anima="parag" className="cycle__bottom__left">
@@ -3560,7 +3559,7 @@ export default function PageBody() {
                 </div>
               </div>
               <p className="parag" style={{ "--mask": "linear-gradient(-15deg, transparent -50%, black 0%)" } as React.CSSProperties}>
-                That gap is where losses live — the window between what was true and what was read. Seconds of staleness can price a position at yesterday’s value.
+                That gap is where losses live. Seconds of staleness can price a position at yesterday’s value.
               </p>
             </div>
           </div>
@@ -3657,16 +3656,16 @@ export default function PageBody() {
                 </div>
               </div>
               <p className="parag" style={{ "--mask": "linear-gradient(-15deg, transparent -50%, black 0%)" } as React.CSSProperties}>
-                Every source — oracle, index, cache — carries its own claim to truth.
+                Every source carries its own claim to truth.
                 <br />
-                Warm light tells the body:
+                A verified round says:
                 <em>
-                  Rest is near.
+                  This was true at this block.
                   <br />
                 </em>
-                Cold light says
+                An indexed guess says
                 <em>
-                  : Stay awake.
+                  : probably, recently.
                 </em>
               </p>
             </div>
@@ -3762,7 +3761,7 @@ export default function PageBody() {
                 </div>
               </div>
               <p className="parag" style={{ "--mask": "linear-gradient(-15deg, transparent -50%, black 0%)" } as React.CSSProperties}>
-                When a feed drifts, the agent acts on the wrong number confidently, and the transaction settles exactly as instructed.
+                When a feed drifts, the agent acts on the wrong number — confidently, and exactly as instructed.
               </p>
             </div>
           </div>
@@ -4500,7 +4499,7 @@ export default function PageBody() {
                 </div>
               </div>
               <p className="parag" style={{ "--mask": "linear-gradient(-15deg, transparent -50%, black 0%)" } as React.CSSProperties}>
-                A condition is met and the run begins. A health factor crosses a threshold, a schedule fires, a price moves. Nothing has been decided yet, and nothing can move.
+                A health factor crosses a threshold. Nothing is decided yet, and nothing can move.
               </p>
             </div>
             <div data-anima="parag" className="cycle__bottom__right">
@@ -4590,7 +4589,7 @@ export default function PageBody() {
                 </div>
               </div>
               <p className="parag" style={{ "--mask": "linear-gradient(-15deg, transparent -50%, black 0%)" } as React.CSSProperties}>
-                The strategy reads verified data and forms an intent. This is the only layer where the model reasons — and it still holds no authority to act.
+                The model reads verified data and forms an intent. This is the only layer it reasons in — and it holds no authority.
               </p>
             </div>
           </div>
@@ -4780,7 +4779,7 @@ export default function PageBody() {
                 </div>
               </div>
               <p className="parag" style={{ "--mask": "linear-gradient(-15deg, transparent -50%, black 0%)" } as React.CSSProperties}>
-                The policy evaluates the intent against stated limits: amount, recipient, freshness, window. If a capability is ever issued, it is decided here.
+                Amount, recipient, freshness, window. If a capability is ever issued, it is decided here.
               </p>
             </div>
             <div data-anima="parag" className="cycle__bottom__right">
@@ -4865,7 +4864,7 @@ export default function PageBody() {
                 </div>
               </div>
               <p className="parag" style={{ "--mask": "linear-gradient(-15deg, transparent -50%, black 0%)" } as React.CSSProperties}>
-                Only now does anything reach a chain. The executor presents a capability that is scoped, single-use and already expiring — and submits nothing without one.
+                Only now does anything reach a chain — with a capability that is scoped, single-use and already expiring.
               </p>
             </div>
           </div>
@@ -5555,7 +5554,7 @@ export default function PageBody() {
                   An agentic IDE for designing, proving, deploying and operating secure financial agents. Authority is bounded by a deterministic policy layer, never by a prompt.
                   <br />
                   <span className="text-span">
-                    I hope you find it helpful. Thank you 😊
+                    Give it authority. Never give it keys.
                   </span>
                 </p>
               </div>
