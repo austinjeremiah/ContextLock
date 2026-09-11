@@ -90,7 +90,13 @@ export default function OrganizationPage() {
         ) : null
       }
     >
-      <div className="cl-grid" style={{ gridTemplateColumns: 'minmax(230px, 300px) minmax(0, 1fr)', alignItems: 'start' }}>
+      {/* auto-fit rather than a fixed two-column split: the centre pane narrows
+          as the explorer widens, and a fixed split squeezes the detail column
+          until its content cannot lay out. */}
+      <div
+        className="cl-grid"
+        style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))', alignItems: 'start' }}
+      >
         {/* organization tree */}
         <Card title={PROJECT.organization ?? 'Agents'} flush>
           <ul>

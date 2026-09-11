@@ -27,6 +27,10 @@ import { useControlBridge } from '@/lib/studio/control-bridge';
 import { SEGMENT_TO_RAIL } from '@/lib/studio/nav';
 import type { Agent, Freshness, Project, ProjectSummary, RuntimeEvent, Status } from '@/lib/studio/types';
 
+/* Ground colours either side of the theme change, used to paint the sweep. */
+const LIGHT_CANVAS = '#fef1d0';
+const DARK_CANVAS = '#090909';
+
 export interface WorkbenchLiveState {
   policyState: Status;
   policyFreshness: Freshness;
@@ -163,7 +167,7 @@ export function Workbench({
     const handle = window.setTimeout(() => {
       shiftingRef.current = false;
       bumpShift((n) => n + 1);
-    }, 560);
+    }, 760);
     return () => window.clearTimeout(handle);
   }, [darkSurface]);
 
@@ -171,6 +175,21 @@ export function Workbench({
     <div
       className={`cl-studio cl-shell${darkSurface ? ' cl-theme-dark' : ''}${themeShifting ? ' cl-theme-shift' : ''}`}
     >
+      {/*
+        A sheet painted in the colour being left behind, sliding off to the
+        right. The shell beneath has already switched, so the new theme appears
+        to wash across the screen from the left.
+      */}
+      {themeShifting ? (
+        <div
+          className="cl-theme-wave"
+          aria-hidden
+          style={{
+            background: darkSurface ? LIGHT_CANVAS : DARK_CANVAS,
+            color: darkSurface ? LIGHT_CANVAS : DARK_CANVAS,
+          }}
+        />
+      ) : null}
       <TitleBar
         project={project}
         projects={projects}
