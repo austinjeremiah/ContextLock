@@ -325,39 +325,46 @@ function ArchitectureCanvas() {
             {/* No MiniMap or built-in Controls: at this graph's scale the minimap
                 rendered as an empty grey rectangle, and Fit / Zoom / Lock already
                 live in the page toolbar where they are labelled. */}
-            <Background variant={BackgroundVariant.Dots} gap={22} size={1} color="var(--cl-line)" />
+            {/* Near-black dot grid over the cream ground — the canvas reads as a
+                drafting surface, and the cream still carries the palette. */}
+            <Background variant={BackgroundVariant.Dots} gap={18} size={1.4} color="var(--cl-canvas-dot)" />
           </ReactFlow>
-        </div>
 
-        {/* node inspector — inside the center workspace, not over the agent sidebar */}
-        {selected ? (
-          <div className="cl-drawer" style={{ flex: '0 0 336px', minWidth: 0 }}>
-            <div className="cl-drawer-head">
-              <span className="cl-label" style={{ flex: '1 1 auto' }}>
-                Node inspector
-              </span>
-              <button
-                type="button"
-                className="cl-btn cl-btn-ghost cl-btn-sm"
-                onClick={() => selectNode(null)}
-                aria-label="Close inspector"
-              >
-                <X size={13} aria-hidden />
-              </button>
+          {/*
+            Node inspector. Still inside the center workspace (never over the
+            Agent Sidebar, per spec §13), but floated over the canvas rather than
+            placed beside it: as a flex sibling it competed with the canvas for
+            width and was clipped whenever the centre column got tight.
+          */}
+          {selected ? (
+            <div className="cl-drawer cl-drawer-float">
+              <div className="cl-drawer-head">
+                <span className="cl-label" style={{ flex: '1 1 auto' }}>
+                  Node inspector
+                </span>
+                <button
+                  type="button"
+                  className="cl-btn cl-btn-ghost cl-btn-sm"
+                  onClick={() => selectNode(null)}
+                  aria-label="Close inspector"
+                >
+                  <X size={13} aria-hidden />
+                </button>
+              </div>
+              <div className="cl-drawer-body">
+                <NodeInspector
+                  nodeId={selected.id}
+                  data={selected.data}
+                  graph={graph}
+                  liveOverlay={liveOverlay}
+                  onOpen={(segment, hash) =>
+                    router.push(`/projects/${PROJECT.id}/${segment}${hash ? `#${hash}` : ''}`)
+                  }
+                />
+              </div>
             </div>
-            <div className="cl-drawer-body">
-              <NodeInspector
-                nodeId={selected.id}
-                data={selected.data}
-                graph={graph}
-                liveOverlay={liveOverlay}
-                onOpen={(segment, hash) =>
-                  router.push(`/projects/${PROJECT.id}/${segment}${hash ? `#${hash}` : ''}`)
-                }
-              />
-            </div>
-          </div>
-        ) : null}
+          ) : null}
+        </div>
       </div>
     </StudioPage>
   );

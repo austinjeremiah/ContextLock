@@ -53,7 +53,7 @@ export function ActivityRail({
             if (!explorerOpen) toggleExplorer();
           }}
         >
-          <Icon name={view.icon} size={18} />
+          <Icon name={view.icon} size={20} />
           {railHasAttention(view.id) ? <span className="cl-rail-dot" /> : null}
         </button>
       ))}
@@ -61,7 +61,7 @@ export function ActivityRail({
       <span className="cl-rail-spacer" />
 
       <button type="button" className="cl-rail-btn" title="Help / docs" aria-label="Help and documentation">
-        <CircleHelp size={18} strokeWidth={1.6} aria-hidden />
+        <CircleHelp size={20} strokeWidth={1.6} aria-hidden />
       </button>
       <button
         type="button"
@@ -70,7 +70,7 @@ export function ActivityRail({
         aria-label="Account and settings"
         onClick={() => router.push(`/projects/${projectId}/settings`)}
       >
-        <Settings size={18} strokeWidth={1.6} aria-hidden />
+        <Settings size={20} strokeWidth={1.6} aria-hidden />
       </button>
     </nav>
   );
@@ -144,7 +144,7 @@ export function ProjectExplorer({
                       onClick={() => router.push(hrefFor(item))}
                       onDoubleClick={() => router.push(hrefFor(item))}
                     >
-                      <Icon name={item.icon} size={14} />
+                      <Icon name={item.icon} size={16} />
                       <span className="cl-nav-item-label">{item.label}</span>
                       {itemBadges.map((badge) => (
                         <span
