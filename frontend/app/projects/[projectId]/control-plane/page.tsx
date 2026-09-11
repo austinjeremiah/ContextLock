@@ -1,15 +1,7 @@
 'use client';
 
-import { StudioPage } from '@/components/studio/PageScaffold';
-import { EmptyState } from '@/components/studio/primitives';
+import { PendingSurface } from '@/components/studio/PendingSurface';
 
 export default function Page() {
-  return (
-    <StudioPage segment="control-plane">
-      <EmptyState
-        title="Surface in progress"
-        body="This page is being built in the current phase. The workbench shell, navigation, agent context and status vocabulary around it are already live."
-      />
-    </StudioPage>
-  );
+  return <PendingSurface segment="control-plane" />;
 }

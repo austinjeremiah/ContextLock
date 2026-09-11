@@ -270,7 +270,7 @@ export default function ComposerPage() {
                     key={helper.command}
                     type="button"
                     className="cl-btn cl-btn-block"
-                    style={{ justifyContent: 'flex-start', height: 'auto', padding: '7px 10px', textAlign: 'left', fontFamily: 'var(--sans)' }}
+                    style={{ fontFamily: 'var(--sans)' }}
                     onClick={() => insertHelper(helper.insert)}
                   >
                     <span className="cl-mono" style={{ marginRight: 8 }}>

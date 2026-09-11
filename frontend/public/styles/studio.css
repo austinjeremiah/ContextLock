@@ -359,7 +359,7 @@ html:has(.cl-studio) { font-size: 16px; }
   border-bottom: 1px solid var(--cl-line);
   flex: 0 0 auto;
 }
-.cl-explorer-scroll { overflow-y: auto; overflow-x: hidden; padding: 6px 0 14px; flex: 1 1 auto; }
+.cl-explorer-scroll { overflow-y: auto; overflow-x: hidden; overflow-wrap: anywhere; padding: 6px 0 14px; flex: 1 1 auto; }
 .cl-explorer-group { padding: 8px 10px 2px; }
 .cl-nav-item {
   display: flex;
@@ -443,7 +443,7 @@ html:has(.cl-studio) { font-size: 16px; }
 .cl-agent-head-row { display: flex; align-items: center; gap: 6px; }
 .cl-agent-title { flex: 1 1 auto; font-family: var(--medium); font-size: 13.5px; }
 .cl-agent-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 7px; }
-.cl-agent-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 12px 10px; display: flex; flex-direction: column; gap: 10px; }
+.cl-agent-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; padding: 12px 10px; display: flex; flex-direction: column; gap: 10px; }
 .cl-agent-composer { flex: 0 0 auto; border-top: 1px solid var(--cl-line); padding: 8px; background: var(--cl-panel-2); }
 .cl-agent-input {
   width: 100%; min-height: 62px; max-height: 180px; resize: none;
@@ -452,7 +452,7 @@ html:has(.cl-studio) { font-size: 16px; }
   outline: none; transition: border-color 0.15s ease;
 }
 .cl-agent-input:focus { border-color: var(--cl-ink); }
-.cl-agent-composer-row { display: flex; align-items: center; gap: 6px; margin-top: 6px; }
+.cl-agent-composer-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 6px; }
 
 /* --- status bar ----------------------------------------------------------- */
 .cl-statusbar {
@@ -538,7 +538,15 @@ body.cl-resizing-v, body.cl-resizing-v * { cursor: row-resize !important; user-s
 
 .cl-btn-sm { height: 28px; padding: 0 11px; font-size: 12px; }
 .cl-btn-lg { height: 38px; padding: 0 20px; font-size: 14px; }
-.cl-btn-block { width: 100%; }
+.cl-btn-block {
+  width: 100%;
+  height: auto;
+  min-height: 32px;
+  padding-block: 7px;
+  white-space: normal;
+  text-align: left;
+  justify-content: flex-start;
+}
 
 .cl-btn-group { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 

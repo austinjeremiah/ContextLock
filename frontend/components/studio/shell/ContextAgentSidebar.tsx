@@ -265,7 +265,7 @@ export function ContextAgentSidebar({
                   key={q}
                   type="button"
                   className="cl-btn cl-btn-block"
-                  style={{ justifyContent: 'flex-start', height: 'auto', padding: '7px 10px', textAlign: 'left', fontFamily: 'var(--sans)' }}
+                  style={{ fontFamily: 'var(--sans)' }}
                   onClick={() => submit(q)}
                 >
                   {q}
