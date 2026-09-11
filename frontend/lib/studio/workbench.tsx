@@ -31,6 +31,16 @@ export interface Toast {
   message: string;
 }
 
+/** Appearance preferences (spec §29). Persisted with the rest of the layout. */
+export interface Appearance {
+  /** `auto` keeps the dark ground for the Code editor only. */
+  theme: 'light' | 'dark' | 'auto';
+  density: 'comfortable' | 'compact';
+  editorFontSize: number;
+}
+
+export const DEFAULT_APPEARANCE: Appearance = { theme: 'auto', density: 'comfortable', editorFontSize: 13 };
+
 export interface PanelSizes {
   explorer: number;
   agent: number;
@@ -59,6 +69,7 @@ interface PersistedState {
   rail: RailViewId;
   tabs: EditorTab[];
   developerMode: boolean;
+  appearance: Appearance;
 }
 
 interface WorkbenchValue {
@@ -118,6 +129,11 @@ interface WorkbenchValue {
   developerMode: boolean;
   setDeveloperMode: (on: boolean) => void;
 
+  /* appearance (spec §29) */
+  appearance: Appearance;
+  setAppearance: (next: Partial<Appearance>) => void;
+  resetAppearance: () => void;
+
   /* viewport class (spec §46) */
   viewport: 'wide' | 'medium' | 'narrow' | 'monitor';
 }
@@ -157,6 +173,7 @@ export function WorkbenchProvider({ children }: { children: ReactNode }) {
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [developerMode, setDeveloperMode] = useState(false);
+  const [appearance, setAppearanceState] = useState<Appearance>(DEFAULT_APPEARANCE);
   const [viewport, setViewport] = useState<WorkbenchValue['viewport']>('wide');
   const [hydrated, setHydrated] = useState(false);
   const agentInputRef = useRef<HTMLTextAreaElement | null>(null);
@@ -183,6 +200,7 @@ export function WorkbenchProvider({ children }: { children: ReactNode }) {
         setActiveTabId(saved.tabs[saved.tabs.length - 1]?.id ?? null);
       }
       if (typeof saved.developerMode === 'boolean') setDeveloperMode(saved.developerMode);
+      if (saved.appearance) setAppearanceState({ ...DEFAULT_APPEARANCE, ...saved.appearance });
     }
     setHydrated(true);
   }, []);
@@ -198,13 +216,14 @@ export function WorkbenchProvider({ children }: { children: ReactNode }) {
       rail,
       tabs,
       developerMode,
+      appearance,
     };
     try {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
     } catch {
       /* storage unavailable — layout simply resets next session */
     }
-  }, [hydrated, sizes, explorerOpen, agentOpen, bottomOpen, bottomTab, rail, tabs, developerMode]);
+  }, [hydrated, sizes, explorerOpen, agentOpen, bottomOpen, bottomTab, rail, tabs, developerMode, appearance]);
 
   /* viewport classes from spec §46 */
   useEffect(() => {
@@ -285,6 +304,12 @@ export function WorkbenchProvider({ children }: { children: ReactNode }) {
     window.setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 3200);
   }, []);
 
+  const setAppearance = useCallback((next: Partial<Appearance>) => {
+    setAppearanceState((prev) => ({ ...prev, ...next }));
+  }, []);
+
+  const resetAppearance = useCallback(() => setAppearanceState(DEFAULT_APPEARANCE), []);
+
   const proposePatch = useCallback((patch: Omit<AgentPatch, 'id' | 'at'>) => {
     setPendingPatches((prev) => [
       ...prev,
@@ -349,6 +374,9 @@ export function WorkbenchProvider({ children }: { children: ReactNode }) {
       pushToast,
       developerMode,
       setDeveloperMode,
+      appearance,
+      setAppearance,
+      resetAppearance,
       viewport,
     }),
     [
@@ -360,6 +388,7 @@ export function WorkbenchProvider({ children }: { children: ReactNode }) {
       selection, pageKind, agentDraft, focusAgentInput, registerAgentInput,
       pendingPatches, proposePatch, dismissPatch,
       paletteOpen, toasts, pushToast, developerMode, viewport,
+      appearance, setAppearance, resetAppearance,
     ],
   );
 

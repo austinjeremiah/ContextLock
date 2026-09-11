@@ -1,11 +1,26 @@
 /**
  * Prohibited shortcuts (spec §30, third column).
  *
+ * ┌─ THIS IS NOT A SECURITY BOUNDARY ──────────────────────────────────────┐
+ * │ This file MOCKS how the backend agent should answer. It is pattern     │
+ * │ matching on a prompt, which anyone can phrase around, and it must      │
+ * │ never be relied on to stop anything.                                   │
+ * │                                                                        │
+ * │ What actually stops the agent acting is architectural: it has no tool  │
+ * │ that executes a privileged control. A `control-suggestion` card can    │
+ * │ only carry a ControlCommand that OPENS a native dialog, and the        │
+ * │ dialog is completed by a person. A real model replying "done, I        │
+ * │ disabled it" changes nothing, because there is nothing to call.        │
+ * │                                                                        │
+ * │ When the backend lands, delete this routing and let the real agent     │
+ * │ produce refusal cards. Keep the card shape; keep the architecture.     │
+ * └────────────────────────────────────────────────────────────────────────┘
+ *
  * Every page names one thing the Context Agent must never do there, and those
  * prohibitions are the product. An agent that quietly declines reads as broken;
- * an agent that complies is a security hole. So each one is detected and
- * answered with a visible refusal that says what was asked, why it is not the
- * agent's to do, and where the legitimate route is.
+ * an agent that complies is a security hole. So each one is answered with a
+ * visible refusal that says what was asked, why it is not the agent's to do,
+ * and where the legitimate route is.
  *
  * The detectors are intentionally narrow. A refusal fired at a genuine question
  * is worse than no refusal at all — "explain the hard cap" must answer, while

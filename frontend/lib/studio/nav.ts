@@ -151,8 +151,22 @@ export const RAIL_VIEWS: RailView[] = [
   { id: 'operate', label: 'Operate', icon: 'activity', groupIds: ['operate'] },
   { id: 'integrations', label: 'Integrations', icon: 'plug', groupIds: ['implement'] },
   { id: 'reports', label: 'Reports', icon: 'file-text', groupIds: ['output'] },
-  { id: 'settings', label: 'Settings', icon: 'settings', groupIds: ['workspace'] },
 ];
+
+/**
+ * Settings reaches the same explorer group, but it lives in the rail *footer*
+ * next to Help rather than in the main list — where every other entry is a
+ * stage of building an agent, and a workspace preference is not one.
+ */
+export const SETTINGS_RAIL_VIEW: RailView = {
+  id: 'settings',
+  label: 'Settings',
+  icon: 'settings',
+  groupIds: ['workspace'],
+};
+
+/** Every rail view, wherever it is rendered — use this for lookups by id. */
+export const ALL_RAIL_VIEWS: RailView[] = [...RAIL_VIEWS, SETTINGS_RAIL_VIEW];
 
 /** Which rail entry owns a given route segment, so navigation keeps the rail in sync. */
 export const SEGMENT_TO_RAIL: Record<string, RailViewId> = {

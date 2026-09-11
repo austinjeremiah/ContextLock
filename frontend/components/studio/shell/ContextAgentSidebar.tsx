@@ -348,7 +348,7 @@ export function ContextAgentSidebar({
         ) : null}
 
         {mentionToken ? (
-          <div className="cl-mention-picker" role="listbox" aria-label="Project entities">
+          <div className="cl-mention-picker" role="listbox" id="cl-mention-list" aria-label="Project entities">
             {mentionMatches.length === 0 ? (
               <div className="cl-meta" style={{ padding: '8px 10px' }}>
                 Nothing in this project matches “{mentionToken.query}”.
@@ -357,6 +357,7 @@ export function ContextAgentSidebar({
               mentionMatches.map((entity, i) => (
                 <button
                   key={`${entity.kind}:${entity.id}`}
+                  id={`cl-mention-${i}`}
                   type="button"
                   role="option"
                   aria-selected={i === mentionIndexSel}
@@ -426,6 +427,13 @@ export function ContextAgentSidebar({
             }
           }}
           aria-label="Message the Context Agent"
+          role="combobox"
+          aria-expanded={Boolean(mentionToken && mentionMatches.length > 0)}
+          aria-controls={mentionToken ? 'cl-mention-list' : undefined}
+          aria-activedescendant={
+            mentionToken && mentionMatches.length > 0 ? `cl-mention-${mentionIndexSel}` : undefined
+          }
+          aria-autocomplete="list"
         />
 
         <div className="cl-agent-composer-row">

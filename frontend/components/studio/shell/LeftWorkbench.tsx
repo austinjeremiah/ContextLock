@@ -10,7 +10,15 @@
 import { useRouter, usePathname } from 'next/navigation';
 import { CircleHelp, PanelLeftClose, Settings } from 'lucide-react';
 import { Icon } from './icons';
-import { NAV_GROUPS, RAIL_VIEWS, SEGMENT_TO_RAIL, type NavItem, type RailViewId } from '@/lib/studio/nav';
+import {
+  ALL_RAIL_VIEWS,
+  NAV_GROUPS,
+  RAIL_VIEWS,
+  SEGMENT_TO_RAIL,
+  SETTINGS_RAIL_VIEW,
+  type NavItem,
+  type RailViewId,
+} from '@/lib/studio/nav';
 import { useWorkbench } from '@/lib/studio/workbench';
 import type { Tone } from '@/lib/studio/types';
 
@@ -31,7 +39,7 @@ export function ActivityRail({
   const router = useRouter();
 
   const railHasAttention = (view: RailViewId) => {
-    const groupIds = RAIL_VIEWS.find((v) => v.id === view)?.groupIds ?? [];
+    const groupIds = ALL_RAIL_VIEWS.find((v) => v.id === view)?.groupIds ?? [];
     return NAV_GROUPS.filter((g) => groupIds.includes(g.id)).some((g) =>
       g.items.some((item) => (badges[item.id] ?? []).some((b) => b.tone === 'deny' || b.tone === 'warn' || b.tone === 'blocked')),
     );
@@ -63,12 +71,20 @@ export function ActivityRail({
       <button type="button" className="cl-rail-btn" title="Help / docs" aria-label="Help and documentation">
         <CircleHelp size={20} strokeWidth={1.6} aria-hidden />
       </button>
+      {/* The only Settings entry. It sets the rail as well as navigating, so
+          the explorer shows the workspace group like any other rail view. */}
       <button
         type="button"
         className="cl-rail-btn"
-        title="Account / settings"
-        aria-label="Account and settings"
-        onClick={() => router.push(`/projects/${projectId}/settings`)}
+        data-active={rail === SETTINGS_RAIL_VIEW.id}
+        aria-label={SETTINGS_RAIL_VIEW.label}
+        aria-current={rail === SETTINGS_RAIL_VIEW.id ? 'true' : undefined}
+        title={SETTINGS_RAIL_VIEW.label}
+        onClick={() => {
+          setRail(SETTINGS_RAIL_VIEW.id);
+          if (!explorerOpen) toggleExplorer();
+          router.push(`/projects/${projectId}/settings`);
+        }}
       >
         <Settings size={20} strokeWidth={1.6} aria-hidden />
       </button>
@@ -91,7 +107,7 @@ export function ProjectExplorer({
   const pathname = usePathname();
   const { rail, toggleExplorer } = useWorkbench();
 
-  const view = RAIL_VIEWS.find((v) => v.id === rail) ?? RAIL_VIEWS[0];
+  const view = ALL_RAIL_VIEWS.find((v) => v.id === rail) ?? RAIL_VIEWS[0];
   const groups = NAV_GROUPS.filter((g) => view.groupIds.includes(g.id));
 
   const hrefFor = (item: NavItem) => {

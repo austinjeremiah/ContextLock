@@ -19,12 +19,13 @@ import { EditorTabBar } from './EditorTabBar';
 import { BottomPanel } from './BottomPanel';
 import { StatusBar } from './StatusBar';
 import { ContextAgentSidebar } from './ContextAgentSidebar';
+import { AuthoringUnavailable, MonitorNav, isMonitorSegment } from './MonitoringMode';
 import { CommandPalette } from './CommandPalette';
 import { Modal } from '../dialogs';
 import { SmoothScroll } from '../SmoothScroll';
 import { PANEL_LIMITS, useWorkbench } from '@/lib/studio/workbench';
 import { useControlBridge } from '@/lib/studio/control-bridge';
-import { SEGMENT_TO_RAIL } from '@/lib/studio/nav';
+import { SEGMENT_TO_RAIL, metaForSegment } from '@/lib/studio/nav';
 import type { Agent, Freshness, Project, ProjectSummary, RuntimeEvent, Status } from '@/lib/studio/types';
 
 /* Ground colours either side of the theme change, used to paint the sweep. */
@@ -73,6 +74,8 @@ export function Workbench({
     setRail,
     toasts,
     focusAgentInput,
+    appearance,
+    viewport,
   } = useWorkbench();
   const { requestControl } = useControlBridge();
 
@@ -139,8 +142,12 @@ export function Workbench({
 
   /* Code is the one surface that genuinely is an editor, so the whole workbench
      flips dark there — rail, explorer, chrome and all. Darkening only the centre
-     pane leaves the shell looking half-broken. */
-  const darkSurface = segment === 'code';
+     pane leaves the shell looking half-broken.
+
+     `auto` is that behaviour; an explicit choice in Settings overrides it. */
+  const darkSurface = appearance.theme === 'auto' ? segment === 'code' : appearance.theme === 'dark';
+
+  const monitorMode = viewport === 'monitor';
 
   /*
    * Swapping every token at once snaps, so the shell cross-fades instead. The
@@ -174,6 +181,8 @@ export function Workbench({
   return (
     <div
       className={`cl-studio cl-shell${darkSurface ? ' cl-theme-dark' : ''}${themeShifting ? ' cl-theme-shift' : ''}`}
+      data-density={appearance.density}
+      style={{ ['--cl-editor-font' as string]: `${appearance.editorFontSize}px` }}
     >
       {/*
         A sheet painted in the colour being left behind, sliding off to the
@@ -199,10 +208,14 @@ export function Workbench({
         onOpenRevisions={() => setRevisionsOpen(true)}
       />
 
-      <div className="cl-shell-body">
-        <ActivityRail projectId={project.id} badges={live.navBadges} />
+      {/* §46 monitoring mode: a compact nav replaces the rail and explorer,
+          which are authoring furniture and have nothing to do at this width. */}
+      {monitorMode ? <MonitorNav projectId={project.id} agentSlug={agentSlug} segment={segment} /> : null}
 
-        {explorerOpen ? (
+      <div className="cl-shell-body">
+        {!monitorMode ? <ActivityRail projectId={project.id} badges={live.navBadges} /> : null}
+
+        {explorerOpen && !monitorMode ? (
           <>
             <div style={{ width: sizes.explorer, flex: `0 0 ${sizes.explorer}px`, minWidth: 0, display: 'flex' }}>
               <ProjectExplorer
@@ -222,7 +235,7 @@ export function Workbench({
               onReset={() => resetPanelSize('explorer')}
             />
           </>
-        ) : (
+        ) : monitorMode ? null : (
           <button
             type="button"
             className="cl-icon-btn"
@@ -244,7 +257,15 @@ export function Workbench({
         {/* center workspace */}
         <div className="cl-center" ref={centerRef}>
           <EditorTabBar />
-          {!bottomMaximized ? (
+          {/* §46: below 900px an authoring surface is replaced rather than
+              squeezed. Monitoring pages render normally. */}
+          {monitorMode && !isMonitorSegment(segment) ? (
+            <SmoothScroll className="cl-page">
+              <div className="cl-page-pad">
+                <AuthoringUnavailable projectId={project.id} agentSlug={agentSlug} title={metaForSegment(segment).title} />
+              </div>
+            </SmoothScroll>
+          ) : !bottomMaximized ? (
             <SmoothScroll className="cl-page">{children}</SmoothScroll>
           ) : null}
           {bottomOpen ? (

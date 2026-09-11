@@ -9,6 +9,7 @@
  */
 import { useCallback } from 'react';
 import Editor, { DiffEditor, type Monaco } from '@monaco-editor/react';
+import { useWorkbench } from '@/lib/studio/workbench';
 
 /** Editor theme built from the workbench's own dark tokens. */
 const THEME_NAME = 'contextlock-dark';
@@ -72,6 +73,8 @@ export function CodeEditor({
   onChange?: (value: string) => void;
 }) {
   const beforeMount = useCallback((monaco: Monaco) => defineTheme(monaco), []);
+  const { appearance } = useWorkbench();
+  const fontSize = appearance.editorFontSize;
 
   return (
     <Editor
@@ -80,7 +83,7 @@ export function CodeEditor({
       theme={THEME_NAME}
       beforeMount={beforeMount}
       onChange={(next) => onChange?.(next ?? '')}
-      options={{ ...OPTIONS, readOnly, domReadOnly: readOnly }}
+      options={{ ...OPTIONS, fontSize, lineHeight: Math.round(fontSize * 1.62), readOnly, domReadOnly: readOnly }}
       loading={<EditorLoading />}
     />
   );
@@ -96,6 +99,8 @@ export function CodeDiff({
   language: string;
 }) {
   const beforeMount = useCallback((monaco: Monaco) => defineTheme(monaco), []);
+  const { appearance } = useWorkbench();
+  const fontSize = appearance.editorFontSize;
 
   return (
     <DiffEditor
@@ -104,7 +109,14 @@ export function CodeDiff({
       language={language}
       theme={THEME_NAME}
       beforeMount={beforeMount}
-      options={{ ...OPTIONS, readOnly: true, renderSideBySide: true, enableSplitViewResizing: false }}
+      options={{
+        ...OPTIONS,
+        fontSize,
+        lineHeight: Math.round(fontSize * 1.62),
+        readOnly: true,
+        renderSideBySide: true,
+        enableSplitViewResizing: false,
+      }}
       loading={<EditorLoading />}
     />
   );

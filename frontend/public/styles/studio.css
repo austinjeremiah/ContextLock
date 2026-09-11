@@ -580,6 +580,74 @@ html:has(.cl-studio) { font-size: 16px; }
 }
 .cl-refusal-why { font-size: 12.5px; line-height: 1.6; }
 
+/* ============================================================================
+   Monitoring / review mode (spec §46, below 900px)
+   ----------------------------------------------------------------------------
+   The shell keeps its title bar and status bar and drops the authoring
+   furniture. The nav is a horizontal strip rather than a rail, because at this
+   width a vertical icon column costs more than it returns.
+   ========================================================================== */
+.cl-monitor-nav {
+  display: flex;
+  gap: 2px;
+  padding: 6px 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  background: var(--cl-panel-2);
+  border-bottom: 1px solid var(--cl-line);
+}
+.cl-monitor-nav::-webkit-scrollbar { display: none; }
+.cl-monitor-nav-btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  flex: 0 0 auto;
+  padding: 8px 12px;
+  font-size: 13px;
+  color: var(--cl-ink-2);
+  border-radius: 8px;
+  cursor: pointer;
+}
+.cl-monitor-nav-btn[data-active='true'] {
+  color: var(--cl-ink);
+  background: var(--cl-raised);
+  font-family: var(--medium);
+}
+.cl-monitor-nav-count {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 17px; height: 17px; padding: 0 5px;
+  font-size: 11px;
+  color: #fff;
+  background: var(--cl-deny);
+}
+
+.cl-monitor-status {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  padding: 11px;
+  background: var(--cl-panel-2);
+  border: 1px solid var(--cl-line);
+  border-radius: 12px;
+}
+.cl-monitor-status-row { display: flex; align-items: center; gap: 7px; }
+
+.cl-monitor-block { max-width: 560px; }
+
+/* ============================================================================
+   Compact density (spec §29)
+   ----------------------------------------------------------------------------
+   Tightens padding and row height only. Type size, colour and every semantic
+   signal stay exactly as they are — density is about fitting more on screen,
+   not about making the product harder to read.
+   ========================================================================== */
+.cl-shell[data-density='compact'] .cl-card-body { padding: 10px; }
+.cl-shell[data-density='compact'] .cl-card-head { padding: 8px 10px; }
+.cl-shell[data-density='compact'] .cl-page-pad { padding: 14px 16px 28px; }
+.cl-shell[data-density='compact'] .cl-section { margin-bottom: 20px; }
+.cl-shell[data-density='compact'] .cl-table th,
+.cl-shell[data-density='compact'] .cl-table td { padding: 7px 10px; }
+.cl-shell[data-density='compact'] .cl-list-row { padding: 6px 10px; }
+.cl-shell[data-density='compact'] .cl-path-step { padding: 7px 10px; }
+.cl-shell[data-density='compact'] .cl-kv dt,
+.cl-shell[data-density='compact'] .cl-kv dd { padding: 5px 0; }
+
 /* --- pending agent patch on its target page (spec §6.4) --------------------
    Marked as arriving from the agent so it is never mistaken for state the page
    itself is reporting. */

@@ -157,14 +157,24 @@ inside the word, and the fixed pattern then swallowed the page's own quick
 prompt "Why is Enable Policy disabled?", which is a question about a greyed-out
 button, not a request to change state.
 
-## ⬜ Remaining — 1 phase plus landing polish
+## ✅ Phase FE-9 — Reports, Settings and polish
 
-| Phase | Scope | Pages |
+| Piece | Spec | What landed |
 |---|---|---|
-| **FE-9** ← next | Output + polish | Safety Reports (§28), Settings (§29), a11y (§45), responsive monitoring mode (§46) |
-| **Landing** | Polish pass | last, by explicit decision |
+| Safety Reports | §28 | Seven report types with revision, generated time, hash, current/stale and privacy classification; full Agent Safety Report preview across all 14 required sections; Generate / Regenerate / Preview / Verify Hash / Download PDF / Download JSON / Copy Share Link. **Secret scanning gates distribution** — every download and share control is unavailable until a scan passes, and an ungenerated report is UNSCANNED rather than an empty pass. A report built against r7 while the Blueprint is r8 is marked STALE and says what that does and does not mean |
+| Evidence | §28 | Evidence bundle with what each artifact *proves*, stated plainly; simulated runs carry a SIMULATED RUN badge wherever they appear, so CRE evidence reads as simulator output and never as DON execution |
+| Settings | §29 | Six tabs — Project, Appearance, Simulation limits, Runtime, Notifications, Developer mode. **Simulation limits are read-only** because they are server policy; a control that appeared to raise them would be a lie. **Developer mode reveals, never disables** — stated on the tab and true in the code |
+| Appearance wired for real | §29 | Theme (auto / light / dark), density and editor font size are live preferences, persisted, driving the shell and Monaco — not decorative controls. `auto` keeps the dark ground for the Code editor only |
+| Monitoring mode | §46 | Below 900px the workbench changes job rather than shrinking: rail and explorer give way to a compact nav over Overview, Activity, Alerts and Reports plus a plain policy/runtime status. An authoring page reached at that width **explains why it is unavailable** and offers somewhere useful — it is never silently redirected or hidden |
+| Accessibility | §45 | Mention picker given full combobox semantics (`aria-expanded`, `aria-controls`, `aria-activedescendant`, `role=option`). The rest of §45 was already satisfied: keyboard-operable resizers, accessible architecture node list, focus-trapped modals, text labels on every badge, reduced-motion handling, AA contrast |
 
-**Current page count:** 22 built. Only Reports and Settings remain, both in FE-9.
+**All 24 pages are now built.** No `PendingSurface` stub remains in the app.
+
+## ⬜ Remaining — landing polish only
+
+| Phase | Scope | Notes |
+|---|---|---|
+| **Landing** ← next | Polish pass | Deferred by explicit decision until the workbench was done. Includes wiring "Get Started" → wallet connect; the session layer already supports it |
 
 ---
 
