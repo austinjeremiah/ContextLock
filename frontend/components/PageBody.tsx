@@ -144,81 +144,41 @@ export default function PageBody() {
             </div>
             <div className="note__texts">
               <div className="note__title">
-                <div className="description note__descr" aria-label="From a Creative to another Creative">
+                <div className="description note__descr" aria-label="Why we built ContextLock">
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      F
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      r
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      o
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      m
-                    </div>
-                  </div>
-                  <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      a
-                    </div>
-                  </div>
-                  <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      C
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      r
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      e
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      a
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      t
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      i
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      v
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      e
-                    </div>
-                  </div>
-                  <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      t
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      o
-                    </div>
-                  </div>
-                  <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      a
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      n
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      o
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      t
+                      W
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       h
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      e
+                      y
+                    </div>
+                  </div>
+                  <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      w
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      r
+                      e
+                    </div>
+                  </div>
+                  <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      b
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      u
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      i
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      l
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      t
                     </div>
                   </div>
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
@@ -226,62 +186,71 @@ export default function PageBody() {
                       C
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      r
+                      o
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      e
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      a
+                      n
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       t
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      i
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      v
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       e
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      x
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      t
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      L
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      o
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      c
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      k
                     </div>
                   </div>
                 </div>
               </div>
               <div className="note__descr note__descr__parags">
                 <p className="parag note__parag" style={{ "--mask": "linear-gradient(-15deg, transparent -50%, black 0%)" } as React.CSSProperties}>
-                  This website isn’t a product.
+                  This page isn’t a pitch.
                   <span className="note__parag__bold">
-                    It’s a personal experiment.
+                    It’s the argument behind the product.
                   </span>
                   <br />
                   ‍
                   <br />
-                  A small piece of research turned into an interactive story — a reminder for myself and for you. We build things that live on screens. We chase deadlines, chase ideas, chase perfection — and somewhere along the way, we forget that our creativity doesn’t come from caffeine or chaos. It comes from rest.
+                  We kept seeing the same shape of failure. An agent is given a key so it can move quickly, told carefully what it may and may not do, and then trusted to keep obeying that instruction — against every input it will ever read, from anyone who can reach it.
                   <br />
                   <br />
-                  This site isn’t claiming expertise. It’s a creative research project — a way to explore how design, storytelling, and science can merge to help us, the creative community, take better care of ourselves. Because better sleep means better ideas.
+                  That is not a security model. It is a hope, written in the same channel an attacker gets to write in. The model is not the problem: it does exactly what it is told, by whoever is doing the telling.
                   <br />
-                  Better rhythm means better work.
+                  Obedience is the vulnerability.
                   <br />
                   <br />
-                  If you leave here with one thought, let it be this:
+                  If you take one thought from this, let it be this:
                   <br />
                   <span className="note__parag__bold">
-                    You can’t create sustainably without rest.
+                    A boundary the agent can reinterpret is not a boundary.
                   </span>
                   <br />
-                  Sleep is the part of the process you don’t see in the timeline — but it’s where the real crafting happens. Thank you for exploring this with me.
+                  Authority has to live somewhere the model cannot argue with it — a policy layer that evaluates every action and refuses most of them. Thanks for reading this far.
                   <br />
                   ‍
                   <br />
                   <span className="note__parag__serif">
-                    Let’s keep designing — but also keep dreaming.
+                    Give it authority. Never give it keys.
                     <br />
                     ‍
                     <br />
-                    — Victor Costa
+                    — The ContextLock team
                   </span>
                 </p>
               </div>
@@ -477,7 +446,7 @@ export default function PageBody() {
             </div>
             <div className="insights__insight">
               <div className="insights__insight__text">
-                “Sleep isn’t rest. It’s maintenance.”
+                “Your agent isn’t malicious. It’s obedient.”
               </div>
             </div>
           </div>
@@ -486,7 +455,7 @@ export default function PageBody() {
       <div className="insigh-pannel" style={{ "opacity": "1" } as React.CSSProperties}>
         <div className="insigh-pannel__hold">
           <div className="insights__text">
-            Find the sleeping Insights
+            Find the hidden Insights
           </div>
           <ul role="list" className="insights__indic-lis w-list-unstyled">
             <li data-insi-indic="its_preparation" className="insigh-pannel__each">
@@ -1448,7 +1417,7 @@ export default function PageBody() {
             </div>
             <div data-anima="parag" className="stats__text__parag">
               <p className="small-parag" style={{ "opacity": "1" } as React.CSSProperties}>
-                An agent is only ever as sound as what it acted on. Chainlink Data Feeds supply a verified oracle round with a freshness window attached, and the workflow runs inside Chainlink CRE — so a decision rests on evidence anyone can re-check later, not on whatever the model last happened to read.
+                Every decision reads a verified Chainlink oracle round with a freshness window attached, and the workflow runs inside Chainlink CRE — so the inputs can be re-checked afterwards, not merely trusted.
               </p>
             </div>
           </div>
@@ -1460,64 +1429,46 @@ export default function PageBody() {
             <div className="stats_stats__border" style={{ "translate": "none", "rotate": "none", "scale": "none", "transform": "translate(0px, 0px)" } as React.CSSProperties} />
             <ul role="list" className="stats__stats__ul w-list-unstyled" style={{ "translate": "none", "rotate": "none", "scale": "none", "transform": "translate(0px, 0px)" } as React.CSSProperties}>
               <li className="stats__stats__li">
-                <div className="stats__stats__number" aria-label="00.00" style={{ "translate": "none", "rotate": "none", "scale": "none", "transform": "translate(0px, 0px)" } as React.CSSProperties}>
+                <div className="stats__stats__number" aria-label="00s" style={{ "translate": "none", "rotate": "none", "scale": "none", "transform": "translate(0px, 0px)" } as React.CSSProperties}>
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "translate": "none", "rotate": "none", "scale": "none", "transform": "translate(0%, -190%)" } as React.CSSProperties}>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       0
                     </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "translate": "none", "rotate": "none", "scale": "none", "transform": "translate(0%, -190%)" } as React.CSSProperties}>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       0
                     </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "translate": "none", "rotate": "none", "scale": "none", "transform": "translate(0%, -190%)" } as React.CSSProperties}>
-                      .
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "translate": "none", "rotate": "none", "scale": "none", "transform": "translate(0%, -190%)" } as React.CSSProperties}>
-                      0
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "translate": "none", "rotate": "none", "scale": "none", "transform": "translate(0%, -190%)" } as React.CSSProperties}>
-                      0
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      s
                     </div>
                   </div>
                 </div>
               </li>
               <li className="stats__stats__li">
-                <div className="stats__stats__number" aria-label="06.57" style={{ "translate": "none", "rotate": "none", "scale": "none", "transform": "translate(0%, 95%)" } as React.CSSProperties}>
+                <div className="stats__stats__number" aria-label="09s" style={{ "translate": "none", "rotate": "none", "scale": "none", "transform": "translate(0%, 95%)" } as React.CSSProperties}>
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "translate": "none", "rotate": "none", "scale": "none", "transform": "translate(0%, -190%)" } as React.CSSProperties}>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       0
                     </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "translate": "none", "rotate": "none", "scale": "none", "transform": "translate(0%, -190%)" } as React.CSSProperties}>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      9
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      s
+                    </div>
+                  </div>
+                </div>
+              </li>
+              <li className="stats__stats__li">
+                <div className="stats__stats__number" aria-label="60s" style={{ "translate": "none", "rotate": "none", "scale": "none", "transform": "translate(0%, 190%)" } as React.CSSProperties}>
+                  <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       6
                     </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "translate": "none", "rotate": "none", "scale": "none", "transform": "translate(0%, -190%)" } as React.CSSProperties}>
-                      .
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "translate": "none", "rotate": "none", "scale": "none", "transform": "translate(0%, -190%)" } as React.CSSProperties}>
-                      5
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "translate": "none", "rotate": "none", "scale": "none", "transform": "translate(0%, -190%)" } as React.CSSProperties}>
-                      7
-                    </div>
-                  </div>
-                </div>
-              </li>
-              <li className="stats__stats__li">
-                <div className="stats__stats__number" aria-label="08h00" style={{ "translate": "none", "rotate": "none", "scale": "none", "transform": "translate(0%, 190%)" } as React.CSSProperties}>
-                  <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "translate": "none", "rotate": "none", "scale": "none", "transform": "translate(0%, -190%)" } as React.CSSProperties}>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       0
                     </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "translate": "none", "rotate": "none", "scale": "none", "transform": "translate(0%, -190%)" } as React.CSSProperties}>
-                      8
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "translate": "none", "rotate": "none", "scale": "none", "transform": "translate(0%, -190%)" } as React.CSSProperties}>
-                      h
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "translate": "none", "rotate": "none", "scale": "none", "transform": "translate(0%, -190%)" } as React.CSSProperties}>
-                      0
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "translate": "none", "rotate": "none", "scale": "none", "transform": "translate(0%, -190%)" } as React.CSSProperties}>
-                      0
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      s
                     </div>
                   </div>
                 </div>
@@ -1552,19 +1503,16 @@ export default function PageBody() {
           <div data-anima="parag" className="stats__subt">
             <div className="subtitle">
               <div className="subtitle__dot" />
-              <div className="subtitle__text importance__text" aria-label="PILLS - THE SHORTCUT TRAP">
+              <div className="subtitle__text importance__text" aria-label="KEYS - THE SHORTCUT TRAP">
                 <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    P
+                    K
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    I
+                    E
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    L
-                  </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    L
+                    Y
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                     S
@@ -1629,7 +1577,7 @@ export default function PageBody() {
               </div>
             </div>
             <p className="parag importance__text" style={{ "--mask": "linear-gradient(-15deg, transparent -50%, black 0%)" } as React.CSSProperties}>
-              Sleeping pills promise peace, but often steal the rhythm your body needs to heal itself. They mute the symptoms, not the cause.
+              Handing an agent a key promises speed, and removes the one place a mistake could be stopped. It hides the risk; it never bounds it.
             </p>
           </div>
         </div>
@@ -1706,7 +1654,7 @@ export default function PageBody() {
                 </div>
               </div>
               <div className="importance__title__sans">
-                <div className="title_sans" aria-label="of the right Beat.">
+                <div className="title_sans" aria-label="of the right limit.">
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       o
@@ -1745,13 +1693,16 @@ export default function PageBody() {
                   </div>
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      B
+                      l
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      e
+                      i
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      a
+                      m
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      i
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       t
@@ -1794,7 +1745,7 @@ export default function PageBody() {
             <div data-anima="parag" className="importance__bottom__left">
               <div className="subtitle">
                 <div className="subtitle__dot" />
-                <div className="subtitle__text importance__text" aria-label="THE PULSE WITHIN">
+                <div className="subtitle__text importance__text" aria-label="THE CEILING WITHIN">
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       T
@@ -1808,19 +1759,25 @@ export default function PageBody() {
                   </div>
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      P
+                      C
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      U
+                      E
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      I
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       L
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      S
+                      I
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      E
+                      N
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      G
                     </div>
                   </div>
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
@@ -1846,39 +1803,42 @@ export default function PageBody() {
                 </div>
               </div>
               <p className="parag importance__text" style={{ "--mask": "linear-gradient(-15deg, transparent -50%, black 0%)" } as React.CSSProperties}>
-                Your heart sets the tempo for every system in your body. When stress hits, your pulse speeds up. When calm returns, it slows — signaling safety. At night, your heart rate should gently drop, guiding the body into restoration. This delay shifts melatonin release — your natural sleep trigger.
+                A per-action limit sets the tempo for everything downstream. Under it, the agent acts alone. Above it, the action escalates to a human instead of executing. Above the hard ceiling it is refused outright — whatever the market is doing, and whatever the model believes.
               </p>
             </div>
             <div data-anima="parag" className="importance__bottom__right">
               <div className="subtitle">
                 <div className="subtitle__dot" />
-                <div className="subtitle__text" aria-label="HIGH RATE = LOW REST">
+                <div className="subtitle__text" aria-label="NO CEILING = NO BOUND">
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      H
+                      N
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      O
+                    </div>
+                  </div>
+                  <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      C
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      E
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       I
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      L
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      I
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      N
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       G
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      H
-                    </div>
-                  </div>
-                  <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      R
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      A
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      T
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      E
                     </div>
                   </div>
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
@@ -1888,33 +1848,33 @@ export default function PageBody() {
                   </div>
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      L
+                      N
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      O
+                    </div>
+                  </div>
+                  <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      B
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       O
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      W
-                    </div>
-                  </div>
-                  <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      R
+                      U
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      E
+                      N
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      S
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      T
+                      D
                     </div>
                   </div>
                 </div>
               </div>
               <p className="parag" style={{ "--mask": "linear-gradient(-15deg, transparent -50%, black 0%)" } as React.CSSProperties}>
-                A steady rhythm is not just health — it’s harmony. Breathing deeply, lowering lights, or listening to slow music can reset your internal metronome, aligning body and mind. But constant alerts, caffeine, and anxiety keep it racing, tricking your brain into
+                A ceiling alone is not enough — it needs a window. Ten permitted actions of nine hundred dollars is nine thousand dollars, and every one of them passed the per-action check. A rolling budget is what stops correct decisions compounding into
                 <em>
                   fight-or-flight
                 </em>
@@ -1943,7 +1903,7 @@ export default function PageBody() {
             </div>
             <div className="onclock__title">
               <div data-anima="texts" className="onclock__title__serif">
-                <div className="title_serif" aria-label="Be on the Clock.">
+                <div className="title_serif" aria-label="Be on the Hook.">
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       B
@@ -1973,16 +1933,13 @@ export default function PageBody() {
                   </div>
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      C
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      l
+                      H
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       o
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      c
+                      o
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       k
@@ -2025,122 +1982,122 @@ export default function PageBody() {
               <ul role="list" className="onclock__words w-list-unstyled">
                 <li className="onclock__word" style={{ "--_rest": "rotate(0rad) translate(0, -340.8px) rotate(0rad)", "transform": "translate(-50%, -50%) rotate(0rad) translate(0px, -340.8px) rotate(0rad)" } as React.CSSProperties}>
                   <div className="onclock__word__text" style={{ "translate": "none", "rotate": "none", "scale": "none", "opacity": "1", "transform": "translate(0px, 0px)" } as React.CSSProperties}>
-                    SLEEP
+                    READ
                   </div>
                 </li>
                 <li className="onclock__word" style={{ "--_rest": "rotate(0.2617993877991494rad) translate(0, -340.8px) rotate(-0.2617993877991494rad)", "transform": "translate(-50%, -50%) rotate(0.261799rad) translate(0px, -340.8px) rotate(-0.261799rad)" } as React.CSSProperties}>
                   <div className="onclock__word__text" style={{ "translate": "none", "rotate": "none", "scale": "none", "opacity": "1", "transform": "translate(0px, 0px)" } as React.CSSProperties}>
-                    SLEEP
+                    READ
                   </div>
                 </li>
                 <li className="onclock__word" style={{ "--_rest": "rotate(0.5235987755982988rad) translate(0, -340.8px) rotate(-0.5235987755982988rad)", "transform": "translate(-50%, -50%) rotate(0.523599rad) translate(0px, -340.8px) rotate(-0.523599rad)" } as React.CSSProperties}>
                   <div className="onclock__word__text" style={{ "translate": "none", "rotate": "none", "scale": "none", "opacity": "1", "transform": "translate(0px, 0px)" } as React.CSSProperties}>
-                    SLEEP
+                    CHECK
                   </div>
                 </li>
                 <li className="onclock__word" style={{ "--_rest": "rotate(0.7853981633974483rad) translate(0, -340.8px) rotate(-0.7853981633974483rad)", "transform": "translate(-50%, -50%) rotate(0.785398rad) translate(0px, -340.8px) rotate(-0.785398rad)" } as React.CSSProperties}>
                   <div className="onclock__word__text" style={{ "translate": "none", "rotate": "none", "scale": "none", "opacity": "1", "transform": "translate(0px, 0px)" } as React.CSSProperties}>
-                    SLEEP
+                    READ
                   </div>
                 </li>
                 <li className="onclock__word" style={{ "--_rest": "rotate(1.0471975511965976rad) translate(0, -340.8px) rotate(-1.0471975511965976rad)", "transform": "translate(-50%, -50%) rotate(1.0472rad) translate(0px, -340.8px) rotate(-1.0472rad)" } as React.CSSProperties}>
                   <div className="onclock__word__text" style={{ "translate": "none", "rotate": "none", "scale": "none", "opacity": "1", "transform": "translate(0px, 0px)" } as React.CSSProperties}>
-                    SLEEP
+                    DENY
                   </div>
                 </li>
                 <li className="onclock__word" style={{ "--_rest": "rotate(1.3089969389957472rad) translate(0, -340.8px) rotate(-1.3089969389957472rad)", "transform": "translate(-50%, -50%) rotate(1.309rad) translate(0px, -340.8px) rotate(-1.309rad)" } as React.CSSProperties}>
                   <div className="onclock__word__text" style={{ "translate": "none", "rotate": "none", "scale": "none", "opacity": "1", "transform": "translate(0px, 0px)" } as React.CSSProperties}>
-                    SLEEP
+                    READ
                   </div>
                 </li>
                 <li className="onclock__word" style={{ "--_rest": "rotate(1.5707963267948966rad) translate(0, -340.8px) rotate(-1.5707963267948966rad)", "transform": "translate(-50%, -50%) rotate(1.5708rad) translate(0px, -340.8px) rotate(-1.5708rad)" } as React.CSSProperties}>
                   <div className="onclock__word__text" style={{ "translate": "none", "rotate": "none", "scale": "none", "opacity": "1", "transform": "translate(0px, 0px)" } as React.CSSProperties}>
-                    SLEEP
+                    CHECK
                   </div>
                 </li>
                 <li className="onclock__word" style={{ "--_rest": "rotate(1.8325957145940461rad) translate(0, -340.8px) rotate(-1.8325957145940461rad)", "transform": "translate(-50%, -50%) rotate(1.8326rad) translate(0px, -340.8px) rotate(-1.8326rad)" } as React.CSSProperties}>
                   <div className="onclock__word__text" style={{ "translate": "none", "rotate": "none", "scale": "none", "opacity": "1", "transform": "translate(0px, 0px)" } as React.CSSProperties}>
-                    SLEEP
+                    READ
                   </div>
                 </li>
                 <li className="onclock__word" style={{ "--_rest": "rotate(2.0943951023931953rad) translate(0, -340.8px) rotate(-2.0943951023931953rad)", "transform": "translate(-50%, -50%) rotate(2.0944rad) translate(0px, -340.8px) rotate(-2.0944rad)" } as React.CSSProperties}>
                   <div className="onclock__word__text" style={{ "translate": "none", "rotate": "none", "scale": "none", "opacity": "1", "transform": "translate(0px, 0px)" } as React.CSSProperties}>
-                    WORK
+                    READ
                   </div>
                 </li>
                 <li className="onclock__word" style={{ "--_rest": "rotate(2.356194490192345rad) translate(0, -340.8px) rotate(-2.356194490192345rad)", "transform": "translate(-50%, -50%) rotate(2.35619rad) translate(0px, -340.8px) rotate(-2.35619rad)" } as React.CSSProperties}>
                   <div className="onclock__word__text" style={{ "translate": "none", "rotate": "none", "scale": "none", "opacity": "1", "transform": "translate(0px, 0px)" } as React.CSSProperties}>
-                    WORK
+                    ESCALATE
                   </div>
                 </li>
                 <li className="onclock__word" style={{ "--_rest": "rotate(2.6179938779914944rad) translate(0, -340.8px) rotate(-2.6179938779914944rad)", "transform": "translate(-50%, -50%) rotate(2.61799rad) translate(0px, -340.8px) rotate(-2.61799rad)" } as React.CSSProperties}>
                   <div className="onclock__word__text" style={{ "translate": "none", "rotate": "none", "scale": "none", "opacity": "1", "transform": "translate(0px, 0px)" } as React.CSSProperties}>
-                    WORK
+                    READ
                   </div>
                 </li>
                 <li className="onclock__word" style={{ "--_rest": "rotate(2.8797932657906435rad) translate(0, -340.8px) rotate(-2.8797932657906435rad)", "transform": "translate(-50%, -50%) rotate(2.87979rad) translate(0px, -340.8px) rotate(-2.87979rad)" } as React.CSSProperties}>
                   <div className="onclock__word__text" style={{ "translate": "none", "rotate": "none", "scale": "none", "opacity": "1", "transform": "translate(0px, 0px)" } as React.CSSProperties}>
-                    EAT
+                    CHECK
                   </div>
                 </li>
                 <li className="onclock__word" style={{ "--_rest": "rotate(3.141592653589793rad) translate(0, -340.8px) rotate(-3.141592653589793rad)", "transform": "translate(-50%, -50%) rotate(3.14159rad) translate(0px, -340.8px) rotate(-3.14159rad)" } as React.CSSProperties}>
                   <div className="onclock__word__text" style={{ "translate": "none", "rotate": "none", "scale": "none", "opacity": "1", "transform": "translate(0px, 0px)" } as React.CSSProperties}>
-                    WORK
+                    ALLOW
                   </div>
                 </li>
                 <li className="onclock__word" style={{ "--_rest": "rotate(3.4033920413889422rad) translate(0, -340.8px) rotate(-3.4033920413889422rad)", "transform": "translate(-50%, -50%) rotate(3.40339rad) translate(0px, -340.8px) rotate(-3.40339rad)" } as React.CSSProperties}>
                   <div className="onclock__word__text" style={{ "translate": "none", "rotate": "none", "scale": "none", "opacity": "1", "transform": "translate(0px, 0px)" } as React.CSSProperties}>
-                    WORK
+                    READ
                   </div>
                 </li>
                 <li className="onclock__word" style={{ "--_rest": "rotate(3.6651914291880923rad) translate(0, -340.8px) rotate(-3.6651914291880923rad)", "transform": "translate(-50%, -50%) rotate(3.66519rad) translate(0px, -340.8px) rotate(-3.66519rad)" } as React.CSSProperties}>
                   <div className="onclock__word__text" style={{ "translate": "none", "rotate": "none", "scale": "none", "opacity": "1", "transform": "translate(0px, 0px)" } as React.CSSProperties}>
-                    WORK
+                    READ
                   </div>
                 </li>
                 <li className="onclock__word" style={{ "--_rest": "rotate(3.9269908169872414rad) translate(0, -340.8px) rotate(-3.9269908169872414rad)", "transform": "translate(-50%, -50%) rotate(3.92699rad) translate(0px, -340.8px) rotate(-3.92699rad)" } as React.CSSProperties}>
                   <div className="onclock__word__text" style={{ "translate": "none", "rotate": "none", "scale": "none", "opacity": "1", "transform": "translate(0px, 0px)" } as React.CSSProperties}>
-                    EXERCISE
+                    DENY
                   </div>
                 </li>
                 <li className="onclock__word" style={{ "--_rest": "rotate(4.1887902047863905rad) translate(0, -340.8px) rotate(-4.1887902047863905rad)", "transform": "translate(-50%, -50%) rotate(4.18879rad) translate(0px, -340.8px) rotate(-4.18879rad)" } as React.CSSProperties}>
                   <div className="onclock__word__text" style={{ "translate": "none", "rotate": "none", "scale": "none", "opacity": "1", "transform": "translate(0px, 0px)" } as React.CSSProperties}>
-                    EXERCISE
+                    CHECK
                   </div>
                 </li>
                 <li className="onclock__word" style={{ "--_rest": "rotate(4.4505895925855405rad) translate(0, -340.8px) rotate(-4.4505895925855405rad)", "transform": "translate(-50%, -50%) rotate(4.45059rad) translate(0px, -340.8px) rotate(-4.45059rad)" } as React.CSSProperties}>
                   <div className="onclock__word__text" style={{ "translate": "none", "rotate": "none", "scale": "none", "opacity": "1", "transform": "translate(0px, 0px)" } as React.CSSProperties}>
-                    EXERCISE
+                    READ
                   </div>
                 </li>
                 <li className="onclock__word" style={{ "--_rest": "rotate(4.71238898038469rad) translate(0, -340.8px) rotate(-4.71238898038469rad)", "transform": "translate(-50%, -50%) rotate(4.71239rad) translate(0px, -340.8px) rotate(-4.71239rad)" } as React.CSSProperties}>
                   <div className="onclock__word__text" style={{ "translate": "none", "rotate": "none", "scale": "none", "opacity": "1", "transform": "translate(0px, 0px)" } as React.CSSProperties}>
-                    EAT
+                    READ
                   </div>
                 </li>
                 <li className="onclock__word" style={{ "--_rest": "rotate(4.974188368183839rad) translate(0, -340.8px) rotate(-4.974188368183839rad)", "transform": "translate(-50%, -50%) rotate(4.97419rad) translate(0px, -340.8px) rotate(-4.97419rad)" } as React.CSSProperties}>
                   <div className="onclock__word__text" style={{ "translate": "none", "rotate": "none", "scale": "none", "opacity": "1", "transform": "translate(0px, 0px)" } as React.CSSProperties}>
-                    STUDY
+                    ESCALATE
                   </div>
                 </li>
                 <li className="onclock__word" style={{ "--_rest": "rotate(5.235987755982989rad) translate(0, -340.8px) rotate(-5.235987755982989rad)", "transform": "translate(-50%, -50%) rotate(5.23599rad) translate(0px, -340.8px) rotate(-5.23599rad)" } as React.CSSProperties}>
                   <div className="onclock__word__text" style={{ "translate": "none", "rotate": "none", "scale": "none", "opacity": "1", "transform": "translate(0px, 0px)" } as React.CSSProperties}>
-                    STUDY
+                    READ
                   </div>
                 </li>
                 <li className="onclock__word" style={{ "--_rest": "rotate(5.497787143782138rad) translate(0, -340.8px) rotate(-5.497787143782138rad)", "transform": "translate(-50%, -50%) rotate(5.49779rad) translate(0px, -340.8px) rotate(-5.49779rad)" } as React.CSSProperties}>
                   <div className="onclock__word__text" style={{ "translate": "none", "rotate": "none", "scale": "none", "opacity": "1", "transform": "translate(0px, 0px)" } as React.CSSProperties}>
-                    REST
+                    CHECK
                   </div>
                 </li>
                 <li className="onclock__word" style={{ "--_rest": "rotate(5.759586531581287rad) translate(0, -340.8px) rotate(-5.759586531581287rad)", "transform": "translate(-50%, -50%) rotate(5.75959rad) translate(0px, -340.8px) rotate(-5.75959rad)" } as React.CSSProperties}>
                   <div className="onclock__word__text" style={{ "translate": "none", "rotate": "none", "scale": "none", "opacity": "1", "transform": "translate(0px, 0px)" } as React.CSSProperties}>
-                    REST
+                    READ
                   </div>
                 </li>
                 <li className="onclock__word" style={{ "--_rest": "rotate(6.021385919380437rad) translate(0, -340.8px) rotate(-6.021385919380437rad)", "transform": "translate(-50%, -50%) rotate(6.02139rad) translate(0px, -340.8px) rotate(-6.02139rad)" } as React.CSSProperties}>
                   <div className="onclock__word__text" style={{ "translate": "none", "rotate": "none", "scale": "none", "opacity": "1", "transform": "translate(0px, 0px)" } as React.CSSProperties}>
-                    REST
+                    DENY
                   </div>
                 </li>
               </ul>
@@ -2151,7 +2108,7 @@ export default function PageBody() {
             <div data-anima="parag" className="onclock__bottom__left">
               <div className="subtitle">
                 <div className="subtitle__dot" />
-                <div className="subtitle__text" aria-label="WE OVERCLOCK OUR MACHINES">
+                <div className="subtitle__text" aria-label="WE OVER-PERMISSION OUR AGENTS">
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       W
@@ -2174,19 +2131,37 @@ export default function PageBody() {
                       R
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      C
+                      -
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      L
+                      P
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      E
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      R
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      M
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      I
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      S
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      S
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      I
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       O
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      C
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      K
+                      N
                     </div>
                   </div>
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
@@ -2202,25 +2177,19 @@ export default function PageBody() {
                   </div>
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      M
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       A
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      C
+                      G
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      H
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      I
+                      E
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       N
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      E
+                      T
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       S
@@ -2229,13 +2198,13 @@ export default function PageBody() {
                 </div>
               </div>
               <p className="parag" style={{ "--mask": "linear-gradient(-15deg, transparent -50%, black 0%)" } as React.CSSProperties}>
-                Designers and developers share a trait: we chase flow.Hours vanish inside pixels or code. But each late-night push steals from tomorrow’s clarity. Blue light replaces sunsets. Slack pings replace silence.
+                Builders share a trait: we grant access to move faster. One more scope, one more key, one more allowlisted address. Each grant is reasonable alone. Together they are the whole treasury.
               </p>
             </div>
             <div data-anima="parag" className="encounter__bottom__right">
               <div className="subtitle">
                 <div className="subtitle__dot" />
-                <div className="subtitle__text" aria-label="THEN WONDER THE OVERHEAT">
+                <div className="subtitle__text" aria-label="THEN WONDER AT THE DRAIN">
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       T
@@ -2272,6 +2241,14 @@ export default function PageBody() {
                   </div>
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      A
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      T
+                    </div>
+                  </div>
+                  <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       T
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
@@ -2283,34 +2260,25 @@ export default function PageBody() {
                   </div>
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      O
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      V
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      E
+                      D
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       R
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      H
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      E
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       A
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      T
+                      I
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      N
                     </div>
                   </div>
                 </div>
               </div>
               <p className="parag" style={{ "--mask": "linear-gradient(-15deg, transparent -50%, black 0%)" } as React.CSSProperties}>
-                Over time, this constant “on” state erodes sleep architecture — the deep layers of rest we need most. We start waking up more tired than before we slept. “We overclock our machines. Then wonder why they overheat.”
+                Over time, permission granted for convenience becomes permission nobody remembers granting. The agent can do far more than anyone intended. “We over-permission our agents. Then wonder why the funds move.”
               </p>
             </div>
           </div>
@@ -2334,16 +2302,10 @@ export default function PageBody() {
             </div>
             <div data-anima="texts" className="encouter__title">
               <div className="encounter__title__serif">
-                <div className="title_serif" aria-label="Encounter the Balance">
+                <div className="title_serif" aria-label="Bound what it can do">
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      E
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      n
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      c
+                      B
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       o
@@ -2355,13 +2317,102 @@ export default function PageBody() {
                       n
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      d
+                    </div>
+                  </div>
+                  <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      w
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      h
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      a
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       t
                     </div>
+                  </div>
+                  <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      e
+                      i
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      r
+                      t
+                    </div>
+                  </div>
+                  <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      c
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      a
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      n
+                    </div>
+                  </div>
+                  <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      d
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      o
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="encounter__title__sans">
+                <div className="title_sans encounter__title__sans__title" aria-label="not what it might think">
+                  <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      n
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      o
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      t
+                    </div>
+                  </div>
+                  <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      w
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      h
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      a
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      t
+                    </div>
+                  </div>
+                  <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      i
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      t
+                    </div>
+                  </div>
+                  <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      m
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      i
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      g
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      h
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      t
                     </div>
                   </div>
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
@@ -2372,82 +2423,13 @@ export default function PageBody() {
                       h
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      e
-                    </div>
-                  </div>
-                  <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      B
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      a
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      l
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      a
+                      i
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       n
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      c
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      e
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="encounter__title__sans">
-                <div className="title_sans encounter__title__sans__title" aria-label="and sleep better">
-                  <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      a
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      n
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      d
-                    </div>
-                  </div>
-                  <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      s
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      l
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      e
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      e
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      p
-                    </div>
-                  </div>
-                  <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      b
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      e
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      t
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      t
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      e
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      r
+                      k
                     </div>
                   </div>
                 </div>
@@ -2492,7 +2474,7 @@ export default function PageBody() {
             <div data-anima="parag" className="encounter__bottom__left">
               <div className="subtitle">
                 <div className="subtitle__dot" />
-                <div className="subtitle__text" aria-label="THE SECRET IS RHYTHM">
+                <div className="subtitle__text" aria-label="THE SECRET IS SCOPE">
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       T
@@ -2534,34 +2516,31 @@ export default function PageBody() {
                   </div>
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      R
+                      S
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      H
+                      C
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      Y
+                      O
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      T
+                      P
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      H
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      M
+                      E
                     </div>
                   </div>
                 </div>
               </div>
               <p className="parag" style={{ "--mask": "linear-gradient(-15deg, transparent -50%, black 0%)" } as React.CSSProperties}>
-                Our bodies were never built for static creation. Yet designers and developers often live between chair and screen, motionless for hours keeping their creativity alive, but their circulation asleep. Balance is the true performance enhancer. Overworking or overtraining both flood the body with cortisol, delaying rest.
+                Models were never built to be boundaries. Yet teams put the limit in the system prompt and hope the agent keeps reading it. Instructions are advice, and advice can be argued with. Anything that can be talked out of enforcing a rule was never enforcing it. Scope is the true control.
               </p>
             </div>
             <div data-anima="parag" className="encounter__bottom__right">
               <div className="subtitle">
                 <div className="subtitle__dot" />
-                <div className="subtitle__text" aria-label="AND NOT INTENSITY">
+                <div className="subtitle__text" aria-label="AND NOT INTENTION">
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       A
@@ -2601,24 +2580,24 @@ export default function PageBody() {
                       N
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      S
+                      T
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       I
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      T
+                      O
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      Y
+                      N
                     </div>
                   </div>
                 </div>
               </div>
               <p className="parag" style={{ "--mask": "linear-gradient(-15deg, transparent -50%, black 0%)" } as React.CSSProperties}>
-                Movement isn’t the opposite of productivity; it fuels it. Exercise regulates your circadian rhythm, balances hormones, and lowers the stress that hijacks deep sleep. A short walk, a stretch, a jog — each is a signal to your body:
+                Constraint isn’t the opposite of autonomy; it is what makes autonomy safe to grant. A narrow scope, an allowlist, a capability that expires — each is a statement your agent cannot argue with:
                 <em>
-                  The day is in motion, the night we can rest. Balance is the true performance enhancer.
+                  Bound what it can do, and it no longer matters what it is told. Scope is the true control.
                 </em>
               </p>
             </div>
@@ -2631,13 +2610,33 @@ export default function PageBody() {
             <div className="drop-cans__subt">
               <div className="subtitle">
                 <div className="subtitle__dot" />
-                <div className="subtitle__text" aria-label="⚠️ DURING NIGHT: AVOID IT AT ANY COST">
+                <div className="subtitle__text" aria-label="⚠️ IN PRODUCTION: AVOID IT AT ANY COST">
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      ⚠️
+                      ⚠
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      ️
                     </div>
                   </div>
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      I
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      N
+                    </div>
+                  </div>
+                  <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      P
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      R
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      O
+                    </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       D
                     </div>
@@ -2645,33 +2644,19 @@ export default function PageBody() {
                       U
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      R
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      I
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      N
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      G
-                    </div>
-                  </div>
-                  <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      N
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      I
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      G
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      H
+                      C
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       T
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      I
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      O
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      N
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       :
@@ -2740,7 +2725,7 @@ export default function PageBody() {
             </div>
             <div data-anima="texts" className="drop-cans__title">
               <div className="drop-cans__title__serif">
-                <div className="title_serif" aria-label="Just drop the cans,">
+                <div className="title_serif" aria-label="Just drop the keys,">
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       J
@@ -2782,13 +2767,13 @@ export default function PageBody() {
                   </div>
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      c
+                      k
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      a
+                      e
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      n
+                      y
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       s
@@ -2800,7 +2785,7 @@ export default function PageBody() {
                 </div>
               </div>
               <div className="drop-cans__title__sans">
-                <div className="title_sans" aria-label="no more heart-racing">
+                <div className="title_sans" aria-label="no more blind signing">
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       n
@@ -2825,31 +2810,33 @@ export default function PageBody() {
                   </div>
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      h
+                      b
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      e
+                      l
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      a
+                      i
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      r
+                      n
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      t
+                      d
+                    </div>
+                  </div>
+                  <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      s
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      -
+                      i
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      r
+                      g
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      a
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      c
+                      n
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       i
@@ -2895,42 +2882,13 @@ export default function PageBody() {
           </div>
           <div className="drop-cans__bottom">
             <div data-anima="parag" className="drop-cans__bottom__left">
-              <div className="description" aria-label="Your heartbeat shapes your sleep, and your mind. A steady rhythm is not just health — it’s harmony.">
+              <div className="description" aria-label="What an agent may spend shapes everything downstream. A stated ceiling is not bureaucracy — it’s the blast radius.">
                 <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    Y
+                    W
                   </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    o
-                  </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    u
-                  </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    r
-                  </div>
-                </div>
-                <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                     h
-                  </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    e
-                  </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    a
-                  </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    r
-                  </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    t
-                  </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    b
-                  </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    e
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                     a
@@ -2941,61 +2899,49 @@ export default function PageBody() {
                 </div>
                 <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    s
+                    a
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    h
+                    n
                   </div>
+                </div>
+                <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                     a
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    p
+                    g
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                     e
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    s
+                    n
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    t
                   </div>
                 </div>
                 <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    m
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    a
+                  </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                     y
                   </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    o
-                  </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    u
-                  </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    r
-                  </div>
                 </div>
                 <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                     s
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    l
-                  </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    e
-                  </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    e
-                  </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                     p
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    ,
-                  </div>
-                </div>
-                <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    a
+                    e
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                     n
@@ -3006,21 +2952,45 @@ export default function PageBody() {
                 </div>
                 <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    y
+                    s
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    o
+                    h
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    u
+                    a
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    r
+                    p
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    e
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    s
                   </div>
                 </div>
                 <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    m
+                    e
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    v
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    e
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    r
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    y
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    t
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    h
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                     i
@@ -3029,7 +2999,39 @@ export default function PageBody() {
                     n
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    g
+                  </div>
+                </div>
+                <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                     d
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    o
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    w
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    n
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    s
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    t
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    r
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    e
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    a
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    m
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                     .
@@ -3048,36 +3050,39 @@ export default function PageBody() {
                     t
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    e
-                  </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                     a
-                  </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    d
-                  </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    y
-                  </div>
-                </div>
-                <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    r
-                  </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    h
-                  </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    y
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                     t
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    h
+                    e
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    m
+                    d
+                  </div>
+                </div>
+                <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    c
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    e
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    i
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    l
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    i
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    n
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    g
                   </div>
                 </div>
                 <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
@@ -3101,21 +3106,13 @@ export default function PageBody() {
                 </div>
                 <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    j
+                    b
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                     u
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    s
-                  </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    t
-                  </div>
-                </div>
-                <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    h
+                    r
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                     e
@@ -3124,13 +3121,22 @@ export default function PageBody() {
                     a
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    l
+                    u
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    t
+                    c
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    h
+                    r
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    a
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    c
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    y
                   </div>
                 </div>
                 <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
@@ -3154,25 +3160,50 @@ export default function PageBody() {
                 </div>
                 <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    t
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                     h
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    e
+                  </div>
+                </div>
+                <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    b
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    l
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                     a
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    s
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    t
+                  </div>
+                </div>
+                <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                     r
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    m
+                    a
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    o
+                    d
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    n
+                    i
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    y
+                    u
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    s
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                     .
@@ -3237,17 +3268,17 @@ export default function PageBody() {
       <div className="spacer-fs scene-phone">
         <div data-anima="parag" className="scene-phone__description">
           <div className="description descr-phone">
-            “Your phone scrolls. Your brain doesn’t stop.” Every late-night scroll keeps your mind in motion.
+            “Your agent reads. Your agent obeys.” Every untrusted input is an instruction waiting to be followed.
           </div>
         </div>
         <div data-anima="parag" className="scene-phone__description scene-phone__description__left">
           <div className="description descr-phone">
-            “Blue light is the new midnight sun.” Postponing dreams and confusing your inner clock.
+            “A key is the new blank cheque.” Signed before anyone can read what it authorised.
           </div>
         </div>
         <div data-anima="parag" className="scene-phone__description">
           <div className="description descr-phone">
-            “You can’t rest if you’re still refreshing.” Your brain can’t let go of today, if you can't let the cellphone go.
+            “You can’t bound it if you only asked it nicely.” A rule the agent can reinterpret is not a rule at all.
           </div>
         </div>
       </div>
@@ -3318,7 +3349,7 @@ export default function PageBody() {
                 </div>
               </div>
               <div className="cycle__title__sans">
-                <div className="title_sans" aria-label="the blue Glow.">
+                <div className="title_sans" aria-label="the stale feed.">
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       t
@@ -3332,13 +3363,16 @@ export default function PageBody() {
                   </div>
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      b
+                      s
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      t
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      a
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       l
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      u
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       e
@@ -3346,16 +3380,16 @@ export default function PageBody() {
                   </div>
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      G
+                      f
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      l
+                      e
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      o
+                      e
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      w
+                      d
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       .
@@ -3369,7 +3403,7 @@ export default function PageBody() {
             <div data-anima="parag" className="the-balance__bottom__right">
               <div className="subtitle">
                 <div className="subtitle__dot" />
-                <div className="subtitle__text" aria-label="THE BIOLOGICAL CONFUSION">
+                <div className="subtitle__text" aria-label="THE SILENT CONFUSION">
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       T
@@ -3383,34 +3417,22 @@ export default function PageBody() {
                   </div>
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      B
+                      S
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       I
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      O
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       L
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      O
+                      E
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      G
+                      N
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      I
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      C
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      A
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      L
+                      T
                     </div>
                   </div>
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
@@ -3445,13 +3467,13 @@ export default function PageBody() {
                 </div>
               </div>
               <p className="parag" style={{ "--mask": "linear-gradient(-15deg, transparent -50%, black 0%)" } as React.CSSProperties}>
-                Your body listens to light. Blue wavelengths from screens mimic daylight, confusing your circadian rhythm. To your brain, midnight looks like morning.
+                Your agent listens to data. A stale price still parses, still looks reasonable, still returns a number. To the model, an hour ago looks like now.
               </p>
             </div>
             <div data-anima="parag" className="cycle__bottom__left">
               <div className="subtitle">
                 <div className="subtitle__dot" />
-                <div className="subtitle__text" aria-label="YOUR BODY LISTENS TO LIGHT">
+                <div className="subtitle__text" aria-label="YOUR AGENT LISTENS TO DATA">
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       Y
@@ -3468,16 +3490,19 @@ export default function PageBody() {
                   </div>
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      B
+                      A
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      O
+                      G
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      D
+                      E
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      Y
+                      N
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      T
                     </div>
                   </div>
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
@@ -3513,25 +3538,22 @@ export default function PageBody() {
                   </div>
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      L
+                      D
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      I
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      G
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      H
+                      A
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       T
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      A
                     </div>
                   </div>
                 </div>
               </div>
               <p className="parag" style={{ "--mask": "linear-gradient(-15deg, transparent -50%, black 0%)" } as React.CSSProperties}>
-                This delay shifts melatonin release — your natural sleep trigger. Even a few minutes of screen time can reset your biological clock by hours.
+                That gap is where losses live — the window between what was true and what was read. Seconds of staleness can price a position at yesterday’s value.
               </p>
             </div>
           </div>
@@ -3539,22 +3561,25 @@ export default function PageBody() {
             <div data-anima="parag" className="the-balance__bottom__right">
               <div className="subtitle">
                 <div className="subtitle__dot" />
-                <div className="subtitle__text" aria-label="LIGHT, SCREENS, DURING THE NIGHT">
+                <div className="subtitle__text" aria-label="PRICES, FEEDS, DURING A SPIKE">
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      L
+                      P
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      R
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       I
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      G
+                      C
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      H
+                      E
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      T
+                      S
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       ,
@@ -3562,13 +3587,7 @@ export default function PageBody() {
                   </div>
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      S
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      C
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      R
+                      F
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       E
@@ -3577,7 +3596,7 @@ export default function PageBody() {
                       E
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      N
+                      D
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       S
@@ -3608,36 +3627,30 @@ export default function PageBody() {
                   </div>
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      T
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      H
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      E
+                      A
                     </div>
                   </div>
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      N
+                      S
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      P
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       I
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      G
+                      K
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      H
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      T
+                      E
                     </div>
                   </div>
                 </div>
               </div>
               <p className="parag" style={{ "--mask": "linear-gradient(-15deg, transparent -50%, black 0%)" } as React.CSSProperties}>
-                Every source — phone, monitor, lamp — sends an instruction to your biology.
+                Every source — oracle, index, cache — carries its own claim to truth.
                 <br />
                 Warm light tells the body:
                 <em>
@@ -3653,7 +3666,7 @@ export default function PageBody() {
             <div data-anima="parag" className="the-balance__bottom__left">
               <div className="subtitle">
                 <div className="subtitle__dot" />
-                <div className="subtitle__text" aria-label="ALIGNMENT WITH NATURE’S TIMING">
+                <div className="subtitle__text" aria-label="ALIGNMENT WITH THE CHAIN HEAD">
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       A
@@ -3699,54 +3712,50 @@ export default function PageBody() {
                   </div>
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      N
+                      T
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      H
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      E
+                    </div>
+                  </div>
+                  <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      C
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      H
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       A
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      T
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      U
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      R
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      E
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      ’
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      S
-                    </div>
-                  </div>
-                  <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      T
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      I
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      M
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       I
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       N
                     </div>
+                  </div>
+                  <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      G
+                      H
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      E
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      A
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      D
                     </div>
                   </div>
                 </div>
               </div>
               <p className="parag" style={{ "--mask": "linear-gradient(-15deg, transparent -50%, black 0%)" } as React.CSSProperties}>
-                When this rhythm drifts, you start waking up at the wrong point in your sleep cycle, feeling unrested even after eight hours.
+                When a feed drifts, the agent acts on the wrong number confidently, and the transaction settles exactly as instructed.
               </p>
             </div>
           </div>
@@ -3810,22 +3819,145 @@ export default function PageBody() {
           </div>
           <div className="the-balance__bottom__subt">
             <div data-anima="parag" className="drop-cans__bottom__left">
-              <div className="description" aria-label="Turn down the Light!Blue lights signal to your brain that midnight looks like morning.“You can’t dream in daylight.”">
+              <div className="description" aria-label="Check the clock on the price. A feed past its window still returns a number, and the number still looks like a fact. “Stale data doesn’t error. It answers.”">
                 <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    T
+                    C
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    u
+                    h
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    r
+                    e
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    c
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    k
+                  </div>
+                </div>
+                <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    t
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    h
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    e
+                  </div>
+                </div>
+                <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    c
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    l
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    o
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    c
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    k
+                  </div>
+                </div>
+                <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    o
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                     n
                   </div>
                 </div>
                 <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    t
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    h
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    e
+                  </div>
+                </div>
+                <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    p
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    r
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    i
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    c
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    e
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    .
+                  </div>
+                </div>
+                <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    A
+                  </div>
+                </div>
+                <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    f
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    e
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    e
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    d
+                  </div>
+                </div>
+                <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    p
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    a
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    s
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    t
+                  </div>
+                </div>
+                <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    i
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    t
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    s
+                  </div>
+                </div>
+                <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    w
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    i
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    n
+                  </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                     d
                   </div>
@@ -3835,91 +3967,19 @@ export default function PageBody() {
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                     w
                   </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    n
-                  </div>
-                </div>
-                <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    t
-                  </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    h
-                  </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    e
-                  </div>
-                </div>
-                <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    L
-                  </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    i
-                  </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    g
-                  </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    h
-                  </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    t
-                  </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    !
-                  </div>
-                </div>
-                <br />
-                <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    B
-                  </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    l
-                  </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    u
-                  </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    e
-                  </div>
-                </div>
-                <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    l
-                  </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    i
-                  </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    g
-                  </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    h
-                  </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    t
-                  </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    s
-                  </div>
                 </div>
                 <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                     s
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    t
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                     i
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    g
-                  </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    n
-                  </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    a
+                    l
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                     l
@@ -3927,18 +3987,13 @@ export default function PageBody() {
                 </div>
                 <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    r
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    e
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                     t
-                  </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    o
-                  </div>
-                </div>
-                <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    y
-                  </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    o
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                     u
@@ -3946,62 +4001,98 @@ export default function PageBody() {
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                     r
                   </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    n
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    s
+                  </div>
                 </div>
                 <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    a
+                  </div>
+                </div>
+                <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    n
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    u
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    m
+                  </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                     b
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    e
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                     r
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    a
+                    ,
                   </div>
+                </div>
+                <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    i
+                    a
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                     n
-                  </div>
-                </div>
-                <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    t
-                  </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    h
-                  </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    a
-                  </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    t
-                  </div>
-                </div>
-                <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    m
-                  </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    i
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                     d
                   </div>
+                </div>
+                <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    n
-                  </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    i
-                  </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    g
+                    t
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                     h
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    e
+                  </div>
+                </div>
+                <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    n
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    u
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    m
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    b
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    e
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    r
+                  </div>
+                </div>
+                <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    s
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                     t
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    i
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    l
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    l
                   </div>
                 </div>
                 <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
@@ -4037,51 +4128,72 @@ export default function PageBody() {
                 </div>
                 <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    m
+                    a
+                  </div>
+                </div>
+                <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    f
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    o
+                    a
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    r
+                    c
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    n
-                  </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    i
-                  </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    n
-                  </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    g
+                    t
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                     .
                   </div>
                 </div>
-                <br />
                 <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                     “
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    Y
+                    S
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    t
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    a
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    l
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    e
+                  </div>
+                </div>
+                <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    d
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    a
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    t
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    a
+                  </div>
+                </div>
+                <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    d
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                     o
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    u
-                  </div>
-                </div>
-                <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    c
+                    e
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    a
+                    s
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                     n
@@ -4095,53 +4207,53 @@ export default function PageBody() {
                 </div>
                 <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    d
+                    e
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                     r
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    e
+                    r
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    a
+                    o
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    m
+                    r
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    .
                   </div>
                 </div>
                 <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    i
+                    I
+                  </div>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    t
+                  </div>
+                </div>
+                <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
+                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                    a
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                     n
                   </div>
-                </div>
-                <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    d
+                    s
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    a
+                    w
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    y
+                    e
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    l
+                    r
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    i
-                  </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    g
-                  </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    h
-                  </div>
-                  <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                    t
+                    s
                   </div>
                   <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                     .
@@ -4174,7 +4286,7 @@ export default function PageBody() {
             </div>
             <div data-anima="texts" className="cycle__title">
               <div className="cycle__title__serif">
-                <div className="title_serif" aria-label="The Layers of your">
+                <div className="title_serif" aria-label="The Layers of one">
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       T
@@ -4216,7 +4328,22 @@ export default function PageBody() {
                   </div>
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      y
+                      o
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      n
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      e
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="cycle__title__sans">
+                <div className="title_sans" aria-label="bounded decision.">
+                  <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      b
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       o
@@ -4225,13 +4352,18 @@ export default function PageBody() {
                       u
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      r
+                      n
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      d
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      e
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      d
                     </div>
                   </div>
-                </div>
-              </div>
-              <div className="cycle__title__sans">
-                <div className="title_sans" aria-label="desirable sleep.">
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       d
@@ -4240,42 +4372,22 @@ export default function PageBody() {
                       e
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      c
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      i
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       s
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       i
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      r
+                      o
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      a
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      b
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      l
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      e
-                    </div>
-                  </div>
-                  <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      s
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      l
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      e
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      e
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      p
+                      n
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       .
@@ -4289,7 +4401,7 @@ export default function PageBody() {
             <div data-anima="parag" className="cycle__bottom__left">
               <div className="subtitle">
                 <div className="subtitle__dot" />
-                <div className="subtitle__text" aria-label="THE GATEWAY (PRE-LIGHT SLEEP)">
+                <div className="subtitle__text" aria-label="THE TRIGGER (A SIGNAL ARRIVES)">
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       T
@@ -4303,7 +4415,111 @@ export default function PageBody() {
                   </div>
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      T
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      R
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      I
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       G
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      G
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      E
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      R
+                    </div>
+                  </div>
+                  <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      (
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      A
+                    </div>
+                  </div>
+                  <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      S
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      I
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      G
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      N
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      A
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      L
+                    </div>
+                  </div>
+                  <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      A
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      R
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      R
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      I
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      V
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      E
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      S
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      )
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <p className="parag" style={{ "--mask": "linear-gradient(-15deg, transparent -50%, black 0%)" } as React.CSSProperties}>
+                A condition is met and the run begins. A health factor crosses a threshold, a schedule fires, a price moves. Nothing has been decided yet, and nothing can move.
+              </p>
+            </div>
+            <div data-anima="parag" className="cycle__bottom__right">
+              <div className="subtitle">
+                <div className="subtitle__dot" />
+                <div className="subtitle__text" aria-label="THE STRATEGY (INTENT FORMS)">
+                  <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      T
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      H
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      E
+                    </div>
+                  </div>
+                  <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      S
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      T
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      R
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       A
@@ -4315,10 +4531,7 @@ export default function PageBody() {
                       E
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      W
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      A
+                      G
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       Y
@@ -4329,28 +4542,19 @@ export default function PageBody() {
                       (
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      P
+                      I
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      R
+                      N
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      T
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       E
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      -
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      L
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      I
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      G
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      H
+                      N
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       T
@@ -4358,19 +4562,19 @@ export default function PageBody() {
                   </div>
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      F
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      O
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      R
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      M
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       S
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      L
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      E
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      E
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      P
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       )
@@ -4379,101 +4583,7 @@ export default function PageBody() {
                 </div>
               </div>
               <p className="parag" style={{ "--mask": "linear-gradient(-15deg, transparent -50%, black 0%)" } as React.CSSProperties}>
-                A few minutes between waking and dreaming. Muscles relax, heartbeat slows, thoughts drift like tabs closing one by one. If you wake here, it feels like you never slept.
-              </p>
-            </div>
-            <div data-anima="parag" className="cycle__bottom__right">
-              <div className="subtitle">
-                <div className="subtitle__dot" />
-                <div className="subtitle__text" aria-label="THE STABILIZER (LIGHT-SLEEP)">
-                  <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      T
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      H
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      E
-                    </div>
-                  </div>
-                  <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      S
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      T
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      A
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      B
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      I
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      L
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      I
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      Z
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      E
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      R
-                    </div>
-                  </div>
-                  <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      (
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      L
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      I
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      G
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      H
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      T
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      -
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      S
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      L
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      E
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      E
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      P
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      )
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <p className="parag" style={{ "--mask": "linear-gradient(-15deg, transparent -50%, black 0%)" } as React.CSSProperties}>
-                You enter light sleep. Brain waves slow, temperature drops. This is where your body begins true rest — half of your total night happens here.
+                The strategy reads verified data and forms an intent. This is the only layer where the model reasons — and it still holds no authority to act.
               </p>
             </div>
           </div>
@@ -4504,7 +4614,7 @@ export default function PageBody() {
                 </svg>
               </div>
               <div className="cycle__cycle__title cycle__cycle__title__h1">
-                <div className="title_serif title_serif__cycle" aria-label="The SleepCycle">
+                <div className="title_serif title_serif__cycle" aria-label="The PolicyPath">
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       T
@@ -4518,36 +4628,34 @@ export default function PageBody() {
                   </div>
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      S
+                      P
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      o
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       l
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      e
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      e
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      p
-                    </div>
-                  </div>
-                  <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      C
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      y
+                      i
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       c
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      l
+                      y
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      e
+                      P
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      a
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      t
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      h
                     </div>
                   </div>
                 </div>
@@ -4572,7 +4680,7 @@ export default function PageBody() {
             <div data-anima="parag" className="cycle__bottom__left">
               <div className="subtitle">
                 <div className="subtitle__dot" />
-                <div className="subtitle__text" aria-label="THE SLOW-WAVE (DEEP SLEEP)">
+                <div className="subtitle__text" aria-label="THE POLICY (AUTHORITY DECIDES)">
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       T
@@ -4586,36 +4694,68 @@ export default function PageBody() {
                   </div>
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      S
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      L
+                      P
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       O
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      W
+                      L
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      -
+                      I
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      W
+                      C
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      A
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      V
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      E
+                      Y
                     </div>
                   </div>
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       (
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      A
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      U
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      T
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      H
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      O
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      R
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      I
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      T
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      Y
+                    </div>
+                  </div>
+                  <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      D
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      E
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      C
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      I
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       D
@@ -4624,27 +4764,7 @@ export default function PageBody() {
                       E
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      E
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      P
-                    </div>
-                  </div>
-                  <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       S
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      L
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      E
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      E
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      P
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       )
@@ -4653,13 +4773,13 @@ export default function PageBody() {
                 </div>
               </div>
               <p className="parag" style={{ "--mask": "linear-gradient(-15deg, transparent -50%, black 0%)" } as React.CSSProperties}>
-                Your brain performs deep maintenance: repairing tissues, building immunity, consolidating memory. If creativity has roots, this is where they grow.
+                The policy evaluates the intent against stated limits: amount, recipient, freshness, window. If a capability is ever issued, it is decided here.
               </p>
             </div>
             <div data-anima="parag" className="cycle__bottom__right">
               <div className="subtitle">
                 <div className="subtitle__dot" />
-                <div className="subtitle__text" aria-label="THE DREAM SPACE (REM)">
+                <div className="subtitle__text" aria-label="THE EXECUTOR (SETTLEMENT)">
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       T
@@ -4673,36 +4793,28 @@ export default function PageBody() {
                   </div>
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      D
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      R
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       E
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      A
+                      X
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      M
-                    </div>
-                  </div>
-                  <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      S
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      P
-                    </div>
-                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      A
+                      E
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       C
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      E
+                      U
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      T
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      O
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      R
                     </div>
                   </div>
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
@@ -4710,13 +4822,34 @@ export default function PageBody() {
                       (
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      R
+                      S
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      E
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      T
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      T
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      L
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       E
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       M
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      E
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      N
+                    </div>
+                    <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                      T
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       )
@@ -4725,7 +4858,7 @@ export default function PageBody() {
                 </div>
               </div>
               <p className="parag" style={{ "--mask": "linear-gradient(-15deg, transparent -50%, black 0%)" } as React.CSSProperties}>
-                Logic dissolves, emotion rewires, imagination reorganizes experience. Your pulse rises again; your brain acts like it’s awake — but it’s rebuilding your inner world.
+                Only now does anything reach a chain. The executor presents a capability that is scoped, single-use and already expiring — and submits nothing without one.
               </p>
             </div>
           </div>
@@ -4760,30 +4893,13 @@ export default function PageBody() {
                 <div className="solution__hero__subt">
                   <div className="subtitle">
                     <div className="subtitle__dot" />
-                    <div className="subtitle__text" aria-label="IT'S TIME TO LEARN :">
-                      <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
-                        <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                          I
-                        </div>
-                        <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                          T
-                        </div>
-                        <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                          '
-                        </div>
-                        <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                          S
-                        </div>
-                      </div>
+                    <div className="subtitle__text" aria-label="THE RULES WE HOLD :">
                       <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                         <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                           T
                         </div>
                         <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                          I
-                        </div>
-                        <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                          M
+                          H
                         </div>
                         <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                           E
@@ -4791,13 +4907,11 @@ export default function PageBody() {
                       </div>
                       <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                         <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                          T
+                          R
                         </div>
                         <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                          O
+                          U
                         </div>
-                      </div>
-                      <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                         <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                           L
                         </div>
@@ -4805,13 +4919,29 @@ export default function PageBody() {
                           E
                         </div>
                         <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                          A
+                          S
+                        </div>
+                      </div>
+                      <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
+                        <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                          W
                         </div>
                         <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                          R
+                          E
+                        </div>
+                      </div>
+                      <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
+                        <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                          H
                         </div>
                         <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                          N
+                          O
+                        </div>
+                        <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                          L
+                        </div>
+                        <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                          D
                         </div>
                       </div>
                       <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
@@ -4829,13 +4959,13 @@ export default function PageBody() {
                 </div>
                 <div className="solution__hero__title__sans">
                   <div className="title_sans">
-                    for a better sleep.
+                    before you trust it.
                   </div>
                 </div>
               </div>
               <div className="solution__hero__parag">
                 <p className="parag" style={{ "--mask": "linear-gradient(-15deg, transparent -50%, black 0%)" } as React.CSSProperties}>
-                  Now, we rebuild. Sleep hygiene isn’t a trend. It’s UX for your biology.
+                  Six rules we hold. They are not advice to the model. They are enforced.
                 </p>
               </div>
               <div className="solution__hero__dot" />
@@ -4853,7 +4983,7 @@ export default function PageBody() {
                   <div className="solutions__each__subt">
                     <div className="subtitle">
                       <div className="subtitle__dot" />
-                      <div className="subtitle__text" aria-label="01  - FIRST TIP">
+                      <div className="subtitle__text" aria-label="01  - FIRST RULE">
                         <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                           <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                             0
@@ -4863,6 +4993,9 @@ export default function PageBody() {
                           </div>
                         </div>
                         <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
+                          <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                             
+                          </div>
                           <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                             -
                           </div>
@@ -4886,13 +5019,16 @@ export default function PageBody() {
                         </div>
                         <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                           <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                            T
+                            R
                           </div>
                           <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                            I
+                            U
                           </div>
                           <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                            P
+                            L
+                          </div>
+                          <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                            E
                           </div>
                         </div>
                       </div>
@@ -4905,7 +5041,7 @@ export default function PageBody() {
                   </div>
                   <div className="solutions__each__parag">
                     <p className="parag" style={{ "--mask": "linear-gradient(-15deg, transparent -50%, black 0%)" } as React.CSSProperties}>
-                      Wind down with consistency — your brain loves patterns.
+                      State the ceiling yourself — it is never inferred.
                     </p>
                   </div>
                 </div>
@@ -4921,7 +5057,7 @@ export default function PageBody() {
                   <div className="solutions__each__subt">
                     <div className="subtitle">
                       <div className="subtitle__dot" />
-                      <div className="subtitle__text" aria-label="02 - SECOND TIP">
+                      <div className="subtitle__text" aria-label="02 - SECOND RULE">
                         <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                           <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                             0
@@ -4957,13 +5093,16 @@ export default function PageBody() {
                         </div>
                         <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                           <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                            T
+                            R
                           </div>
                           <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                            I
+                            U
                           </div>
                           <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                            P
+                            L
+                          </div>
+                          <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                            E
                           </div>
                         </div>
                       </div>
@@ -4992,7 +5131,7 @@ export default function PageBody() {
                   <div className="solutions__each__subt">
                     <div className="subtitle">
                       <div className="subtitle__dot" />
-                      <div className="subtitle__text" aria-label="03 - THIRD TIP">
+                      <div className="subtitle__text" aria-label="03 - THIRD RULE">
                         <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                           <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                             0
@@ -5025,13 +5164,16 @@ export default function PageBody() {
                         </div>
                         <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                           <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                            T
+                            R
                           </div>
                           <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                            I
+                            U
                           </div>
                           <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                            P
+                            L
+                          </div>
+                          <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                            E
                           </div>
                         </div>
                       </div>
@@ -5044,7 +5186,7 @@ export default function PageBody() {
                   </div>
                   <div className="solutions__each__parag">
                     <p className="parag" style={{ "--mask": "linear-gradient(-15deg, transparent -50%, black 0%)" } as React.CSSProperties}>
-                      Cool, dark, quiet. Like a minimalist interface.
+                      Narrow, expiring, single-use. Never a standing key.
                     </p>
                   </div>
                 </div>
@@ -5060,7 +5202,7 @@ export default function PageBody() {
                   <div className="solutions__each__subt">
                     <div className="subtitle">
                       <div className="subtitle__dot" />
-                      <div className="subtitle__text" aria-label="04 - FOURTH TIP">
+                      <div className="subtitle__text" aria-label="04 - FOURTH RULE">
                         <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                           <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                             0
@@ -5096,13 +5238,16 @@ export default function PageBody() {
                         </div>
                         <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                           <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                            T
+                            R
                           </div>
                           <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                            I
+                            U
                           </div>
                           <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                            P
+                            L
+                          </div>
+                          <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                            E
                           </div>
                         </div>
                       </div>
@@ -5115,7 +5260,7 @@ export default function PageBody() {
                   </div>
                   <div className="solutions__each__parag">
                     <p className="parag" style={{ "--mask": "linear-gradient(-15deg, transparent -50%, black 0%)" } as React.CSSProperties}>
-                      Caffeine, heavy meals, and late stress all crash your system.
+                      Stale data, unknown recipients and mainnet writes are refused.
                     </p>
                   </div>
                 </div>
@@ -5131,7 +5276,7 @@ export default function PageBody() {
                   <div className="solutions__each__subt">
                     <div className="subtitle">
                       <div className="subtitle__dot" />
-                      <div className="subtitle__text" aria-label="05 - FITH TIP">
+                      <div className="subtitle__text" aria-label="05 - FIFTH RULE">
                         <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                           <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                             0
@@ -5153,6 +5298,9 @@ export default function PageBody() {
                             I
                           </div>
                           <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                            F
+                          </div>
+                          <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                             T
                           </div>
                           <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
@@ -5161,13 +5309,16 @@ export default function PageBody() {
                         </div>
                         <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                           <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                            T
+                            R
                           </div>
                           <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                            I
+                            U
                           </div>
                           <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                            P
+                            L
+                          </div>
+                          <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                            E
                           </div>
                         </div>
                       </div>
@@ -5180,7 +5331,7 @@ export default function PageBody() {
                   </div>
                   <div className="solutions__each__parag">
                     <p className="parag" style={{ "--mask": "linear-gradient(-15deg, transparent -50%, black 0%)" } as React.CSSProperties}>
-                      Activity by day improves sleep by night — the most natural reset.
+                      Prove it in simulation before it ever touches a network.
                     </p>
                   </div>
                 </div>
@@ -5196,7 +5347,7 @@ export default function PageBody() {
                   <div className="solutions__each__subt">
                     <div className="subtitle">
                       <div className="subtitle__dot" />
-                      <div className="subtitle__text" aria-label="06 - SIXTH TIP">
+                      <div className="subtitle__text" aria-label="06 - SIXTH RULE">
                         <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                           <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                             0
@@ -5229,13 +5380,16 @@ export default function PageBody() {
                         </div>
                         <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                           <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                            T
+                            R
                           </div>
                           <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                            I
+                            U
                           </div>
                           <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                            P
+                            L
+                          </div>
+                          <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
+                            E
                           </div>
                         </div>
                       </div>
@@ -5248,7 +5402,7 @@ export default function PageBody() {
                   </div>
                   <div className="solutions__each__parag">
                     <p className="parag" style={{ "--mask": "linear-gradient(-15deg, transparent -50%, black 0%)" } as React.CSSProperties}>
-                      Meditate, stretch, or read — give thoughts a soft landing.
+                      Attack it yourself — find the limit before someone else does.
                     </p>
                   </div>
                 </div>
@@ -5263,7 +5417,7 @@ export default function PageBody() {
             <div className="ender__content__subt">
               <div className="subtitle">
                 <div className="subtitle__dot" />
-                <div className="subtitle__text" aria-label="NOW IT'S TIME TO APPLY">
+                <div className="subtitle__text" aria-label="NOW IT'S TIME TO BUILD">
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       N
@@ -5313,19 +5467,19 @@ export default function PageBody() {
                   </div>
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      A
+                      B
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      P
+                      U
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      P
+                      I
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
                       L
                     </div>
                     <div aria-hidden="true" style={{ "position": "relative", "display": "inline-block", "opacity": "1" } as React.CSSProperties}>
-                      Y
+                      D
                     </div>
                   </div>
                 </div>
@@ -5333,12 +5487,12 @@ export default function PageBody() {
             </div>
             <div className="ender__content__descr" style={{ "opacity": "1" } as React.CSSProperties}>
               <div className="description intro-descr ender__descr">
-                Now that you know what to do, it’s time to actually try it out. Start small, feel the difference tonight. Better sleep, better ideas — that’s the deal.
+                Now that you know what holds, it’s time to build something that holds. Start on a testnet, bound it tightly, and watch it refuse. That’s the deal.
               </div>
             </div>
             <div className="ender__content__descr2" style={{ "opacity": "0" } as React.CSSProperties}>
               <div className="description intro-descr ender__descr">
-                Make it part of your routine, not a challenge. Turn off the noise, slow down, and let your mind breathe. Tomorrow’s creativity starts with tonight’s calm
+                Make it part of the design, not a patch. Write the limits down, prove them, deploy them disabled, and turn authority on only once the evidence is in
                 <br />
                 — go reboot yourself. 😴
               </div>
@@ -5391,7 +5545,7 @@ export default function PageBody() {
               </div>
               <div className="footer__descr">
                 <p className="parag parag__footer" style={{ "--mask": "linear-gradient(-15deg, transparent -50%, black 0%)" } as React.CSSProperties}>
-                  A creative project exploring how to rest and sleep better. Handcrafted for designers and creatives seeking balance, better focus, and a more efficient sleep.
+                  An agentic IDE for designing, proving, deploying and operating secure financial agents. Authority is bounded by a deterministic policy layer, never by a prompt.
                   <br />
                   <span className="text-span">
                     I hope you find it helpful. Thank you 😊
@@ -5533,7 +5687,7 @@ export default function PageBody() {
               </ul>
               <div className="footer__disclosure">
                 <p className="parag parag__footer participation" style={{ "--mask": "linear-gradient(-15deg, transparent -50%, black 0%)" } as React.CSSProperties}>
-                  THIS PROJECT IS PART OF THE WEBFLOW X CONTRA CHALLENGE
+                  ORIGINAL EXPERIENCE DESIGN BY VICTOR WORK · VWLAB.IO
                 </p>
               </div>
               <a href="https://vwlab.io/products/memorable-web-experience" target="_blank" className="footer__vwlab__link w-inline-block">
