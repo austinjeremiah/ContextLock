@@ -59,7 +59,9 @@ export function BottomPanel({ projectId, events }: { projectId: string; events: 
   };
 
   return (
-    <section className="cl-bottom" aria-label="Panel">
+    /* The console area runs dark in any theme — the token swap carries tables,
+       badges and logs with it, so nothing inside needs its own dark styling. */
+    <section className="cl-bottom cl-theme-dark cl-console" aria-label="Panel">
       <div className="cl-bottom-head">
         {tabs.map((tab) => (
           <button
