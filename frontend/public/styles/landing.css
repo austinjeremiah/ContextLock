@@ -16,13 +16,20 @@
    it has, with the letter-spacing scaling alongside — spacing kept at a fixed
    3rem would shred the word on a phone. */
 .hero__title__h1 {
-  font-size: clamp(2.8rem, 10.5vw, 10.5rem);
-  letter-spacing: clamp(0.7rem, 3vw, 3rem);
-  line-height: 1.06;
+  font-size: clamp(3rem, 15vw, 19rem);
+  letter-spacing: clamp(0.5rem, 2.6vw, 2.6rem);
+  line-height: 1;
+}
+
+/* The eyebrow was left at the template's fixed 1.9rem while the wordmark
+   beneath it grew, which made it look like a caption rather than a claim. */
+.hero__subt__text {
+  font-size: clamp(1.5rem, 2.3vw, 3rem);
+  letter-spacing: 0.01em;
 }
 
 .hero__title {
-  grid-column-gap: clamp(1.2rem, 4vw, 4.4rem);
+  grid-column-gap: clamp(1rem, 3.4vw, 4.4rem);
   grid-row-gap: clamp(0.4rem, 2vw, 1.6rem);
   flex-wrap: wrap;
   margin-top: clamp(1rem, 3vh, 2.5rem);
@@ -75,8 +82,8 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 18px;
-  margin-top: clamp(2.6rem, 6vh, 5rem);
+  gap: clamp(14px, 1.6vw, 24px);
+  margin-top: clamp(2.6rem, 6vh, 5.5rem);
 }
 
 .cl-hero-cta__primary,
@@ -84,9 +91,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 1.05em 2.6em;
+  padding: 1.05em 2.9em;
   border-radius: 999px;
-  font-size: clamp(1.05rem, 1.35vw, 1.45rem);
+  font-size: clamp(1.15rem, 1.7vw, 1.85rem);
   letter-spacing: 0.01em;
   text-decoration: none;
   white-space: nowrap;
