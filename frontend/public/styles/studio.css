@@ -655,6 +655,20 @@ html:has(.cl-studio) { font-size: 16px; }
 .cl-shell[data-density='compact'] .cl-kv dt,
 .cl-shell[data-density='compact'] .cl-kv dd { padding: 5px 0; }
 
+/* --- clarifying interview (spec §10, §30) ---------------------------------
+   The agent stating it will not supply a financial figure. Amber and bordered
+   so it reads as a deliberate position rather than a missing suggestion. */
+.cl-interview-refusal {
+  margin-top: 11px;
+  padding: 9px 11px;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--cl-warn);
+  background: var(--cl-warn-bg);
+  border-left: 2px solid var(--cl-warn);
+  border-radius: 0 8px 8px 0;
+}
+
 /* --- pending agent patch on its target page (spec §6.4) --------------------
    Marked as arriving from the agent so it is never mistaken for state the page
    itself is reporting. */

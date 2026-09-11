@@ -12,6 +12,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { FileInput, Lightbulb, Pause, Play, Sparkles, Square } from 'lucide-react';
 import { StudioPage } from '@/components/studio/PageScaffold';
 import { AgentPatchInbox } from '@/components/studio/AgentPatches';
+import { RequirementInterview } from '@/components/studio/RequirementInterview';
 import {
   Badge,
   BlockerBanner,
@@ -29,6 +30,7 @@ import {
   COMPOSER_EXAMPLES,
   COMPOSER_SLASH_HELPERS,
   DETECTED_REQUIREMENTS,
+  questionsFor,
   QUOTA,
   type BuildStage,
 } from '@/lib/studio/mock/build';
@@ -78,6 +80,14 @@ export default function ComposerPage() {
 
   useEffect(() => {
     if (!isNew) return;
+    /* A description typed in the New Project modal wins over a stale autosaved
+       draft — it is the more recent intent. */
+    const seed = searchParams.get('seed');
+    if (seed) {
+      setText(seed);
+      setState('DRAFT');
+      return;
+    }
     try {
       const saved = window.localStorage.getItem(DRAFT_KEY);
       if (saved) {
@@ -87,21 +97,31 @@ export default function ComposerPage() {
     } catch {
       /* ignore */
     }
-  }, [isNew]);
+  }, [isNew, searchParams]);
 
   useEffect(() => () => {
     if (timerRef.current) window.clearTimeout(timerRef.current);
   }, []);
 
+  /* Answers given in the clarifying interview. They close the same gaps the
+     parser left open, so a requirement satisfied by conversation is
+     indistinguishable from one stated in the description. */
+  const [answers, setAnswers] = useState<Record<string, string>>({});
+
   const requirements = useMemo(() => {
     if (!text.trim()) return [];
     const mentionsCeiling = /(never|not).{0,40}(above|more than|exceed)/i.test(text) || /hard (cap|ceiling)/i.test(text);
-    return DETECTED_REQUIREMENTS.map((r) =>
-      r.id === 'req_ceiling' && mentionsCeiling
-        ? { ...r, value: 'Stated in description', status: 'PASS' as Status, note: undefined }
-        : r,
-    );
-  }, [text]);
+    return DETECTED_REQUIREMENTS.map((r) => {
+      const answered = answers[r.id];
+      if (answered) return { ...r, value: answered, status: 'PASS' as Status, note: undefined };
+      if (r.id === 'req_ceiling' && mentionsCeiling) {
+        return { ...r, value: 'Stated in description', status: 'PASS' as Status, note: undefined };
+      }
+      return r;
+    });
+  }, [text, answers]);
+
+  const openQuestions = useMemo(() => questionsFor(requirements), [requirements]);
 
   const missingRequired = requirements.filter((r) => r.status === 'REQUIRED');
   const isDeterministic = state === 'COMPLETE' || state === 'AWAITING_REVIEW';
@@ -305,6 +325,22 @@ export default function ComposerPage() {
           Integrations, where their values are never displayed.
         </p>
       </Section>
+
+      {/* Clarifying interview — the parser reports what the description says;
+          this asks about what it leaves out (spec §10, §30). */}
+      {requirements.length > 0 ? (
+        <Section label="Clarify">
+          <RequirementInterview
+            questions={openQuestions}
+            answers={answers}
+            onAnswer={(id, value) => {
+              setAnswers((prev) => ({ ...prev, [id]: value }));
+              setSavedAt(new Date().toISOString());
+            }}
+            onSkip={() => undefined}
+          />
+        </Section>
+      ) : null}
 
       {/* detected requirements */}
       <Section

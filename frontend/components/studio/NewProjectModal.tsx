@@ -21,9 +21,13 @@ export function NewProjectModal({ open, onClose }: { open: boolean; onClose: () 
 
   const create = () => {
     onClose();
+    /* The description carries into the Composer rather than being discarded.
+       What you typed here is the start of the interview there — retyping it
+       would make this field feel like it did nothing. */
+    const seed = description.trim() ? `&seed=${encodeURIComponent(description.trim())}` : '';
     // Until the backend exists, a new project opens the composer of the demo
     // project so the build flow stays walkable end to end.
-    router.push(`/projects/prj_treasury_guardian/build?new=1`);
+    router.push(`/projects/prj_treasury_guardian/build?new=1${seed}`);
   };
 
   return (

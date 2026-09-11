@@ -170,6 +170,25 @@ button, not a request to change state.
 
 **All 24 pages are now built.** No `PendingSurface` stub remains in the app.
 
+## ✅ Clarifying interview in the Composer
+
+The parser reported what a description *said* and then stopped, leaving the
+gaps as red rows for the user to go and fix. It flagged holes without ever
+asking about them, which is why the Composer felt like a form.
+
+| Piece | Spec | What landed |
+|---|---|---|
+| Interview queue | §10 | One question at a time, REQUIRED gaps before WARN, rather than a wall of empty fields. Answer / Skip; skipped questions stay open in the requirements table and a REQUIRED gap still blocks the build |
+| The refusal | §30 | For a financial boundary the agent asks and then **refuses to answer**. No figure, no "typical" value, no inference from the other limits — and it says so on the question, so the absence of a suggestion reads as a position rather than an oversight. Everywhere else it proposes candidates freely |
+| Answers close gaps | §10 | An answer sets the requirement to PASS exactly as a stated description would, so a requirement satisfied by conversation is indistinguishable from one written up front |
+| Modal → Composer | §9.1 | The description typed in the New Project modal now carries through as `?seed=`. It was previously discarded, which made the field appear to do nothing |
+
+**Deliberately NOT changed:** the New Project modal stays a plain form. It
+captures three deterministic facts — name, single/multi, template — and turning
+"what do you want to call it?" into a chat turn is worse UX, not better. The
+conversation belongs one screen later, where the answers are open-ended and
+carry consequences.
+
 ## ⬜ Remaining — landing polish only
 
 | Phase | Scope | Notes |
