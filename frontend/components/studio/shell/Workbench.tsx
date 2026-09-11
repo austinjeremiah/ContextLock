@@ -138,17 +138,32 @@ export function Workbench({
      pane leaves the shell looking half-broken. */
   const darkSurface = segment === 'code';
 
-  /* Swapping every token at once snaps. Enable the cross-fade only while the
-     theme is actually changing: leaving it on would make hover feel sluggish,
-     since it animates the same properties. */
-  const [themeShifting, setThemeShifting] = useState(false);
+  /*
+   * Swapping every token at once snaps, so the shell cross-fades instead. The
+   * enabling class has to be applied in the SAME commit as the theme change:
+   * setting it from an effect runs after the browser has already painted the
+   * new theme, leaving nothing to animate. So the change is detected during
+   * render and only the clean-up is deferred.
+   *
+   * The transition is not left on permanently because it animates the same
+   * properties hover does, which would make every button feel sluggish.
+   */
   const previousDark = useRef(darkSurface);
+  const shiftingRef = useRef(false);
+  const [, bumpShift] = useState(0);
+
+  if (previousDark.current !== darkSurface) {
+    previousDark.current = darkSurface;
+    shiftingRef.current = true;
+  }
+  const themeShifting = shiftingRef.current;
 
   useEffect(() => {
-    if (previousDark.current === darkSurface) return;
-    previousDark.current = darkSurface;
-    setThemeShifting(true);
-    const handle = window.setTimeout(() => setThemeShifting(false), 520);
+    if (!shiftingRef.current) return;
+    const handle = window.setTimeout(() => {
+      shiftingRef.current = false;
+      bumpShift((n) => n + 1);
+    }, 560);
     return () => window.clearTimeout(handle);
   }, [darkSurface]);
 
