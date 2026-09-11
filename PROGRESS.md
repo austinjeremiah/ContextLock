@@ -80,21 +80,33 @@ rediscovered later.
 - Code runs the dark editor theme across the whole shell.
 - Dev compile time: wallet stack moved behind a dynamic import, Turbopack on.
 
-## ⬜ Remaining phases — 6 phases plus landing polish
+## ✅ Phase FE-4 — Test surfaces
+
+| Page | Spec | What landed |
+|---|---|---|
+| Simulation Center | §15 | 24 scenarios across all 11 groups; grouped list with per-scenario checkboxes; detail shows deterministic inputs, mutation, expected vs actual, reason code, changed fields, layers evaluated, timing and run log; **a run built against an older Blueprint is shown STALE** rather than as a current pass; security path per run; Run All / Run Selected / Stop Run / Create Scenario / Duplicate / Reset to Template / Compare Runs / Open failed assertion / Run CRE Simulation. The expected result is fixed when a scenario is written and is never editable to turn a failure green |
+| Reality Lab | §16 | **Market source and execution target are two separate fields**, never merged; four modes each reporting AVAILABLE / LIMITED / BLOCKED with the exact blocker (Historical Replay is LIMITED for want of an archive RPC; The Graph is UNAVAILABLE for want of a credential, with no substitution); snapshot header with anchor block, coherence and hash; source table with trust class and freshness; provenance drawer; local fork panel with Create / Reset / Snapshot / Restore / Destroy / Run Agent on Fork, endpoint shown only in developer mode; **fork transactions are labelled LOCAL FORK TRANSACTION and never receive a public explorer link**; six synthetic overlays applied over an immutable base snapshot, with Apply / Clear / Compare with Base |
+| Attack Lab | §17 | 16 attacks across all 10 categories; cards carry applicability, severity, last result and stopping layer; detail shows original vs injected values, the stopping layer, reason code, and `NOT ISSUED` / `NOT SUBMITTED`; **defences exercised lists only the layers a run actually reached** — a layer never reached is not claimed as a defence; mainnet write attempt always offered for a write-capable agent; attacks that cannot apply to a reporting-only principal are marked not applicable and report no result; Run Attack / Run All Applicable / View Security Path / Compare with Baseline / Open Policy Rule / Open Simulation / Export Result |
+
+Attack applicability is derived from the agent's execution class, so a
+reporting-only principal is not shown green results for attacks that could never
+have run against it.
+
+## ⬜ Remaining phases — 5 phases plus landing polish
 
 | Phase | Scope | Pages |
 |---|---|---|
-| **FE-4** ← next | Test surfaces | Simulation Center (§15), Reality Lab (§16), Attack Lab (§17) |
-| **FE-5** | Engineering | Code / Monaco editor + file tree + diff (§18), Integrations & Data Sources (§19) |
+| **FE-5** ← next | Engineering | Code / Monaco editor + file tree + diff (§18), Integrations & Data Sources (§19) |
 | **FE-6** | Deployment | Preflight, cost estimate, deployment progress (§20) — **wallet connect lands here** |
 | **FE-7** | Live operations | Overview (§21), Activity (§22), Policies (§23), Runtime (§24), Control Plane (§25), Chainlink CRE (§26), Identity/ENS (§27) |
 | **FE-8** | Context Agent | page context envelopes, selections and proposed patches across every page (§39) |
 | **FE-9** | Output + polish | Safety Reports (§28), Settings (§29), a11y (§45), responsive monitoring mode (§46) |
 | **Landing** | Polish pass | last, by explicit decision |
 
-**Current page count:** 8 built (Projects, New project, Composer, Organization,
-Blueprint, Architecture, Permissions, Code shell) · 15 navigable but not yet
-built, each rendering the shared `PendingSurface`.
+**Current page count:** 11 built (Projects, New project, Composer, Organization,
+Blueprint, Architecture, Permissions, Simulation, Reality Lab, Attack Lab, Code
+shell) · 12 navigable but not yet built, each rendering the shared
+`PendingSurface`.
 
 ---
 
@@ -165,8 +177,12 @@ any selection keyed to the old data must reset.
 wagmi + RainbowKit + viem + WalletConnect is ~7,000 modules. Mounted in the
 layout it made every route compile all of it (~20s per page in dev, which does
 not tree-shake). It lives in `components/studio/wallet/` behind `dynamic()`.
-**Only Deploy and Policies may mount it.** Never import it in a layout or a
-shared provider.
+
+Providers do belong in a layout — just never the **root** one, since a layout's
+module graph compiles for every route beneath it. The correct home is a nested
+layout scoped to the routes that need it (`deploy/layout.tsx`,
+`policies/layout.tsx`), which keeps React context working normally while only
+those routes pay the cost.
 
 ### Product copy, not build notes
 
