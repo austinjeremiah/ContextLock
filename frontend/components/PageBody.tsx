@@ -561,6 +561,28 @@ export default function PageBody() {
                 LOCK
               </h1>
             </div>
+            {/*
+              The way into the product. The page had no route to /projects at
+              all — every link went to the original author's site — so a visitor
+              could read the whole story and never find the thing it is about.
+
+              Its own class, added as a child of .hero__content: the Three.js
+              bundle animates that wrapper as a whole and only reads
+              .hero__title__h1, .hero__subt and .hero__scroll by name, so a new
+              sibling is safe.
+            */}
+            <div className="cl-hero-cta">
+              <a href="/projects" className="cl-hero-cta__primary">
+                Enter Studio
+              </a>
+              <a href="#" className="cl-hero-cta__secondary" onClick={(e) => {
+                e.preventDefault();
+                document.querySelector('.introduction')?.scrollIntoView({ behavior: 'smooth' });
+              }}>
+                See how it works
+              </a>
+            </div>
+
             <div className="hero__scroll" style={{ "opacity": "0.9654" } as React.CSSProperties}>
               <div className="hero__scroll__wrap">
                 <div className="hero__scroll__dot">

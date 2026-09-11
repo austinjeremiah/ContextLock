@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Sleep Well Creatives',
-  description: 'Sleep Well Creatives',
+  title: 'ContextLock — Give AI authority, not keys',
+  description:
+    'Design, prove, deploy and operate secure financial agents. Authority is bounded by a deterministic policy layer, not by a prompt.',
 };
 
 export default function RootLayout({
@@ -28,6 +29,10 @@ export default function RootLayout({
         <link rel="stylesheet" href="/styles/lenis.css" precedence="high" />
         <link rel="stylesheet" href="/styles/app.css" precedence="high" />
         <link rel="stylesheet" href="/styles/inline.css" precedence="high" />
+        {/* ContextLock's own additions load last so they win on equal
+            specificity without !important. Kept separate from the scraped
+            Webflow sheets above. */}
+        <link rel="stylesheet" href="/styles/landing.css" precedence="high" />
         {children}
       </body>
     </html>

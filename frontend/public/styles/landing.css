@@ -1,0 +1,85 @@
+/* ============================================================================
+   ContextLock additions to the landing page
+   ----------------------------------------------------------------------------
+   Kept in its own file rather than edited into the scraped Webflow stylesheets,
+   so what belongs to this product is always separable from what came with the
+   template. Loaded last, so it wins on equal specificity without !important.
+
+   Everything here uses the site's own tokens (--color, --soft, --white) and its
+   own faces (var(--medium), var(--serif)) — the landing's look is the source of
+   truth for the whole product, not the other way round.
+   ========================================================================== */
+
+/* --- hero call to action -------------------------------------------------- */
+.cl-hero-cta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 2.4rem;
+}
+
+.cl-hero-cta__primary,
+.cl-hero-cta__secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.95em 2.1em;
+  border-radius: 999px;
+  font-size: 1.05rem;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+}
+
+.cl-hero-cta__primary {
+  background: var(--color, #0042af);
+  color: var(--soft, #fef1d0);
+  border: 1px solid var(--color, #0042af);
+}
+.cl-hero-cta__primary:hover {
+  transform: translateY(-2px);
+  background: #002e77;
+  border-color: #002e77;
+}
+
+.cl-hero-cta__secondary {
+  background: transparent;
+  color: var(--color, #0042af);
+  border: 1px solid color-mix(in srgb, var(--color, #0042af) 38%, transparent);
+}
+.cl-hero-cta__secondary:hover {
+  transform: translateY(-2px);
+  border-color: var(--color, #0042af);
+}
+
+.cl-hero-cta__primary:focus-visible,
+.cl-hero-cta__secondary:focus-visible {
+  outline: 2px solid var(--color, #0042af);
+  outline-offset: 3px;
+}
+
+/* The hero is centred and vertically tight on short screens; the CTA gives up
+   its top margin first rather than pushing the scroll cue off-screen. */
+@media (max-height: 760px) {
+  .cl-hero-cta { margin-top: 1.5rem; }
+}
+
+@media (max-width: 600px) {
+  .cl-hero-cta { gap: 10px; width: 100%; }
+  .cl-hero-cta__primary,
+  .cl-hero-cta__secondary {
+    flex: 1 1 auto;
+    padding: 0.9em 1.4em;
+    font-size: 0.95rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cl-hero-cta__primary,
+  .cl-hero-cta__secondary { transition: none; }
+  .cl-hero-cta__primary:hover,
+  .cl-hero-cta__secondary:hover { transform: none; }
+}
