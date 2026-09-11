@@ -204,7 +204,7 @@ export default function AttackLabPage() {
         </div>
 
         {/* detail */}
-        <div className="cl-split-main">
+        <div className="cl-split-main" data-lenis-prevent>
           <div className="cl-page-pad" style={{ maxWidth: 900 }}>
             <header className="cl-page-head">
               <div className="cl-page-head-main">

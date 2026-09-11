@@ -231,7 +231,7 @@ export default function SimulationPage() {
         </div>
 
         {/* scenario detail */}
-        <div className="cl-split-main">
+        <div className="cl-split-main" data-lenis-prevent>
           <div className="cl-page-pad" style={{ maxWidth: 940 }}>
             {isStale ? (
               <StaleBanner

@@ -1294,3 +1294,68 @@ body.cl-resizing-v, body.cl-resizing-v * { cursor: row-resize !important; user-s
 @media (max-width: 1100px) {
   .cl-rev-chip .cl-rev-seg + .cl-rev-seg { display: none; }
 }
+
+/* ============================================================================
+   Corner treatment
+   ----------------------------------------------------------------------------
+   Containers and controls are softened; status badges stay square.
+
+   That split is the point of the spec's "use rounded corners sparingly": a
+   badge like DENY, STALE or LOCKED is a machine state, and a square chip reads
+   as a readout on an instrument where a pill reads as a friendly label. The
+   surfaces around them can soften without costing that.
+   ========================================================================== */
+.cl-btn { border-radius: 8px; }
+.cl-btn-sm { border-radius: 7px; }
+.cl-btn-lg { border-radius: 9px; }
+.cl-chip,
+.cl-env-badge,
+.cl-cmd-field,
+.cl-icon-btn { border-radius: 8px; }
+.cl-rev-chip { border-radius: 8px; overflow: hidden; }
+
+.cl-input,
+.cl-select,
+.cl-textarea,
+.cl-agent-input { border-radius: 8px; }
+
+.cl-card,
+.cl-banner,
+.cl-path,
+.cl-steps,
+.cl-statechange,
+.cl-matrix-col,
+.cl-modal,
+.cl-palette { border-radius: 12px; }
+
+.cl-card,
+.cl-path,
+.cl-steps,
+.cl-statechange,
+.cl-matrix-col,
+.cl-modal,
+.cl-palette { overflow: hidden; }
+
+.cl-toast { border-radius: 10px; }
+.cl-ref-value { border-radius: 6px; }
+
+/* Navigation entries read as pills, inset so the rounding has room. */
+.cl-nav-item {
+  border-radius: 8px;
+  border-left-color: transparent;
+  margin: 1px 8px;
+  width: calc(100% - 16px);
+  padding-left: 11px;
+}
+.cl-nav-item[data-active="true"] { border-left-color: transparent; }
+
+/* Status badges stay square, deliberately. */
+.cl-badge { border-radius: 0; }
+
+/* The editor sits in a rounded well rather than meeting the panes square. */
+.cl-editor-well {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--cl-line);
+  margin: 0 12px 12px;
+}

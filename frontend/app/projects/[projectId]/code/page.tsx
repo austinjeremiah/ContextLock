@@ -178,8 +178,10 @@ export default function CodePage() {
                       <span className="cl-nav-item-label cl-mono" style={{ fontSize: 12.5 }}>
                         {f.name}
                       </span>
+                      {/* Only marks that actually differ between files: LOCKED was on
+                          every entry, so it told you nothing. */}
                       {marksFor(f)
-                        .filter((m) => m === 'modified' || m === 'stale' || m === 'locked')
+                        .filter((m) => m === 'modified' || m === 'stale')
                         .map((mark) => (
                           <span
                             key={mark}
@@ -215,8 +217,19 @@ export default function CodePage() {
             <span className="cl-mono" style={{ fontSize: 12.5 }}>
               {file.path}
             </span>
-            <Badge tone="neutral">{file.language}</Badge>
-            <Badge tone="neutral">r{file.revision}</Badge>
+            {file.blueprintSection ? (
+              <button
+                type="button"
+                className="cl-btn cl-btn-ghost cl-btn-sm"
+                onClick={() => router.push(`/projects/${PROJECT.id}/blueprint?agent=${agentSlug}`)}
+                title="Open the Blueprint section that generated this file"
+              >
+                from Blueprint · {file.blueprintSection.replace(/-/g, ' ')}
+              </button>
+            ) : null}
+            {/* The language is in the extension, the build revision is in the page
+                header, and GENERATED repeats the tree group — so none of them
+                earn a badge here. What is left is what varies per file. */}
             {readOnly ? (
               <Badge tone="blocked" title="Generated code is read-only after a successful build">
                 Read-only
@@ -225,13 +238,11 @@ export default function CodePage() {
               <Badge tone="warn">Draft · editable</Badge>
             )}
             {isModified ? <Badge tone="warn">Modified</Badge> : null}
-            {file.marks
-              .filter((m) => m === 'generated' || m === 'template-owned' || m === 'stale')
-              .map((mark) => (
-                <Badge key={mark} tone={CODE_MARK_LABEL[mark].tone} title={CODE_MARK_LABEL[mark].title}>
-                  {CODE_MARK_LABEL[mark].label}
-                </Badge>
-              ))}
+            {file.marks.includes('stale') ? (
+              <Badge tone="warn" title={CODE_MARK_LABEL.stale.title}>
+                STALE
+              </Badge>
+            ) : null}
 
             <span className="cl-spacer" />
 
@@ -301,38 +312,9 @@ export default function CodePage() {
             ) : null}
           </div>
 
-          {/* blueprint provenance */}
-          {file.blueprintSection || file.coveredByTest ? (
-            <div
-              className="cl-row cl-row-wrap"
-              style={{ gap: 10, padding: '7px 14px', borderBottom: '1px solid var(--cl-line)', flex: '0 0 auto' }}
-            >
-              {file.blueprintSection ? (
-                <button
-                  type="button"
-                  className="cl-btn cl-btn-ghost cl-btn-sm"
-                  onClick={() => router.push(`/projects/${PROJECT.id}/blueprint?agent=${agentSlug}`)}
-                >
-                  Generated from Blueprint · {file.blueprintSection.replace(/-/g, ' ')}
-                </button>
-              ) : null}
-              {file.coveredByTest ? (
-                <button
-                  type="button"
-                  className="cl-btn cl-btn-ghost cl-btn-sm"
-                  onClick={() => {
-                    const test = CODE_FILES.find((f) => f.path === file.coveredByTest);
-                    if (test) select(test);
-                  }}
-                >
-                  Covered by {file.coveredByTest}
-                </button>
-              ) : null}
-            </div>
-          ) : null}
 
           {/* editor surface */}
-          <div style={{ flex: '1 1 auto', minHeight: 0 }} data-lenis-prevent>
+          <div className="cl-editor-well" style={{ flex: '1 1 auto', minHeight: 0 }} data-lenis-prevent>
             {mode === 'diff' && file.previousContent ? (
               <CodeDiff original={file.previousContent} modified={draft ?? file.content} language={file.language} />
             ) : (
@@ -363,8 +345,7 @@ export default function CodePage() {
           >
             {readOnly ? (
               <span className="cl-meta">
-                Read-only. Generated code is locked after a successful build so the artifact still matches its
-                Blueprint.
+                Generated code is locked after a successful build so the artifact still matches its Blueprint.
               </span>
             ) : (
               <span className="cl-row" style={{ gap: 7, color: 'var(--cl-warn)' }}>
@@ -373,7 +354,9 @@ export default function CodePage() {
               </span>
             )}
             <span className="cl-spacer" />
-            <StatusBadge status={buildIsStale ? 'STALE' : 'READY'} />
+            {file.coveredByTest ? (
+              <span className="cl-meta">Covered by {file.coveredByTest}</span>
+            ) : null}
           </div>
         </div>
       </div>
