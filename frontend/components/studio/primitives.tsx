@@ -578,6 +578,64 @@ export function ReasonCode({
   );
 }
 
+/* ------------------------------------------------------------- log message */
+
+/** Tokens worth picking out of a log line so it can be scanned, not read. */
+const LOG_VERDICT = /^(ALLOW|DENY|ESCALATE|PASS|FAIL|WARN|REJECT|reject|refuse)$/;
+const LOG_REASON_CODE = /^[A-Z][A-Z0-9]+(?:_[A-Z0-9]+)+$/;
+const LOG_NUMERIC = /^[$]?[\d,]+(?:\.\d+)?[a-zA-Z%$/]*$/;
+const LOG_REF = /^(0x[0-9a-fA-F.…]+|[a-z]+_[a-z0-9_]+)$/;
+
+/**
+ * Renders one log message with its meaningful tokens tinted.
+ *
+ * A build or run log set in a single ink colour is a wall of text; the useful
+ * parts are the verdict, the reason code and the values. Everything else stays
+ * secondary so those stand out.
+ */
+export function LogMessage({ text }: { text: string }) {
+  const parts = useMemo(() => text.split(/(\s+)/), [text]);
+
+  return (
+    <>
+      {parts.map((token, i) => {
+        if (/^\s+$/.test(token)) return token;
+
+        let color: string | undefined;
+        let family: string | undefined;
+
+        if (LOG_VERDICT.test(token)) {
+          const upper = token.toUpperCase();
+          color =
+            upper === 'ALLOW' || upper === 'PASS'
+              ? 'var(--cl-pass)'
+              : upper === 'ESCALATE' || upper === 'WARN'
+                ? 'var(--cl-warn)'
+                : 'var(--cl-deny)';
+          family = 'var(--medium)';
+        } else if (LOG_REASON_CODE.test(token)) {
+          color = 'var(--cl-deny)';
+          family = 'var(--medium)';
+        } else if (token === '→' || token === '·') {
+          color = 'var(--cl-ink-3)';
+        } else if (LOG_NUMERIC.test(token)) {
+          color = 'var(--cl-data)';
+        } else if (LOG_REF.test(token)) {
+          color = 'var(--cl-sim)';
+        }
+
+        return color ? (
+          <span key={i} style={{ color, fontFamily: family }}>
+            {token}
+          </span>
+        ) : (
+          token
+        );
+      })}
+    </>
+  );
+}
+
 /* ----------------------------------------------------------------- banners */
 
 export function BlockerBanner({

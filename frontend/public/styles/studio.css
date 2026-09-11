@@ -1019,7 +1019,17 @@ body.cl-resizing-v, body.cl-resizing-v * { cursor: row-resize !important; user-s
   padding: 1px 6px;
   border-left: 2px solid transparent;
 }
-.cl-log-line:hover { background: rgba(0, 66, 175, 0.05); }
+.cl-log-line:hover { background: rgba(0, 66, 175, 0.06); }
+
+/* Row-ruled variant: a hairline under each line so a long log scans as rows. */
+.cl-log-rows { padding: 0; }
+.cl-log-rows .cl-log-line {
+  padding: 5px 10px;
+  border-bottom: 1px solid var(--cl-line);
+}
+.cl-log-rows .cl-log-line:last-child { border-bottom: none; }
+.cl-log-rows .cl-log-line:nth-child(even) { background: rgba(0, 66, 175, 0.028); }
+.cl-log-rows .cl-log-line:nth-child(even):hover { background: rgba(0, 66, 175, 0.06); }
 .cl-log-time { color: var(--cl-ink-3); }
 .cl-log-scope { color: var(--cl-ink-3); opacity: 0.85; }
 .cl-log-msg { color: var(--cl-ink-2); overflow-wrap: anywhere; }
@@ -1041,4 +1051,40 @@ body.cl-resizing-v, body.cl-resizing-v * { cursor: row-resize !important; user-s
 @media (max-width: 899px) {
   .cl-log-line { grid-template-columns: minmax(0, 1fr); gap: 0; }
   .cl-log-scope { display: none; }
+}
+
+
+/* ============================================================================
+   Terminal
+   ----------------------------------------------------------------------------
+   A terminal is dark regardless of the surrounding theme. This is a constrained
+   sandbox shell, never a privileged host shell (spec §3.4).
+   ========================================================================== */
+.cl-terminal {
+  margin: -8px -12px -14px;
+  padding: 12px 14px 16px;
+  min-height: 100%;
+  background: #05060a;
+  color: #c9d3e4;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 12.5px;
+  line-height: 1.65;
+}
+.cl-terminal pre { color: #c9d3e4; }
+.cl-terminal .cl-banner {
+  background: rgba(120, 160, 240, 0.09);
+  border-color: rgba(150, 180, 245, 0.34);
+  color: #9fb6e6;
+}
+.cl-terminal .cl-banner-main { color: #dbe4f5; }
+.cl-terminal .cl-banner-body { color: #94a5c4; }
+.cl-terminal .cl-banner-title { color: #dbe4f5; }
+.cl-terminal-prompt { color: #6fc28c; }
+.cl-terminal-path { color: #6ea8f0; }
+.cl-terminal-caret {
+  display: inline-block;
+  width: 8px;
+  height: 15px;
+  vertical-align: text-bottom;
+  background: #c9d3e4;
 }

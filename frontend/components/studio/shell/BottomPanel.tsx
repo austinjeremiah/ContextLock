@@ -10,7 +10,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowDownToLine, Copy, Eraser, Maximize2, Minimize2, PlayCircle, X } from 'lucide-react';
-import { StatusBadge, SeverityBadge, Timestamp } from '../primitives';
+import { LogMessage, StatusBadge, SeverityBadge, Timestamp } from '../primitives';
 import { useWorkbench } from '@/lib/studio/workbench';
 import { OUTPUT_LOG, PROBLEMS, TEST_RESULTS, logAsText } from '@/lib/studio/mock/core';
 import type { BottomPanelTab, RuntimeEvent } from '@/lib/studio/types';
@@ -173,7 +173,9 @@ export function BottomPanel({ projectId, events }: { projectId: string; events: 
                   <div className="cl-log-line" data-level={line.level} key={`${line.time}-${i}`}>
                     <span className="cl-log-time">{line.time}</span>
                     <span className="cl-log-scope">{line.scope}</span>
-                    <span className="cl-log-msg">{line.message}</span>
+                    <span className="cl-log-msg">
+                      <LogMessage text={line.message} />
+                    </span>
                   </div>
                 ))}
           </div>
@@ -252,7 +254,7 @@ export function BottomPanel({ projectId, events }: { projectId: string; events: 
         ) : null}
 
         {bottomTab === 'terminal' ? (
-          <div>
+          <div className="cl-terminal">
             <div className="cl-banner" data-tone="sim">
               <div className="cl-banner-main">
                 <div className="cl-banner-title">Constrained developer terminal</div>
@@ -262,11 +264,22 @@ export function BottomPanel({ projectId, events }: { projectId: string; events: 
                 </div>
               </div>
             </div>
-            <pre className="cl-mono" style={{ margin: 0, whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>
-              {`contextlock@sandbox:~/project$ ls
-agent/  contextlock/  adapters/  tests/  cre/  deployment/  config/
-contextlock@sandbox:~/project$ `}
-            </pre>
+            <div style={{ whiteSpace: 'pre-wrap' }}>
+              <div>
+                <span className="cl-terminal-prompt">contextlock@sandbox</span>
+                <span>:</span>
+                <span className="cl-terminal-path">~/project</span>
+                <span>$ ls</span>
+              </div>
+              <div>agent/&nbsp; contextlock/&nbsp; adapters/&nbsp; tests/&nbsp; cre/&nbsp; deployment/&nbsp; config/</div>
+              <div>
+                <span className="cl-terminal-prompt">contextlock@sandbox</span>
+                <span>:</span>
+                <span className="cl-terminal-path">~/project</span>
+                <span>$ </span>
+                <span className="cl-terminal-caret cl-pulse" aria-hidden />
+              </div>
+            </div>
           </div>
         ) : null}
       </div>

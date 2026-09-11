@@ -30,7 +30,7 @@ export function TitleBar({
   onOpenRevisions: () => void;
 }) {
   const router = useRouter();
-  const { setPaletteOpen, openBottom } = useWorkbench();
+  const { setPaletteOpen, openBottom, developerMode, setDeveloperMode } = useWorkbench();
   const { revisions, blockers } = project;
 
   return (
@@ -299,6 +299,19 @@ export function TitleBar({
               All projects
             </MenuItem>
             <MenuItem onClick={close}>Help / docs</MenuItem>
+            <MenuSeparator />
+            {/* Also lives in Settings; surfaced here so the constrained terminal
+                and raw identifiers are reachable. Developer mode never disables
+                a security check (spec §29). */}
+            <MenuItem
+              onClick={() => {
+                setDeveloperMode(!developerMode);
+                close();
+              }}
+              hint={developerMode ? <Check size={12} aria-hidden /> : 'off'}
+            >
+              Developer mode
+            </MenuItem>
           </>
         )}
       </Popover>

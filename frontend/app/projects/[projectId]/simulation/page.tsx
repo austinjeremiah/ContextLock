@@ -20,6 +20,7 @@ import {
   Badge,
   Card,
   KeyValue,
+  LogMessage,
   ReasonCode,
   SecurityPath,
   Section,
@@ -381,10 +382,15 @@ export default function SimulationPage() {
 
             <Section label="Run log">
               <Card flush>
-                <div className="cl-log" style={{ padding: '8px 4px' }}>
+                <div className="cl-log cl-log-rows">
                   {selected.logs.map((line, i) => (
-                    <div className="cl-log-line" data-level="info" key={i} style={{ gridTemplateColumns: '1fr' }}>
-                      <span className="cl-log-msg">{line}</span>
+                    <div className="cl-log-line" data-level="info" key={i} style={{ gridTemplateColumns: '32px minmax(0, 1fr)' }}>
+                      <span className="cl-log-time" style={{ textAlign: 'right' }}>
+                        {i + 1}
+                      </span>
+                      <span className="cl-log-msg">
+                        <LogMessage text={line} />
+                      </span>
                     </div>
                   ))}
                 </div>
