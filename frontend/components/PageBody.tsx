@@ -1582,26 +1582,17 @@ export default function PageBody() {
           </div>
         </div>
       </section>
+      {/*
+        Retired scene. The node has to stay: the engine does
+        querySelector(".scene-tunnel").previousElementSibling, and a null there
+        throws and takes the whole 3D runtime down with it. Hidden in CSS
+        instead, which also drops its scroll height so the section is gone from
+        the page.
+      */}
       <div className="spacer-fs scene-tunnel">
         <div className="scene-tunnel__hold">
           <div className="title_serif title_serif__tunnel" style={{ "opacity": "0" } as React.CSSProperties}>
             Built on proof
-          </div>
-          {/*
-            The stack, arriving out of the tunnel.
-
-            Purely a 2D overlay on top of the existing scene — the tunnel
-            itself is the engine's, and nothing here touches it. Each mark runs
-            the same keyframe on a stagger, scaling up from the vanishing point
-            and fading as it passes the viewer, which reads as depth without
-            needing a third dimension.
-          */}
-          <div className="cl-tunnel" aria-label="Built on Chainlink, ENS and Ethereum">
-            <img src="/media/Chainlink.svg" alt="Chainlink" className="cl-tunnel__mark" style={{ "--i": 0 } as React.CSSProperties} />
-            <img src="/media/ens.png" alt="ENS" className="cl-tunnel__mark" style={{ "--i": 1 } as React.CSSProperties} />
-            <span className="cl-tunnel__mark cl-tunnel__word" style={{ "--i": 2 } as React.CSSProperties}>CRE</span>
-            <span className="cl-tunnel__mark cl-tunnel__word" style={{ "--i": 3 } as React.CSSProperties}>Aave v3</span>
-            <span className="cl-tunnel__mark cl-tunnel__word" style={{ "--i": 4 } as React.CSSProperties}>Sepolia</span>
           </div>
         </div>
       </div>
