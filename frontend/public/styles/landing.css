@@ -232,7 +232,15 @@
 .the-balance,
 .scene-lamp,
 .cycle,
-.solution {
+.solution,
+/* The closing block and the footer. Both were still the template's: a sign-off
+   telling you to go and sleep, a link to the author's animation course, his
+   socials, and the challenge credit. None of it belongs to this product.
+
+   The page now simply ends on the pendulum. */
+.ender,
+.footer,
+.footer-decor-solid {
   display: none;
 }
 
