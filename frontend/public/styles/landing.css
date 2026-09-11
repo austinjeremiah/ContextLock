@@ -10,6 +10,28 @@
    truth for the whole product, not the other way round.
    ========================================================================== */
 
+/* --- hero wordmark --------------------------------------------------------
+   The template set this at a fixed 5.1rem, which left most of the hero empty
+   on a desktop screen. Sized against the viewport instead so it fills the space
+   it has, with the letter-spacing scaling alongside — spacing kept at a fixed
+   3rem would shred the word on a phone. */
+.hero__title__h1 {
+  font-size: clamp(2.8rem, 10.5vw, 10.5rem);
+  letter-spacing: clamp(0.7rem, 3vw, 3rem);
+  line-height: 1.06;
+}
+
+.hero__title {
+  grid-column-gap: clamp(1.2rem, 4vw, 4.4rem);
+  grid-row-gap: clamp(0.4rem, 2vw, 1.6rem);
+  flex-wrap: wrap;
+  margin-top: clamp(1rem, 3vh, 2.5rem);
+}
+
+/* The trailing letter-space pushes the word visually off-centre; pulling it
+   back by half keeps the pair optically centred at every size. */
+.hero__title__h1 { margin-right: calc(clamp(0.7rem, 3vw, 3rem) * -0.5); }
+
 /* --- hero call to action -------------------------------------------------- */
 .cl-hero-cta {
   display: flex;
@@ -34,30 +56,36 @@
   transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
 }
 
+/* The hero sits on the deep blue 3D scene, not on the cream ground, so these
+   take the cream treatment the wordmark above them already uses. Styled blue
+   they were blue-on-blue: the primary barely separated and the secondary was
+   very nearly invisible. */
 .cl-hero-cta__primary {
-  background: var(--color, #0042af);
-  color: var(--soft, #fef1d0);
-  border: 1px solid var(--color, #0042af);
+  background: var(--soft, #fef1d0);
+  color: #002e77;
+  border: 1px solid var(--soft, #fef1d0);
+  font-family: var(--medium), system-ui, sans-serif;
 }
 .cl-hero-cta__primary:hover {
   transform: translateY(-2px);
-  background: #002e77;
-  border-color: #002e77;
+  background: #fff;
+  border-color: #fff;
 }
 
 .cl-hero-cta__secondary {
   background: transparent;
-  color: var(--color, #0042af);
-  border: 1px solid color-mix(in srgb, var(--color, #0042af) 38%, transparent);
+  color: var(--soft, #fef1d0);
+  border: 1px solid color-mix(in srgb, var(--soft, #fef1d0) 55%, transparent);
 }
 .cl-hero-cta__secondary:hover {
   transform: translateY(-2px);
-  border-color: var(--color, #0042af);
+  border-color: var(--soft, #fef1d0);
+  background: color-mix(in srgb, var(--soft, #fef1d0) 12%, transparent);
 }
 
 .cl-hero-cta__primary:focus-visible,
 .cl-hero-cta__secondary:focus-visible {
-  outline: 2px solid var(--color, #0042af);
+  outline: 2px solid var(--soft, #fef1d0);
   outline-offset: 3px;
 }
 
@@ -82,4 +110,27 @@
   .cl-hero-cta__secondary { transition: none; }
   .cl-hero-cta__primary:hover,
   .cl-hero-cta__secondary:hover { transform: none; }
+}
+
+/* --- Chainlink mark inside the stats ring ---------------------------------
+   Sized against the ring rather than in fixed pixels, so it keeps its
+   proportion to the circle at every breakpoint. */
+.cl-stats-mark {
+  display: block;
+  width: clamp(64px, 9vw, 132px);
+  height: auto;
+  margin: 0 auto;
+}
+
+/* --- retired audio affordances --------------------------------------------
+   The background loop and the six narration clips are gone, and no element is
+   registered as an insight trigger any more, so the sound toggle and the
+   "Play insight" cursor have nothing left to control.
+
+   Hidden rather than deleted: the engine holds both by querySelector and calls
+   into them, so the nodes have to stay in the DOM. display:none also takes
+   them out of the accessibility tree, so they are not announced either. */
+.trg-sound,
+.cursor-insight {
+  display: none !important;
 }

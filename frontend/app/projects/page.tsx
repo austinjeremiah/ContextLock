@@ -59,7 +59,16 @@ export default function ProjectsHome() {
           gap: 14,
         }}
       >
-        <span style={{ fontFamily: 'var(--serif)', fontSize: 18, letterSpacing: '-0.3px' }}>ContextLock Studio</span>
+        {/* Back to the landing page. This is the top of the product, so the
+            wordmark is the only way out to the marketing site. */}
+        <a
+          href="/"
+          className="cl-studio-mark"
+          style={{ fontFamily: 'var(--serif)', fontSize: 18, letterSpacing: '-0.3px' }}
+          title="Back to contextlock.com"
+        >
+          ContextLock Studio
+        </a>
         <span className="cl-env-badge" title="Production-chain execution is disabled across all projects.">
           <span>TESTNET LAB</span>
         </span>

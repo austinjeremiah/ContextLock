@@ -2,12 +2,10 @@ export default function PageBody() {
   return (
     <>
       <div className="style w-embed" />
-      <audio loop className="audio-bg">
-        <source src="/assets/690d4c2e8ec8279b99d83f4a_healing-sleep_loop-05.mp3" className="source_audio" />
-      </audio>
-      <a href="https://vwlab.io/products/memorable-web-experience" target="_blank" className="main-logo w-inline-block" style={{ "opacity": "1" } as React.CSSProperties}>
-        <img src="/assets/69074c7847f39bcb35373842_logo.svg" loading="lazy" alt="" className="main-logo__svg" />
-      </a>
+      {/* The engine holds this as $music_bg and calls play/pause on it, so the
+          element has to exist — querySelector returning null throws. Dropping
+          the <source> leaves it valid but silent. */}
+      <audio loop muted className="audio-bg" />
       <div className="cursor-insight" style={{ "translate": "none", "rotate": "none", "scale": "none", "transform": "translate(-50%, -50%) translate3d(1175.97px, 3.0135px, 0px)" } as React.CSSProperties}>
         <div className="cursor-insight__hold">
           <div className="cursor-insight__follow" style={{ "translate": "none", "rotate": "none", "scale": "none", "transform": "rotate(-34deg) scale(1.0008, 1)" } as React.CSSProperties} />
@@ -439,24 +437,21 @@ export default function PageBody() {
         </div>
       </section>
       <div className="pattern" />
+      {/* Narration elements kept but sourceless: the engine looks them up
+          by data-audio and calls play() on the match, so removing them
+          would throw. With no <source> they are silent. */}
       <div className="audios">
-        <audio data-audio="wont_rest" className="audio-chapter audio__wont-rest">
-          <source src="/assets/690a92f561fd673d86b836fe_your_body_wont_rest.mp3" className="source_audio" />
+        <audio muted data-audio="wont_rest" className="audio-chapter audio__wont-rest">
         </audio>
-        <audio data-audio="sleep_maint" className="audio-chapter audio__wont-rest">
-          <source src="/assets/690a92f5fb33e6b206cb851b_sleep_maint.mp3" className="source_audio" />
+        <audio muted data-audio="sleep_maint" className="audio-chapter audio__wont-rest">
         </audio>
-        <audio data-audio="its_preparation" className="audio-chapter audio__its_preparation">
-          <source src="/assets/690a92f5928768155d3cca4a_its_preparation.mp3" className="source_audio" />
+        <audio muted data-audio="its_preparation" className="audio-chapter audio__its_preparation">
         </audio>
-        <audio data-audio="mind_logoff" className="audio-chapter audio__mind_logoff">
-          <source src="/assets/690a92f5928768155d3cca45_mind_logoff.mp3" className="source_audio" />
+        <audio muted data-audio="mind_logoff" className="audio-chapter audio__mind_logoff">
         </audio>
-        <audio data-audio="overheat" className="audio-chapter audio__overheat">
-          <source src="/assets/690a92f5c912c9f544055b81_overheat.mp3" className="source_audio" />
+        <audio muted data-audio="overheat" className="audio-chapter audio__overheat">
         </audio>
-        <audio data-audio="cant_dream" className="audio-chapter audio__cant_dream">
-          <source src="/assets/690a92f5fd61a590797e99e7_cant_dream_daylight.mp3" className="source_audio" />
+        <audio muted data-audio="cant_dream" className="audio-chapter audio__cant_dream">
         </audio>
       </div>
       <canvas className="webgl" data-engine="three.js r180" width="2130" height="1420" style={{ "touchAction": "none", "width": "1065px", "height": "710px" } as React.CSSProperties} />
@@ -575,10 +570,7 @@ export default function PageBody() {
               <a href="/projects" className="cl-hero-cta__primary">
                 Enter Studio
               </a>
-              <a href="#" className="cl-hero-cta__secondary" onClick={(e) => {
-                e.preventDefault();
-                document.querySelector('.introduction')?.scrollIntoView({ behavior: 'smooth' });
-              }}>
+              <a href="#introduction" className="cl-hero-cta__secondary">
                 See how it works
               </a>
             </div>
@@ -600,7 +592,7 @@ export default function PageBody() {
           </div>
         </div>
       </div>
-      <section className="introduction">
+      <section className="introduction" id="introduction">
         <div className="introduction__hold">
           <div className="introduction__index">
             <div className="section-index">
@@ -1292,9 +1284,25 @@ export default function PageBody() {
               </li>
             </ul>
             <div className="stats__stats__minimum">
-              <p className="small-parag minimum" style={{ "opacity": "1" } as React.CSSProperties}>
-                Minimum duration:
-              </p>
+              {/*
+                Inlined rather than <img src="/media/Chainlink.svg">: the source
+                file is filled #0847F7, which on this blue ground would be very
+                nearly invisible. Inline, the path takes --soft and reads the
+                way the ring's own type does.
+              */}
+              <svg
+                className="cl-stats-mark"
+                viewBox="0 0 385 317"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                role="img"
+                aria-label="Chainlink"
+              >
+                <path
+                  d="M192.335 107.486L147.668 133.154V184.492L192.335 210.161L237.001 184.492V133.154L192.335 107.486ZM218.078 173.613L192.343 188.402L166.607 173.613V144.034L192.343 129.245L218.078 144.034V173.613Z"
+                  fill="var(--soft)"
+                />
+              </svg>
             </div>
           </div>
           <div data-anima="parag" className="stats__subt">
@@ -1384,7 +1392,7 @@ export default function PageBody() {
       </section>
       <div className="spacer-fs scene-tunnel">
         <div className="scene-tunnel__hold">
-          <div data-insight="“Rest is not escape — it’s preparation.”" data-iscursor="" data-audio="its_preparation" className="title_serif title_serif__tunnel" style={{ "opacity": "0" } as React.CSSProperties}>
+          <div className="title_serif title_serif__tunnel" style={{ "opacity": "0" } as React.CSSProperties}>
             Don't Pill Up
           </div>
         </div>
@@ -1525,7 +1533,7 @@ export default function PageBody() {
                 </defs>
               </svg>
             </div>
-            <div data-audio="wont_rest" data-insight="“If your brain still works, your body won’t rest.”" data-iscursor="" className="importance__beats__svg importance__beats__svg__opac w-embed">
+            <div className="importance__beats__svg importance__beats__svg__opac w-embed">
               <svg width="100%" viewBox="0 0 1920 507" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <g clipPath="url(#clip0_1_10)">
                   <path d="M1920 250.4H1274.6L1274.2 251.3C1271.8 256.4 1265.9 256.2 1263.8 250.9L1263.4 250C1257.9 238.4 1254.8 239.3 1251.8 250C1248.8 260 1245.7 279.9 1239.2 291.3C1232.6 302.7 1229.1 281.2 1225.6 250.1C1222.1 219.6 1218.5 179.5 1211.1 168.5C1203.6 157.5 1199.7 199.2 1195.8 250C1191.9 300.2 1187.9 359.6 1179.8 370C1171.6 380.3 1167.4 319.4 1163.1 250.1C1158.8 181.3 1154.6 104.1 1145.9 94.6001C1137.1 85.2001 1132.6 163.8 1128.2 250C1123.7 335.6 1119.2 428.8 1110.1 437.1C1100.9 445.2 1096.3 350.9 1091.6 250.1C1086.9 149.8 1082.3 43.0001 1072.9 36.2001C1063.5 29.6001 1058.8 137.3 1054 250C1049.3 362.4 1044.5 479.8 1035 484.8C1025.5 489.7 1020.8 371.6 1016 250C1011.3 128.7 1006.5 4.00007 997.1 1.00007C978.4 -5.29993 978.3 503.3 959.9 505.4C941.5 503.3 941.5 -5.39993 922.7 1.00007C913.3 4.00007 908.6 128.7 903.8 250C899.1 371.5 894.3 489.6 884.8 484.8C875.3 479.8 870.6 362.4 865.8 250C861.1 137.3 856.3 29.6001 846.9 36.2001C837.5 43.0001 832.8 149.7 828.2 250.1C823.6 350.9 818.9 445.2 809.7 437.1C800.5 428.9 796.1 335.7 791.6 250C787.1 163.9 782.6 85.2001 773.9 94.6001C765.2 104 760.9 181.3 756.7 250.1C752.5 319.4 748.2 380.3 740 370C731.8 359.6 727.9 300.2 724 250C720.1 199.2 716.2 157.5 708.7 168.5C701.3 179.5 697.7 219.7 694.2 250.1C690.7 281.2 687.2 302.7 680.6 291.3C674.1 279.9 671 260 668 250C665 239.3 662 238.5 656.4 250L656 250.9C653.8 256.2 648 256.4 645.6 251.3L645.2 250.4H0" stroke="var(--color-soft)" strokeOpacity="0.5" strokeWidth="2" strokeMiterlimit="10" style={{ "strokeDashoffset": "0", "strokeDasharray": "7113.79px, 0.1px" } as React.CSSProperties} />
@@ -1672,7 +1680,7 @@ export default function PageBody() {
           </div>
         </div>
       </section>
-      <div data-audio="cant_dream" data-iscursor="" data-insight="“You can’t dream in daylight.”" className="spacer-fs scene-woman" />
+      <div className="spacer-fs scene-woman" />
       <section className="onclock section-blue">
         <div className="onclock__hold">
           <div className="onclock__top">
@@ -1892,7 +1900,7 @@ export default function PageBody() {
                   </div>
                 </li>
               </ul>
-              <div data-audio="overheat" data-iscursor="" data-insight="“We overclock our machines... Then wonder why they overheat.”" className="onclock__spiral__boder" />
+              <div className="onclock__spiral__boder" />
             </div>
           </div>
           <div className="onclock__bottom">
@@ -3015,7 +3023,7 @@ export default function PageBody() {
                 </div>
               </div>
             </div>
-            <div data-insight="“When your mind can’t log off, neither can your body.”" data-anima="texts" data-iscursor="" data-audio="mind_logoff" className="the-balance__title">
+            <div data-anima="texts" className="the-balance__title">
               <div className="cycle__title__serif">
                 <div className="title_serif" aria-label="An enemy called">
                   <div className="js-words" aria-hidden="true" style={{ "position": "relative", "display": "inline-block" } as React.CSSProperties}>
@@ -3903,7 +3911,7 @@ export default function PageBody() {
           </div>
         </div>
       </section>
-      <div data-insight="“Sleep isn’t rest. It’s maintenance..”" data-iscursor="" data-audio="sleep_maint" className="spacer-fs scene-lamp" />
+      <div className="spacer-fs scene-lamp" />
       <section className="cycle section-blue">
         <div className="cycle__hold">
           <div className="cycle__top">

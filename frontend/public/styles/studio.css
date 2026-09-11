@@ -219,6 +219,17 @@ html:has(.cl-studio) { font-size: 16px; }
 }
 .cl-titlebar-mark:hover { opacity: 0.72; }
 .cl-titlebar-mark:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+
+/* Wordmark on the projects home — same job, back out to the landing page. */
+.cl-studio-mark {
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: opacity 0.15s ease;
+}
+.cl-studio-mark:hover { opacity: 0.72; }
+.cl-studio-mark:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
 .cl-titlebar-spacer { flex: 1 1 auto; min-width: 4px; }
 .cl-titlebar > * { flex-shrink: 0; }
 
