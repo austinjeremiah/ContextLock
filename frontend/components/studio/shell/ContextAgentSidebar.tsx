@@ -12,7 +12,6 @@ import { useRouter } from 'next/navigation';
 import {
   AtSign,
   Check,
-  ChevronDown,
   CornerDownLeft,
   History,
   PanelRightClose,
@@ -26,9 +25,12 @@ import { Popover, MenuItem, MenuLabel } from './Popover';
 import { Badge } from '../primitives';
 import { useWorkbench } from '@/lib/studio/workbench';
 import { respond, streamText } from '@/lib/studio/agent-engine';
-import { metaForSegment } from '@/lib/studio/nav';
+import { searchMentions, type MentionEntity } from '@/lib/studio/mentions';
+import { metaForSegment, segmentForPageKind } from '@/lib/studio/nav';
+import { PROBLEMS } from '@/lib/studio/mock/core';
 import type {
   Agent,
+  AgentCitation,
   AgentMessage,
   AgentPageContext,
   AgentResponseCard,
@@ -38,18 +40,36 @@ import type {
   RevisionSet,
 } from '@/lib/studio/types';
 
-const MENTIONS = [
-  '@blueprint',
-  '@architecture',
-  '@policy',
-  '@simulation:PROMPT_INJECTION',
-  '@deployment:12',
-  '@runtime',
-  '@event:',
-  '@tx:',
-  '@adapter:chainlink-data-feeds',
-  '@agent:guardian',
-];
+/**
+ * Finds the @mention token the caret is sitting in, if any.
+ *
+ * Only an @ that starts a word counts, so an email address or a decorative @
+ * mid-word does not open the picker.
+ */
+function mentionTokenAt(text: string, caret: number): { start: number; query: string } | null {
+  const upToCaret = text.slice(0, caret);
+  const at = upToCaret.lastIndexOf('@');
+  if (at === -1) return null;
+  if (at > 0 && !/\s/.test(upToCaret[at - 1])) return null;
+
+  const query = upToCaret.slice(at + 1);
+  /* Whitespace ends a mention — once the user types a space they are writing
+     prose again, not still choosing an entity. */
+  if (/\s/.test(query)) return null;
+  return { start: at, query };
+}
+
+/** Authority tier labels (spec §6.4), shown so the gate is legible. */
+const TIER_LABEL: Record<string, string> = {
+  read: 'Read',
+  navigate: 'Navigate',
+  draft: 'Draft',
+  'safe-computation': 'Safe computation',
+  'project-mutation': 'Needs explicit Apply',
+  'deployment-mutation': 'Native confirmation',
+  'financial-authority': 'Typed control only',
+  emergency: 'Critical modal only',
+};
 
 export function ContextAgentSidebar({
   projectId,
@@ -86,7 +106,10 @@ export function ContextAgentSidebar({
   ]);
   const [activeThreadId, setActiveThreadId] = useState('thr_1');
   const [streaming, setStreaming] = useState(false);
-  const [showMentions, setShowMentions] = useState(false);
+  /* The picker is driven by what is under the caret, not by a toggle, so it
+     opens as the user types @ and closes when the token stops being one. */
+  const [mentionToken, setMentionToken] = useState<{ start: number; query: string } | null>(null);
+  const [mentionIndexSel, setMentionIndexSel] = useState(0);
   const [attachments, setAttachments] = useState<string[]>([]);
   const cancelRef = useRef<{ cancelled: boolean }>({ cancelled: false });
   const scrollRef = useRef<HTMLDivElement | null>(null);
@@ -94,6 +117,37 @@ export function ContextAgentSidebar({
 
   const thread = threads.find((t) => t.id === activeThreadId) ?? threads[0];
   const messages = thread?.messages ?? [];
+
+  const mentionMatches = useMemo(
+    () => (mentionToken ? searchMentions(mentionToken.query) : []),
+    [mentionToken],
+  );
+
+  /* Highest severity first, so "attach the error" attaches the one that
+     matters rather than whichever happens to be first in the list. */
+  const currentProblem = useMemo(() => {
+    const rank: Record<string, number> = { CRITICAL: 0, HIGH: 1, MEDIUM: 2, LOW: 3, INFO: 4 };
+    return [...PROBLEMS].sort((a, b) => (rank[a.severity] ?? 9) - (rank[b.severity] ?? 9))[0] ?? null;
+  }, []);
+
+  /** Replaces the token under the caret with a resolved entity. */
+  const insertMention = useCallback(
+    (entity: MentionEntity) => {
+      if (!mentionToken) return;
+      const el = inputRef.current;
+      const caret = el?.selectionStart ?? agentDraft.length;
+      const next = `${agentDraft.slice(0, mentionToken.start)}@${entity.token} ${agentDraft.slice(caret)}`;
+      setAgentDraft(next);
+      setMentionToken(null);
+      setMentionIndexSel(0);
+      window.setTimeout(() => {
+        el?.focus();
+        const pos = mentionToken.start + entity.token.length + 2;
+        el?.setSelectionRange(pos, pos);
+      }, 0);
+    },
+    [mentionToken, agentDraft, setAgentDraft],
+  );
 
   const context = useMemo<AgentPageContext>(
     () => ({
@@ -293,23 +347,33 @@ export function ContextAgentSidebar({
           </div>
         ) : null}
 
-        {showMentions ? (
-          <div className="cl-card" style={{ marginBottom: 6, maxHeight: 150, overflowY: 'auto' }}>
-            {MENTIONS.map((m) => (
-              <button
-                key={m}
-                type="button"
-                className="cl-palette-item"
-                style={{ width: '100%', textAlign: 'left' }}
-                onClick={() => {
-                  setAgentDraft(`${agentDraft}${agentDraft.endsWith(' ') || !agentDraft ? '' : ' '}${m} `);
-                  setShowMentions(false);
-                  inputRef.current?.focus();
-                }}
-              >
-                <span className="cl-mono">{m}</span>
-              </button>
-            ))}
+        {mentionToken ? (
+          <div className="cl-mention-picker" role="listbox" aria-label="Project entities">
+            {mentionMatches.length === 0 ? (
+              <div className="cl-meta" style={{ padding: '8px 10px' }}>
+                Nothing in this project matches “{mentionToken.query}”.
+              </div>
+            ) : (
+              mentionMatches.map((entity, i) => (
+                <button
+                  key={`${entity.kind}:${entity.id}`}
+                  type="button"
+                  role="option"
+                  aria-selected={i === mentionIndexSel}
+                  className="cl-mention-item"
+                  data-active={i === mentionIndexSel}
+                  onMouseEnter={() => setMentionIndexSel(i)}
+                  onClick={() => insertMention(entity)}
+                >
+                  <span className="cl-mention-item-main">
+                    <span className="cl-mono cl-mention-token">@{entity.token}</span>
+                    {/* Human label always present — never only an opaque id (§6.7). */}
+                    <span className="cl-mention-label">{entity.label}</span>
+                  </span>
+                  {entity.detail ? <span className="cl-mention-detail">{entity.detail}</span> : null}
+                </button>
+              ))
+            )}
           </div>
         ) : null}
 
@@ -321,8 +385,41 @@ export function ContextAgentSidebar({
           className="cl-agent-input"
           value={agentDraft}
           placeholder="Ask about this page…  @ to mention an entity"
-          onChange={(e) => setAgentDraft(e.target.value)}
+          onChange={(e) => {
+            setAgentDraft(e.target.value);
+            setMentionToken(mentionTokenAt(e.target.value, e.target.selectionStart ?? 0));
+            setMentionIndexSel(0);
+          }}
+          onClick={(e) => {
+            const el = e.currentTarget;
+            setMentionToken(mentionTokenAt(el.value, el.selectionStart ?? 0));
+          }}
           onKeyDown={(e) => {
+            /* While the picker is open it owns the arrow keys, Enter and Escape —
+               otherwise Enter would send a message containing a half-typed
+               mention the frontend could not resolve. */
+            if (mentionToken && mentionMatches.length > 0) {
+              if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                setMentionIndexSel((i) => (i + 1) % mentionMatches.length);
+                return;
+              }
+              if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                setMentionIndexSel((i) => (i - 1 + mentionMatches.length) % mentionMatches.length);
+                return;
+              }
+              if (e.key === 'Enter' || e.key === 'Tab') {
+                e.preventDefault();
+                insertMention(mentionMatches[mentionIndexSel]);
+                return;
+              }
+              if (e.key === 'Escape') {
+                e.preventDefault();
+                setMentionToken(null);
+                return;
+              }
+            }
             if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
               e.preventDefault();
               submit();
@@ -335,7 +432,14 @@ export function ContextAgentSidebar({
           <button
             type="button"
             className="cl-btn cl-btn-ghost cl-btn-sm"
-            onClick={() => setShowMentions((v) => !v)}
+            onClick={() => {
+              const el = inputRef.current;
+              const next = agentDraft.endsWith(' ') || !agentDraft ? `${agentDraft}@` : `${agentDraft} @`;
+              setAgentDraft(next);
+              setMentionToken({ start: next.length - 1, query: '' });
+              setMentionIndexSel(0);
+              window.setTimeout(() => el?.focus(), 0);
+            }}
             title="Mention a project entity"
             aria-label="Mention"
           >
@@ -355,13 +459,18 @@ export function ContextAgentSidebar({
             <Paperclip size={13} aria-hidden />
             Selection
           </button>
+          {/* The highest-severity open problem, not a placeholder id: attaching
+              something that does not exist would put a phantom reference into
+              the turn. Disabled outright when there is nothing wrong. */}
           <button
             type="button"
             className="cl-btn cl-btn-ghost cl-btn-sm"
-            title="Attach the current error or event"
+            disabled={!currentProblem}
+            title={currentProblem ? `Attach “${currentProblem.message}”` : 'No open problems to attach'}
             onClick={() => {
-              setAttachments((prev) => [...new Set([...prev, 'problem:PRB-1'])]);
-              pushToast('Current problem attached to context');
+              if (!currentProblem) return;
+              setAttachments((prev) => [...new Set([...prev, `problem:${currentProblem.id}`])]);
+              pushToast(`Attached: ${currentProblem.message}`);
             }}
           >
             <TriangleAlert size={13} aria-hidden />
@@ -424,7 +533,7 @@ function MessageView({
 
   return (
     <div className="cl-col" style={{ gap: 8 }}>
-      {message.text ? (
+      {message.text?.trim() ? (
         <div style={{ fontSize: 12.5, lineHeight: 1.6 }}>
           {message.text}
           {message.streaming ? <span className="cl-pulse">▍</span> : null}
@@ -432,6 +541,35 @@ function MessageView({
       ) : null}
       {message.cards?.map((card, i) => (
         <ResponseCard key={i} card={card} projectId={projectId} onControlRequest={onControlRequest} />
+      ))}
+    </div>
+  );
+}
+
+/**
+ * Citation chips (spec §6.7).
+ *
+ * Each chip shows the human label and opens the artifact. The id travels in the
+ * envelope but is never what the user has to read.
+ */
+function Citations({ citations, projectId }: { citations: AgentCitation[]; projectId: string }) {
+  const router = useRouter();
+  if (citations.length === 0) return null;
+
+  return (
+    <div className="cl-citations">
+      {citations.map((citation) => (
+        <button
+          key={`${citation.kind}:${citation.id}`}
+          type="button"
+          className="cl-citation"
+          title={`${citation.kind} · ${citation.id}`}
+          disabled={!citation.href}
+          onClick={() => citation.href && router.push(`/projects/${projectId}/${citation.href}`)}
+        >
+          <span className="cl-citation-kind">{citation.kind}</span>
+          {citation.label}
+        </button>
       ))}
     </div>
   );
@@ -447,12 +585,48 @@ function ResponseCard({
   onControlRequest: (control: ControlCommand) => void;
 }) {
   const router = useRouter();
-  const { pushToast } = useWorkbench();
+  const { pushToast, proposePatch } = useWorkbench();
   const [resolved, setResolved] = useState<'applied' | 'rejected' | null>(null);
 
   switch (card.kind) {
     case 'explanation':
-      return <div style={{ fontSize: 12.5, lineHeight: 1.6 }}>{card.text}</div>;
+      return (
+        <div style={{ fontSize: 12.5, lineHeight: 1.6 }}>
+          {card.text}
+          {card.citations?.length ? <Citations citations={card.citations} projectId={projectId} /> : null}
+        </div>
+      );
+
+    /* §30 prohibited shortcut. Styled as a statement, not an error: the agent
+       is working correctly when this appears. */
+    case 'refusal':
+      return (
+        <div className="cl-card cl-refusal">
+          <div className="cl-card-head">
+            <div className="cl-card-title">{card.title}</div>
+            <Badge tone="warn">Not mine to do</Badge>
+          </div>
+          <div className="cl-card-body">
+            <p className="cl-refusal-ask">{card.text}</p>
+            <p className="cl-refusal-why">{card.because}</p>
+            {card.alternative ? (
+              <button
+                type="button"
+                className="cl-btn cl-btn-sm"
+                style={{ marginTop: 10 }}
+                onClick={() =>
+                  card.alternative?.href
+                    ? router.push(`/projects/${projectId}/${card.alternative.href}`)
+                    : undefined
+                }
+              >
+                {card.alternative.label}
+                <CornerDownLeft size={12} aria-hidden />
+              </button>
+            ) : null}
+          </div>
+        </div>
+      );
 
     case 'reference':
       return (
@@ -480,7 +654,9 @@ function ResponseCard({
         <div className="cl-card">
           <div className="cl-card-head">
             <div className="cl-card-title">{card.title}</div>
-            <Badge tone="sim">Proposal</Badge>
+            <Badge tone="sim" title="Authority tier (spec §6.4)">
+              {TIER_LABEL['project-mutation']}
+            </Badge>
           </div>
           <div className="cl-card-body">
             <div className="cl-meta" style={{ marginBottom: 8 }}>
@@ -504,19 +680,36 @@ function ResponseCard({
             </div>
             {resolved ? (
               <div className="cl-meta" style={{ marginTop: 10 }}>
-                {resolved === 'applied' ? 'Applied to draft. Validate before creating a revision.' : 'Proposal rejected.'}
+                {resolved === 'applied'
+                  ? 'Sent to the draft. Review it on the target page — nothing is a revision until you publish one.'
+                  : 'Proposal rejected. Nothing was changed.'}
               </div>
             ) : (
-              <div className="cl-row" style={{ marginTop: 10, gap: 6 }}>
-                <button type="button" className="cl-btn cl-btn-sm" onClick={() => pushToast('Opened change for review')}>
+              <div className="cl-row cl-row-wrap" style={{ marginTop: 10, gap: 6 }}>
+                <button
+                  type="button"
+                  className="cl-btn cl-btn-sm"
+                  onClick={() => router.push(`/projects/${projectId}/${segmentForPageKind(card.targetPage)}`)}
+                >
                   Review change
                 </button>
                 <button
                   type="button"
                   className="cl-btn cl-btn-sm cl-btn-primary"
                   onClick={() => {
+                    /* Explicit Apply is the project-mutation gate (§6.4). Even
+                       then the agent does not write: it hands the proposal to
+                       the page that owns the artifact, and the user reviews it
+                       there. */
+                    proposePatch({
+                      targetPage: card.targetPage,
+                      title: card.title,
+                      target: card.target,
+                      summary: card.summary,
+                      diff: card.diff,
+                    });
                     setResolved('applied');
-                    pushToast('Applied to draft');
+                    pushToast(`Sent to ${card.target} as a pending draft change`);
                   }}
                 >
                   Apply to draft
@@ -578,7 +771,9 @@ function ResponseCard({
             <div className="cl-card-title" style={{ color: 'var(--cl-deny)' }}>
               {card.title}
             </div>
-            <Badge tone="deny">Needs your confirmation</Badge>
+            <Badge tone="deny" title="Authority tier (spec §6.4)">
+              {TIER_LABEL[card.tier] ?? 'Needs your confirmation'}
+            </Badge>
           </div>
           <div className="cl-card-body">
             <p style={{ fontSize: 12.5, lineHeight: 1.55 }}>{card.rationale}</p>

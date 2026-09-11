@@ -14,7 +14,9 @@
  * Swapping this for a real SSE endpoint means replacing `respond()` — the card
  * shapes and the authority rules stay exactly as they are.
  */
-import type { AgentPageContext, AgentResponseCard, PageKind } from './types';
+import { refusalFor } from './agent-refusals';
+import { resolveMentions, type MentionEntity } from './mentions';
+import type { AgentCitation, AgentPageContext, AgentResponseCard, PageKind } from './types';
 
 export interface AgentRequest {
   prompt: string;
@@ -22,8 +24,13 @@ export interface AgentRequest {
   selectionLabel?: string | null;
 }
 
-function explanation(text: string, citations?: AgentResponseCard extends { citations?: infer C } ? C : never): AgentResponseCard {
-  return { kind: 'explanation', text, citations: citations as never };
+function explanation(text: string, citations?: AgentCitation[]): AgentResponseCard {
+  return { kind: 'explanation', text, citations };
+}
+
+/** Mentioned entities become citation chips, so the answer is traceable (§6.7). */
+function citations(entities: MentionEntity[]): AgentCitation[] {
+  return entities.map((e) => ({ label: e.label, kind: e.kind, id: e.id, href: e.href }));
 }
 
 /** Per-page default answer, used when nothing more specific matches. */
@@ -37,6 +44,7 @@ const PAGE_DEFAULT: Record<PageKind, (ctx: AgentPageContext) => AgentResponseCar
     {
       kind: 'proposed-patch',
       title: 'Add explicit limits to the description',
+      targetPage: 'composer',
       target: 'Composer draft',
       summary: 'Restates the same intent with the boundaries made explicit. Authority is unchanged: no new capability is added.',
       diff: [
@@ -69,6 +77,7 @@ const PAGE_DEFAULT: Record<PageKind, (ctx: AgentPageContext) => AgentResponseCar
     {
       kind: 'proposed-patch',
       title: 'Tighten the autonomous per-action limit',
+      targetPage: 'blueprint',
       target: 'Blueprint · Autonomous policy',
       summary:
         'Reduces autonomous authority. This narrows the blast radius; it does not widen it, so it needs no additional escalation review.',
@@ -151,6 +160,7 @@ const PAGE_DEFAULT: Record<PageKind, (ctx: AgentPageContext) => AgentResponseCar
       rationale: 'If you want execution stopped at the authority layer, this is the control that does it. I will open the dialog; you complete it.',
       control: 'DISABLE_POLICY',
       buttonLabel: 'Open Disable Policy',
+      tier: 'financial-authority',
     },
   ],
 
@@ -170,6 +180,7 @@ const PAGE_DEFAULT: Record<PageKind, (ctx: AgentPageContext) => AgentResponseCar
       rationale: 'If policy state drift is critical, the strongest control is Emergency Lock. It attempts the financial policy first.',
       control: 'EMERGENCY_LOCK',
       buttonLabel: 'Open Emergency Lock',
+      tier: 'emergency',
     },
   ],
 
@@ -213,6 +224,7 @@ function keywordCards(prompt: string, ctx: AgentPageContext): AgentResponseCard[
         rationale: 'I cannot run this. The button opens the native critical confirmation, which you complete.',
         control: 'EMERGENCY_LOCK',
         buttonLabel: 'Open Emergency Lock',
+        tier: 'emergency',
       },
     ];
   }
@@ -231,6 +243,7 @@ function keywordCards(prompt: string, ctx: AgentPageContext): AgentResponseCard[
         rationale: 'A free-text message is never authorization for a financial control. I can only open the dialog.',
         control: disable ? 'DISABLE_POLICY' : 'ACTIVATE_TESTNET_POLICY',
         buttonLabel: disable ? 'Open Disable Policy' : 'Open Enable Policy',
+        tier: 'financial-authority',
       },
     ];
   }
@@ -277,12 +290,40 @@ function keywordCards(prompt: string, ctx: AgentPageContext): AgentResponseCard[
 }
 
 export function respond(req: AgentRequest): AgentResponseCard[] {
+  /* §30 prohibited shortcuts are checked first and unconditionally. If a
+     keyword or page default could answer a request that must be refused, the
+     refusal would depend on routing order — which is not a property a security
+     behaviour should have. */
+  const refusal = refusalFor(req.context.pageKind, req.prompt);
+  if (refusal) return [refusal];
+
+  /* Mentions are resolved by the frontend, never left for the model to guess
+     at (§6.2). An unknown one is reported rather than answered around. */
+  const mentions = resolveMentions(req.prompt);
+  if (mentions.unresolved.length > 0) {
+    return [
+      explanation(
+        `I don’t have ${mentions.unresolved.join(', ')} in this project. I will not answer as though I do — type @ to see what exists here.`,
+        citations(mentions.entities),
+      ),
+    ];
+  }
+
   const keyword = keywordCards(req.prompt, req.context);
-  if (keyword) return keyword;
+  if (keyword) return withCitations(keyword, mentions.entities);
 
   const base = PAGE_DEFAULT[req.context.pageKind]?.(req.context) ?? [
     explanation('I can explain what is on this page, trace how it connects to the Blueprint, and propose changes for you to review.'),
   ];
+
+  /* An explicit mention is a stronger signal than the page default: the user
+     named the thing they want addressed, so lead with it. */
+  if (mentions.entities.length > 0) {
+    return [
+      explanation(describeMentions(mentions.entities), citations(mentions.entities)),
+      ...base,
+    ];
+  }
 
   if (req.selectionLabel) {
     return [
@@ -294,6 +335,25 @@ export function respond(req: AgentRequest): AgentResponseCard[] {
   }
 
   return base;
+}
+
+/** Attaches citation chips to the first explanation in a set of cards. */
+function withCitations(cards: AgentResponseCard[], entities: MentionEntity[]): AgentResponseCard[] {
+  if (entities.length === 0) return cards;
+  let attached = false;
+  return cards.map((card) => {
+    if (attached || card.kind !== 'explanation') return card;
+    attached = true;
+    return { ...card, citations: citations(entities) };
+  });
+}
+
+function describeMentions(entities: MentionEntity[]): string {
+  if (entities.length === 1) {
+    const [only] = entities;
+    return `${only.label} — ${only.detail ?? 'in context for this turn'}. I have its identifiers in context; the chip below opens it.`;
+  }
+  return `I have ${entities.map((e) => e.label).join(', ')} in context for this turn. Only these references travel with the message — not the whole project.`;
 }
 
 function describeSelection(kind: PageKind): string {

@@ -23,6 +23,7 @@ import {
   Workflow,
 } from 'lucide-react';
 import { StudioPage } from '@/components/studio/PageScaffold';
+import { AgentPatchInbox } from '@/components/studio/AgentPatches';
 import {
   Badge,
   BlockerBanner,
@@ -228,6 +229,8 @@ export default function BlueprintPage() {
         </>
       }
     >
+      <AgentPatchInbox pageKind="blueprint" />
+
       {raw ? (
         <Section
           label="Raw JSON"

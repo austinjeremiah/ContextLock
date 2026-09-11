@@ -469,6 +469,21 @@ export function metaForSegment(segment: string): PageMeta {
   return PAGE_META[segment] ?? PAGE_META.overview;
 }
 
+/**
+ * Route segment that owns a page kind.
+ *
+ * Not an identity mapping: the Composer lives at `build`, and Permissions at
+ * `security`. Anything routing by page kind — an agent patch going back to the
+ * page that owns its artifact — has to go through here.
+ */
+export function segmentForPageKind(pageKind: PageKind): string {
+  for (const group of NAV_GROUPS) {
+    const hit = group.items.find((item) => item.pageKind === pageKind);
+    if (hit) return hit.segment;
+  }
+  return 'overview';
+}
+
 export function findNavItem(segment: string): NavItem | undefined {
   for (const group of NAV_GROUPS) {
     const hit = group.items.find((item) => item.segment === segment);

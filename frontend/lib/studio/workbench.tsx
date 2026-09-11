@@ -17,7 +17,7 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import type { BottomPanelTab, EditorTab, PageKind } from './types';
+import type { AgentPatch, BottomPanelTab, EditorTab, PageKind } from './types';
 import type { RailViewId } from './nav';
 
 export interface SelectedEntity {
@@ -100,6 +100,12 @@ interface WorkbenchValue {
   focusAgentInput: () => void;
   registerAgentInput: (el: HTMLTextAreaElement | null) => void;
 
+  /* Patches the agent proposed and the user applied (spec §6.4). The agent
+     never writes to a page; it hands the page a proposal to show. */
+  pendingPatches: AgentPatch[];
+  proposePatch: (patch: Omit<AgentPatch, 'id' | 'at'>) => void;
+  dismissPatch: (id: string) => void;
+
   /* command palette */
   paletteOpen: boolean;
   setPaletteOpen: (open: boolean) => void;
@@ -147,6 +153,7 @@ export function WorkbenchProvider({ children }: { children: ReactNode }) {
   const [selection, setSelection] = useState<SelectedEntity | null>(null);
   const [pageKind, setPageKind] = useState<PageKind>('overview');
   const [agentDraft, setAgentDraft] = useState('');
+  const [pendingPatches, setPendingPatches] = useState<AgentPatch[]>([]);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [developerMode, setDeveloperMode] = useState(false);
@@ -278,6 +285,17 @@ export function WorkbenchProvider({ children }: { children: ReactNode }) {
     window.setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 3200);
   }, []);
 
+  const proposePatch = useCallback((patch: Omit<AgentPatch, 'id' | 'at'>) => {
+    setPendingPatches((prev) => [
+      ...prev,
+      { ...patch, id: `patch_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`, at: new Date().toISOString() },
+    ]);
+  }, []);
+
+  const dismissPatch = useCallback((id: string) => {
+    setPendingPatches((prev) => prev.filter((p) => p.id !== id));
+  }, []);
+
   const registerAgentInput = useCallback((el: HTMLTextAreaElement | null) => {
     agentInputRef.current = el;
   }, []);
@@ -322,6 +340,9 @@ export function WorkbenchProvider({ children }: { children: ReactNode }) {
       setAgentDraft,
       focusAgentInput,
       registerAgentInput,
+      pendingPatches,
+      proposePatch,
+      dismissPatch,
       paletteOpen,
       setPaletteOpen,
       toasts,
@@ -337,6 +358,7 @@ export function WorkbenchProvider({ children }: { children: ReactNode }) {
       bottomOpen, toggleBottom, bottomMaximized, toggleBottomMaximized, bottomTab, openBottom,
       rail, tabs, activeTabId, openTab, pinTab, closeTab, closeOtherTabs,
       selection, pageKind, agentDraft, focusAgentInput, registerAgentInput,
+      pendingPatches, proposePatch, dismissPatch,
       paletteOpen, toasts, pushToast, developerMode, viewport,
     ],
   );

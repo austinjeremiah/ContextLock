@@ -35,7 +35,7 @@ import type { Status } from '@/lib/studio/types';
 export default function IdentityPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { pushToast } = useWorkbench();
+  const { pushToast, selection, setSelection } = useWorkbench();
 
   const agentSlug = searchParams.get('agent') ?? PROJECT.agents[0].slug;
   const agent = agentBySlug(agentSlug);
@@ -181,7 +181,12 @@ export default function IdentityPage() {
             </thead>
             <tbody>
               {IDENTITY.records.map((record) => (
-                <tr key={record.key}>
+                <tr
+                  key={record.key}
+                  data-clickable="true"
+                  data-selected={selection?.id === record.key}
+                  onClick={() => setSelection({ kind: 'ens-record', id: record.key, label: record.key })}
+                >
                   <td className="cl-mono">{record.key}</td>
                   <td className="cl-mono" style={{ fontSize: 11.5 }}>
                     {record.value}

@@ -37,7 +37,7 @@ import type { RuntimeRevisionRow, Status } from '@/lib/studio/types';
 export default function RuntimePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { openBottom, pushToast } = useWorkbench();
+  const { openBottom, pushToast, selection, setSelection } = useWorkbench();
 
   const agentSlug = searchParams.get('agent') ?? PROJECT.agents[0].slug;
   const agent = agentBySlug(agentSlug);
@@ -201,12 +201,20 @@ export default function RuntimePage() {
       <Section label="Health dependencies">
         <div className="cl-path">
           {RUNTIME.dependencies.map((dependency) => (
-            <div className="cl-path-step" key={dependency.id}>
+            <button
+              type="button"
+              className="cl-path-step"
+              key={dependency.id}
+              data-clickable="true"
+              data-selected={selection?.id === dependency.id}
+              style={{ width: '100%', textAlign: 'left', cursor: 'pointer' }}
+              onClick={() => setSelection({ kind: 'dependency', id: dependency.id, label: dependency.name })}
+            >
               <span className="cl-path-step-name">{dependency.name}</span>
               <StatusBadge status={dependency.status} />
               <span className="cl-path-step-detail">{dependency.detail}</span>
               <FreshnessBadge freshness={dependency.freshness} compact />
-            </div>
+            </button>
           ))}
           <div className="cl-path-step" style={{ background: 'var(--cl-panel-2)' }}>
             <span className="cl-path-step-name cl-strong">Overall</span>

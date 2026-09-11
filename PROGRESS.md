@@ -133,12 +133,35 @@ labelled as third-party with no promise that funds will arrive.
 | Chainlink CRE | §26 | **Four truth labels stated separately** — official simulation YES, real DON NO, DON consensus NO, hardware TEE NO — each set only by evidence; a simulator never renders a DON badge and a fixture simulation id is labelled as not a workflow id; three mode cards with exact blockers; connect flow that **never asks for a password or OTP**, authenticating through the official CRE login with only a sanitized status returned; promotion that moves the exact approved artifact and never silently rebuilds |
 | Identity / ENS | §27 | Identity card, organization namespace, records and lifecycle; states plainly that **ENS identifies and revokes agents while ContextLock policy defines their financial permissions**, and no spending limit is stored as a name record; revoke confirmation spelling out sibling impact, capability impact, that the policy state is unaffected, and that a fresh ENS read must confirm it |
 
-## ⬜ Remaining phases — 2 phases plus landing polish
+## ✅ Phase FE-8 — Context Agent integration
+
+The sidebar already explained, navigated and proposed. FE-8 made it *bound* —
+the parts of §6 and §30 that constrain what it may do, and the parts that make
+its answers traceable.
+
+| Piece | Spec | What landed |
+|---|---|---|
+| Prohibited shortcuts | §30 | `lib/studio/agent-refusals.ts` — all **19** page-specific prohibitions, each detected and answered with a visible refusal card stating what was asked, why it is not the agent's to do, and the legitimate route. Checked *before* any other routing, so no keyword or page default can accidentally satisfy a request that must be refused |
+| Mention resolution | §6.2 | `lib/studio/mentions.ts` — the frontend resolves `@token` to a real entity id before the turn is sent, never leaving it for the model to guess. Ranked typeahead over agents, adapters, scenarios, attacks, deployments, events, transactions, alerts, files and problems; arrow keys / Enter / Escape; an unknown mention is reported unresolved rather than answered around. **Credentials are deliberately absent from the index** — an adapter is mentionable, its API key is not |
+| Citations | §6.7 | Answers cite the artifacts they drew on as clickable chips carrying the human label; the opaque id is a tooltip, never the text |
+| Authority tiers | §6.4 | Tier is rendered on the card — `Needs explicit Apply`, `Typed control only`, `Critical modal only` — so the gate is legible rather than implied |
+| Patch delivery | §6.4 | "Apply to draft" no longer just toasts. The proposal is delivered to the page that owns the artifact (`AgentPatchInbox` on Blueprint and Composer) where a person merges or discards it. The agent still never writes: applying moves a proposal, it does not mutate |
+| Selection awareness | §6.6 | Extended to the last operate pages — policy matrix rows, runtime dependencies, CRE runs, ENS records. 18 of 22 pages now feed the selection chip; the remaining four are launchpads whose clicks navigate away |
+| Error attachment | §6.2 | Attaches the highest-severity real problem instead of a hardcoded placeholder id, and is disabled when nothing is wrong |
+
+**Verified, not assumed:** a 45-case check confirms each detector fires on its
+prohibited ask and stays silent on the adjacent legitimate question ("disable
+the policy" refuses; "what does disabling the policy do?" answers). It caught
+two real bugs — `\bpolic\b` can never match "policy" because the boundary falls
+inside the word, and the fixed pattern then swallowed the page's own quick
+prompt "Why is Enable Policy disabled?", which is a question about a greyed-out
+button, not a request to change state.
+
+## ⬜ Remaining — 1 phase plus landing polish
 
 | Phase | Scope | Pages |
 |---|---|---|
-| **FE-8** ← next | Context Agent | page context envelopes, selections and proposed patches across every page (§39) |
-| **FE-9** | Output + polish | Safety Reports (§28), Settings (§29), a11y (§45), responsive monitoring mode (§46) |
+| **FE-9** ← next | Output + polish | Safety Reports (§28), Settings (§29), a11y (§45), responsive monitoring mode (§46) |
 | **Landing** | Polish pass | last, by explicit decision |
 
 **Current page count:** 22 built. Only Reports and Settings remain, both in FE-9.
@@ -242,6 +265,20 @@ module graph compiles for every route beneath it. The correct home is a nested
 layout scoped to the routes that need it (`deploy/layout.tsx`,
 `policies/layout.tsx`), which keeps React context working normally while only
 those routes pay the cost.
+
+### A trailing `\b` after a truncated stem never matches
+
+`\bpolic\b` cannot match "policy" — the boundary falls inside the word. Write
+`\bpolic\w*\b`. This shipped silently in a refusal detector and only surfaced
+because the behaviour was tested with a case list rather than eyeballed.
+
+### Test a refusal in both directions
+
+Any pattern that refuses a request needs the negative case as well as the
+positive one. "Disable the policy" must refuse; "Why is Enable Policy disabled?"
+must answer. The second is a question about a greyed-out button, and refusing it
+reads as the product being broken. Every detector added to
+`agent-refusals.ts` gets both cases.
 
 ### Product copy, not build notes
 

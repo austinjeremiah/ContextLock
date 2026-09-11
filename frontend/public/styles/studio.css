@@ -506,6 +506,86 @@ html:has(.cl-studio) { font-size: 16px; }
 .cl-agent-input:focus { border-color: var(--cl-ink); }
 .cl-agent-composer-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 6px; }
 
+/* --- @mention picker (spec §6.2) ------------------------------------------
+   Sits above the input because the composer is already at the bottom of the
+   panel; opening downwards would push it off-screen. */
+.cl-mention-picker {
+  max-height: 232px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  margin-bottom: 6px;
+  background: var(--cl-panel);
+  border: 1px solid var(--cl-line-strong);
+  border-radius: 12px;
+}
+.cl-mention-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+  padding: 7px 10px;
+  text-align: left;
+  cursor: pointer;
+  border-bottom: 1px solid var(--cl-line);
+}
+.cl-mention-item:last-child { border-bottom: none; }
+.cl-mention-item[data-active='true'] { background: var(--cl-raised); }
+.cl-mention-item-main { display: flex; align-items: baseline; gap: 7px; min-width: 0; }
+.cl-mention-token { font-size: 11px; color: var(--cl-ink-3); flex: 0 0 auto; }
+.cl-mention-label {
+  font-family: var(--medium);
+  font-size: 12.5px;
+  color: var(--cl-ink-heading);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.cl-mention-detail {
+  font-size: 11.5px;
+  color: var(--cl-ink-3);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+/* --- citation chips (spec §6.7) -------------------------------------------
+   An answer cites the artifacts it drew on. The chip carries the human label;
+   the opaque id is a tooltip, never the text. */
+.cl-citations { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+.cl-citation {
+  display: inline-flex; align-items: baseline; gap: 5px;
+  padding: 3px 8px;
+  font-size: 11.5px;
+  color: var(--cl-ink);
+  background: var(--cl-raised);
+  border: 1px solid var(--cl-line-strong);
+  border-radius: 999px;
+  cursor: pointer;
+  max-width: 100%;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.cl-citation:hover:not(:disabled) { border-color: var(--cl-ink); }
+.cl-citation:disabled { cursor: default; opacity: 0.75; }
+.cl-citation-kind {
+  font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--cl-ink-3); flex: 0 0 auto;
+}
+
+/* --- refusal card (spec §30) -----------------------------------------------
+   Amber, not red: the agent declining a prohibited shortcut is correct
+   behaviour, not a failure. Red here would read as "something went wrong". */
+.cl-refusal { border-color: var(--cl-warn); }
+.cl-refusal .cl-card-head { background: var(--cl-warn-bg); }
+.cl-refusal .cl-card-title { color: var(--cl-warn); }
+.cl-refusal-ask {
+  font-size: 12.5px; line-height: 1.55;
+  color: var(--cl-ink-2);
+  margin-bottom: 7px;
+}
+.cl-refusal-why { font-size: 12.5px; line-height: 1.6; }
+
+/* --- pending agent patch on its target page (spec §6.4) --------------------
+   Marked as arriving from the agent so it is never mistaken for state the page
+   itself is reporting. */
+.cl-agent-patch { border-color: var(--cl-accent); }
+.cl-agent-patch .cl-card-head { background: var(--cl-sim-bg, var(--cl-panel-2)); }
+
 /* --- status bar ----------------------------------------------------------- */
 .cl-statusbar {
   display: flex; align-items: center; gap: 0;
@@ -781,6 +861,9 @@ body.cl-resizing-v, body.cl-resizing-v * { cursor: row-resize !important; user-s
 }
 .cl-list-row:hover { background: var(--cl-raised); }
 .cl-list-row[data-selected="true"] { background: rgba(0, 66, 175, 0.09); box-shadow: inset 2px 0 0 var(--cl-ink); }
+/* Selectable path steps (runtime dependencies) carry the same selected
+   treatment, so a selection reads identically wherever it is made (§6.6). */
+.cl-path-step[data-selected="true"] { background: rgba(0, 66, 175, 0.09); box-shadow: inset 2px 0 0 var(--cl-ink); }
 
 /* split view used by Simulation / Attack Lab / Code / Organization */
 .cl-split { display: flex; flex: 1 1 auto; min-height: 0; }

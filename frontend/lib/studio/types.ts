@@ -972,6 +972,8 @@ export type AgentResponseCard =
   | {
       kind: 'proposed-patch';
       title: string;
+      /** Page the patch applies to, so Apply can deliver it there (§6.4). */
+      targetPage: PageKind;
       target: string;
       summary: string;
       diff: { field: string; before: string; after: string; authorityExpansion?: boolean }[];
@@ -987,7 +989,42 @@ export type AgentResponseCard =
       /** Opens the deterministic native dialog. Never executes. */
       control: ControlCommand;
       buttonLabel: string;
+      tier: AgentAuthorityTier;
+    }
+  /**
+   * A prohibited shortcut (spec §30). The agent was asked to do something its
+   * page forbids — invent a financial cap, rewrite a test to pass, promote a
+   * trust class by prose — and says so instead of complying. Refusing visibly
+   * is the product behaviour: a silent decline reads as a broken feature.
+   */
+  | {
+      kind: 'refusal';
+      title: string;
+      /** What was asked, restated plainly. */
+      text: string;
+      /** Why this specific thing is not the agent's to do. */
+      because: string;
+      /** The legitimate route to the same goal, when one exists. */
+      alternative?: { label: string; href?: string };
     };
+
+/**
+ * A patch the agent proposed and the user accepted with an explicit Apply
+ * (spec §6.4, project-mutation tier).
+ *
+ * Accepting does not mutate anything by itself — it delivers the proposal to
+ * the page that owns the artifact, which shows it as a pending draft change for
+ * the user to review there. The agent never reaches into a page's state.
+ */
+export interface AgentPatch {
+  id: string;
+  targetPage: PageKind;
+  title: string;
+  target: string;
+  summary: string;
+  diff: { field: string; before: string; after: string; authorityExpansion?: boolean }[];
+  at: string;
+}
 
 export interface AgentMessage {
   id: string;

@@ -11,6 +11,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { FileInput, Lightbulb, Pause, Play, Sparkles, Square } from 'lucide-react';
 import { StudioPage } from '@/components/studio/PageScaffold';
+import { AgentPatchInbox } from '@/components/studio/AgentPatches';
 import {
   Badge,
   BlockerBanner,
@@ -249,6 +250,8 @@ export default function ComposerPage() {
         </>
       }
     >
+      <AgentPatchInbox pageKind="composer" />
+
       {/* prompt editor */}
       <Section
         label="Agent description"

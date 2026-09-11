@@ -39,7 +39,7 @@ import type { Status } from '@/lib/studio/types';
 export default function PoliciesPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { pushToast } = useWorkbench();
+  const { pushToast, selection, setSelection } = useWorkbench();
 
   const agentSlug = searchParams.get('agent') ?? PROJECT.agents[0].slug;
   const agent = agentBySlug(agentSlug);
@@ -204,7 +204,14 @@ export default function PoliciesPage() {
               </thead>
               <tbody>
                 {POLICY.matrix.map((row, i) => (
-                  <tr key={`${row.action}-${i}`}>
+                  <tr
+                    key={`${row.action}-${i}`}
+                    data-clickable="true"
+                    data-selected={selection?.id === `${row.action}-${i}`}
+                    onClick={() =>
+                      setSelection({ kind: 'policy-rule', id: `${row.action}-${i}`, label: row.action })
+                    }
+                  >
                     <td className="cl-strong">{row.action}</td>
                     <td>{row.limit}</td>
                     <td className="cl-meta">{row.recipients}</td>

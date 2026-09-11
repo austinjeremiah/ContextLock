@@ -38,7 +38,7 @@ import type { Status } from '@/lib/studio/types';
 export default function CrePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { pushToast } = useWorkbench();
+  const { pushToast, selection, setSelection } = useWorkbench();
 
   const agentSlug = searchParams.get('agent') ?? PROJECT.agents[0].slug;
   const agent = agentBySlug(agentSlug);
@@ -231,7 +231,12 @@ export default function CrePage() {
               </thead>
               <tbody>
                 {CRE_RUNS.map((run) => (
-                  <tr key={run.id}>
+                  <tr
+                    key={run.id}
+                    data-clickable="true"
+                    data-selected={selection?.id === run.id}
+                    onClick={() => setSelection({ kind: 'cre-run', id: run.id, label: `CRE run ${run.id}` })}
+                  >
                     <td className="cl-meta">
                       <TimeAgo iso={run.at} />
                     </td>
