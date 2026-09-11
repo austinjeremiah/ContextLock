@@ -261,13 +261,21 @@ export function HealthIndicator({ status, label }: { status: Status; label: stri
 function formatAge(iso: string | null): string {
   if (!iso) return 'never';
   const deltaMs = Date.now() - new Date(iso).getTime();
-  const s = Math.max(0, Math.round(deltaMs / 1000));
-  if (s < 60) return `${s}s ago`;
+
+  // A future timestamp — an expiry, say — is not an age. Clamping it to zero
+  // reported "0s ago" for something 268 days away.
+  if (deltaMs < 0) return `in ${formatSpan(Math.abs(deltaMs))}`;
+  return `${formatSpan(deltaMs)} ago`;
+}
+
+function formatSpan(ms: number): string {
+  const s = Math.round(ms / 1000);
+  if (s < 60) return `${s}s`;
   const m = Math.round(s / 60);
-  if (m < 60) return `${m}m ago`;
+  if (m < 60) return `${m}m`;
   const h = Math.round(m / 60);
-  if (h < 48) return `${h}h ago`;
-  return `${Math.round(h / 24)}d ago`;
+  if (h < 48) return `${h}h`;
+  return `${Math.round(h / 24)}d`;
 }
 
 /**

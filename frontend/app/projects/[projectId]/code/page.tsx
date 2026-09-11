@@ -62,7 +62,7 @@ export default function CodePage() {
 
   const file = CODE_FILES.find((f) => f.path === selectedPath) ?? CODE_FILES[0];
   const draft = drafts[file.path];
-  const isModified = draft !== undefined && draft !== file.content;
+  const isModified = hasRealEdit(drafts, file.path, file.content);
   const isUnlocked = unlocked.includes(file.path);
   const readOnly = file.readOnly && !isUnlocked;
 
@@ -82,7 +82,7 @@ export default function CodePage() {
   };
 
   const marksFor = (f: CodeFile) => (isModifiedFile(f) ? [...f.marks, 'modified' as const] : f.marks);
-  const isModifiedFile = (f: CodeFile) => drafts[f.path] !== undefined && drafts[f.path] !== f.content;
+  const isModifiedFile = (f: CodeFile) => hasRealEdit(drafts, f.path, f.content);
 
   return (
     <StudioPage
@@ -134,7 +134,7 @@ export default function CodePage() {
             </div>
           </div>
 
-          {Object.keys(drafts).some((p) => isModifiedFile(CODE_FILES.find((f) => f.path === p)!)) ? (
+          {CODE_FILES.some((f) => hasRealEdit(drafts, f.path, f.content)) ? (
             <div style={{ padding: '0 16px 12px' }}>
               <BlockerBanner
                 tone="warn"
@@ -340,7 +340,12 @@ export default function CodePage() {
                 value={draft ?? file.content}
                 language={file.language}
                 readOnly={readOnly}
-                onChange={(next) => setDrafts((prev) => ({ ...prev, [file.path]: next }))}
+                /* A read-only editor must never record a draft: Monaco emits a
+                   change when it loads a model, which would mark files the user
+                   never touched as MODIFIED. */
+                onChange={(next) =>
+                  readOnly ? undefined : setDrafts((prev) => ({ ...prev, [file.path]: next }))
+                }
               />
             )}
           </div>
@@ -389,6 +394,18 @@ export default function CodePage() {
       />
     </StudioPage>
   );
+}
+
+/**
+ * True only for a genuine edit. Monaco normalises line endings when it loads a
+ * model, so a raw string comparison reports files as modified that were only
+ * ever opened.
+ */
+function hasRealEdit(drafts: Record<string, string>, path: string, original: string): boolean {
+  const draft = drafts[path];
+  if (draft === undefined) return false;
+  const normalise = (text: string) => text.replace(/\r\n/g, '\n').replace(/\s+$/, '');
+  return normalise(draft) !== normalise(original);
 }
 
 function EditorSkeleton() {

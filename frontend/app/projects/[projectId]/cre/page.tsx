@@ -70,7 +70,7 @@ export default function CrePage() {
           {status === 'RUNNING' ? (
             <button
               type="button"
-              className="cl-btn"
+              className="cl-btn cl-btn-danger"
               onClick={() => {
                 setStatus('STOPPED');
                 pushToast('Simulator stopped');

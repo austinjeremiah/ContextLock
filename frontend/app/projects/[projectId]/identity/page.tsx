@@ -102,7 +102,9 @@ export default function IdentityPage() {
         </BlockerBanner>
       }
     >
-      <div className="cl-grid cl-grid-2">
+      {/* Identity carries hashes and addresses, the namespace carries short
+          names — so the split is weighted rather than even. */}
+      <div className="cl-grid cl-grid-wide-narrow">
         <Section label="Identity">
           <Card>
             <KeyValue

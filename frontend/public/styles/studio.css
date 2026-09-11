@@ -665,7 +665,19 @@ body.cl-resizing-v, body.cl-resizing-v * { cursor: row-resize !important; user-s
 /* ============================================================================
    Surfaces: cards, sections, tables, key-value grids
    ========================================================================== */
-.cl-card { background: var(--cl-panel); border: 1px solid var(--cl-line); }
+.cl-card {
+  background: var(--cl-panel);
+  border: 1px solid var(--cl-line);
+  /* Its own container, so key/value pairs inside can respond to the CARD's
+     width rather than the page pane's. */
+  container: cl-card / inline-size;
+}
+
+@container cl-card (max-width: 430px) {
+  .cl-kv { grid-template-columns: minmax(0, 1fr); gap: 1px 0; }
+  .cl-kv dt { margin-top: 9px; }
+  .cl-kv dt:first-child { margin-top: 0; }
+}
 .cl-card-head {
   display: flex; align-items: center; gap: 10px;
   padding: 11px 14px; border-bottom: 1px solid var(--cl-line);
@@ -684,7 +696,11 @@ body.cl-resizing-v, body.cl-resizing-v * { cursor: row-resize !important; user-s
 .cl-grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .cl-grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .cl-grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-.cl-grid-auto { grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); }
+.cl-grid-auto { grid-template-columns: repeat(auto-fill, minmax(275px, 1fr)); }
+.cl-grid-wide-narrow { grid-template-columns: minmax(0, 1.85fr) minmax(0, 1fr); }
+@container cl-pane (max-width: 780px) {
+  .cl-grid-wide-narrow { grid-template-columns: minmax(0, 1fr); }
+}
 
 .cl-kv { display: grid; grid-template-columns: minmax(120px, 210px) minmax(0, 1fr); gap: 5px 14px; align-items: baseline; }
 
@@ -722,7 +738,7 @@ body.cl-resizing-v, body.cl-resizing-v * { cursor: row-resize !important; user-s
 .cl-list-row[data-selected="true"] { background: rgba(0, 66, 175, 0.09); box-shadow: inset 2px 0 0 var(--cl-ink); }
 
 /* split view used by Simulation / Attack Lab / Code / Organization */
-.cl-split { display: flex; min-height: 0; height: 100%; }
+.cl-split { display: flex; flex: 1 1 auto; min-height: 0; }
 .cl-split-side { flex: 0 0 290px; min-width: 0; overflow-y: auto; border-right: 1px solid var(--cl-line); background: var(--cl-panel); }
 .cl-split-main { flex: 1 1 auto; min-width: 0; overflow-y: auto; }
 
