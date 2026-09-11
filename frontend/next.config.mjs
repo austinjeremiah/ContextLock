@@ -9,14 +9,38 @@ const nextConfig = {
     optimizePackageImports: ['lucide-react', '@xyflow/react', '@tanstack/react-query'],
 
     turbo: {
+      /*
+       * Turbopack's resolveAlias matches EXACT specifiers — there is no prefix
+       * matching — so every subpath has to be listed. These are optional
+       * micropayment SDKs reached through
+       *   RainbowKit -> wagmi connectors -> Coinbase baseAccount
+       *   -> @base-org/account -> @coinbase/cdp-sdk -> @x402/*
+       * ContextLock never executes a payment path, so they resolve to empty
+       * rather than being installed.
+       */
       resolveAlias: {
-        // Same shims as the webpack config below, in the form Turbopack expects
-        // (a module path rather than `false`).
         '@react-native-async-storage/async-storage': './lib/studio/empty-module.ts',
-        '@x402/evm': './lib/studio/empty-module.ts',
-        '@x402/svm': './lib/studio/empty-module.ts',
-        '@x402/core': './lib/studio/empty-module.ts',
         'pino-pretty': './lib/studio/empty-module.ts',
+        '@x402/core': './lib/studio/empty-module.ts',
+        '@x402/core/client': './lib/studio/empty-module.ts',
+        '@x402/core/server': './lib/studio/empty-module.ts',
+        '@x402/core/types': './lib/studio/empty-module.ts',
+        '@x402/evm': './lib/studio/empty-module.ts',
+        '@x402/evm/batch-settlement/client': './lib/studio/empty-module.ts',
+        '@x402/evm/exact/client': './lib/studio/empty-module.ts',
+        '@x402/evm/exact/server': './lib/studio/empty-module.ts',
+        '@x402/evm/exact/v1/client': './lib/studio/empty-module.ts',
+        '@x402/evm/upto/client': './lib/studio/empty-module.ts',
+        '@x402/evm/upto/server': './lib/studio/empty-module.ts',
+        '@x402/express': './lib/studio/empty-module.ts',
+        '@x402/extensions': './lib/studio/empty-module.ts',
+        '@x402/extensions/bazaar': './lib/studio/empty-module.ts',
+        '@x402/extensions/builder-code': './lib/studio/empty-module.ts',
+        '@x402/fetch': './lib/studio/empty-module.ts',
+        '@x402/svm': './lib/studio/empty-module.ts',
+        '@x402/svm/exact/client': './lib/studio/empty-module.ts',
+        '@x402/svm/exact/server': './lib/studio/empty-module.ts',
+        '@x402/svm/exact/v1/client': './lib/studio/empty-module.ts',
       },
     },
   },

@@ -11,6 +11,7 @@ import { useRouter } from 'next/navigation';
 import { AlertTriangle, Bell, Check, ChevronDown, GitCompare, Plus, Search, TriangleAlert, User } from 'lucide-react';
 import { Popover, MenuItem, MenuLabel, MenuSeparator } from './Popover';
 import { StatusBadge } from '../primitives';
+import { WalletChip } from '../wallet/WalletChip';
 import { useWorkbench } from '@/lib/studio/workbench';
 import type { Agent, Blocker, Project, ProjectSummary, RevisionSet } from '@/lib/studio/types';
 
@@ -178,6 +179,9 @@ export function TitleBar({
             keeps the state visible. */}
         <span className="cl-titlebar-build-label">{buildStatus.label}</span>
       </button>
+
+      {/* workspace wallet — one connection, available on every surface */}
+      <WalletChip />
 
       {/* blockers / alerts (spec §4) */}
       <Popover

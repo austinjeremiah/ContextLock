@@ -221,6 +221,18 @@ any selection keyed to the old data must reset.
 
 ### Keep the wallet lazy
 
+**A `dynamic()` import only helps if nothing on the path imports the module
+statically.** Wrapping the runtime in `dynamic()` while a panel three levels down
+did `import { ConnectTestnetWallet }` put the whole stack straight back into that
+route's bundle — /deploy measured 353 kB against 143 kB everywhere else. Check
+the route's First Load JS after any change here; if one route is heavier than its
+neighbours, something on it imports the runtime eagerly.
+
+**Turbopack's `resolveAlias` matches exact specifiers — there is no prefix
+matching.** Aliasing `@x402/core` does nothing for `@x402/core/client`. All 21
+subpaths reached through `@coinbase/cdp-sdk` have to be listed individually;
+webpack's `IgnorePlugin` takes a regex and does not.
+
 wagmi + RainbowKit + viem + WalletConnect is ~7,000 modules. Mounted in the
 layout it made every route compile all of it (~20s per page in dev, which does
 not tree-shake). It lives in `components/studio/wallet/` behind `dynamic()`.

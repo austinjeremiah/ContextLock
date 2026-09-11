@@ -1,30 +1,27 @@
 'use client';
 
 /**
- * Wallet stack, loaded on demand.
+ * Wallet runtime gate.
  *
- * wagmi + RainbowKit + viem + WalletConnect is roughly 7,000 modules. Mounting
- * it in the workbench layout meant every route compiled all of it. Only the
- * surfaces that actually sign — Deploy preflight and the Policy controls — wrap
- * themselves in this, and the chunk is fetched when one of them opens.
- *
- * Usage:
- *   <WalletProvider>
- *     <ConnectTestnetWallet />
- *   </WalletProvider>
+ * Renders children untouched until the session is activated, then mounts the
+ * wagmi + RainbowKit runtime around them. Because the runtime arrives through
+ * next/dynamic it lives in its own chunk: a route that never connects a wallet
+ * never downloads those ~7,000 modules, while a connected visitor gets the
+ * wallet everywhere in the app rather than only on Deploy.
  */
 import dynamic from 'next/dynamic';
 import type { ReactNode } from 'react';
+import { useWalletSession } from '@/lib/studio/wallet-session';
 
 const WalletRuntime = dynamic(() => import('./WalletRuntime').then((m) => m.WalletRuntime), {
   ssr: false,
-  loading: () => (
-    <span className="cl-meta" role="status">
-      Loading wallet…
-    </span>
-  ),
+  // The workspace stays usable while the wallet chunk loads.
+  loading: () => null,
 });
 
 export function WalletProvider({ children }: { children: ReactNode }) {
+  const { activated } = useWalletSession();
+
+  if (!activated) return <>{children}</>;
   return <WalletRuntime>{children}</WalletRuntime>;
 }

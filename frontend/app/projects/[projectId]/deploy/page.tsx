@@ -31,7 +31,7 @@ import {
   TimeAgo,
 } from '@/components/studio/primitives';
 import { Modal } from '@/components/studio/dialogs';
-import { ConnectTestnetWallet } from '@/components/studio/wallet/ConnectTestnetWallet';
+import { DeployWalletPanel } from '@/components/studio/wallet/DeployWalletPanel';
 import { useWorkbench } from '@/lib/studio/workbench';
 import { PROJECT, agentBySlug } from '@/lib/studio/mock/core';
 import {
@@ -304,7 +304,7 @@ export default function DeployPage() {
       {/* wallet */}
       <Section label="Deployer wallet">
         <Card>
-          <ConnectTestnetWallet recommendedEth={GAS_ASSUMPTIONS.recommendedEth} onStateChange={setWallet} />
+          <DeployWalletPanel recommendedEth={GAS_ASSUMPTIONS.recommendedEth} onStateChange={setWallet} />
         </Card>
       </Section>
 
