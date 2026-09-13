@@ -18,7 +18,7 @@
  * persisted storage, so they never see the workspace mount without a wallet and
  * then re-mount with one.
  */
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 
 interface WalletSessionValue {
   /** True once the heavy wallet runtime should be mounted. */
@@ -48,10 +48,15 @@ function hasPersistedConnection(): boolean {
 }
 
 export function WalletSessionProvider({ children }: { children: ReactNode }) {
-  // Lazy initializer: a previously connected visitor activates on the first
-  // render rather than after an effect, which would remount the workspace.
-  const [activated, setActivated] = useState(hasPersistedConnection);
+  // The server cannot know whether this visitor connected before, and the runtime is client-only;
+  // so the first render is always "not activated" on both sides and a previously connected visitor
+  // activates right after hydration. Reading storage in the initializer would render a different
+  // tree on the client than the server sent and React would throw the hydration away.
+  const [activated, setActivated] = useState(false);
   const [autoOpen, setAutoOpen] = useState(false);
+  useEffect(() => {
+    if (hasPersistedConnection()) setActivated(true);
+  }, []);
 
   const requestConnect = useCallback(() => {
     setActivated(true);

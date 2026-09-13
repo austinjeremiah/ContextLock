@@ -9,7 +9,8 @@
  * (get one at https://cloud.reown.com). Without it, injected wallets still work;
  * WalletConnect-based wallets are unavailable until it is set.
  */
-import { getDefaultConfig } from '@rainbow-me/rainbowkit';
+import { getDefaultConfig, getDefaultWallets } from '@rainbow-me/rainbowkit';
+import { ledgerWallet } from '@rainbow-me/rainbowkit/wallets';
 import { baseSepolia, mainnet, sepolia } from 'wagmi/chains';
 import { http } from 'wagmi';
 
@@ -24,10 +25,21 @@ export function isExecutionChain(chainId: number | undefined): boolean {
   return chainId !== undefined && EXECUTION_CHAIN_IDS.includes(chainId);
 }
 
+/**
+ * The wallets offered by the connect dialog: RainbowKit's defaults plus Ledger, which signs
+ * escalation approvals on the device through Ledger Live (WalletConnect; needs the project id).
+ * A Ledger paired to MetaMask works through the MetaMask entry as well.
+ */
+const wallets = [
+  ...getDefaultWallets().wallets,
+  { groupName: 'Hardware', wallets: [ledgerWallet] },
+];
+
 export const wagmiConfig = getDefaultConfig({
   appName: 'ContextLock Studio',
   // RainbowKit requires a non-empty id; the guard above is what the UI reports on.
   projectId: WALLETCONNECT_PROJECT_ID || 'contextlock-studio-local',
+  wallets,
   chains: [sepolia, baseSepolia, mainnet],
   transports: {
     [sepolia.id]: http(),

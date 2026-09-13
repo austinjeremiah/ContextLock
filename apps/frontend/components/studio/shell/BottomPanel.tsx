@@ -12,13 +12,15 @@ import { useRouter } from 'next/navigation';
 import { ArrowDownToLine, Copy, Eraser, Maximize2, Minimize2, PlayCircle, X } from 'lucide-react';
 import { LogMessage, StatusBadge, SeverityBadge, Timestamp } from '../primitives';
 import { useWorkbench } from '@/lib/studio/workbench';
-import { OUTPUT_LOG, PROBLEMS, TEST_RESULTS, logAsText } from '@/lib/studio/mock/core';
+import { useStudioProject } from '@/lib/studio/api/project-context';
+import { logAsText } from '@/lib/studio/log';
 import type { BottomPanelTab, RuntimeEvent } from '@/lib/studio/types';
 
 export function BottomPanel({ projectId, events }: { projectId: string; events: RuntimeEvent[] }) {
   const router = useRouter();
   const { bottomTab, setBottomTab, toggleBottom, bottomMaximized, toggleBottomMaximized, developerMode, pushToast } =
     useWorkbench();
+  const { problems: PROBLEMS, tests: TEST_RESULTS, buildLog: OUTPUT_LOG } = useStudioProject();
   const [follow, setFollow] = useState(true);
   const [cleared, setCleared] = useState<Partial<Record<BottomPanelTab, boolean>>>({});
   const scrollRef = useRef<HTMLDivElement | null>(null);
@@ -32,7 +34,7 @@ export function BottomPanel({ projectId, events }: { projectId: string; events: 
     ];
     if (developerMode) base.push({ id: 'terminal', label: 'Terminal' });
     return base;
-  }, [events.length, developerMode]);
+  }, [events.length, developerMode, PROBLEMS.length, TEST_RESULTS]);
 
   useEffect(() => {
     if (follow && scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -45,8 +47,8 @@ export function BottomPanel({ projectId, events }: { projectId: string; events: 
   };
 
   const downloadLog = () => {
-    // Sanitized: the mock log carries no secrets; a real backend serves the
-    // scrubbed artifact rather than the browser assembling one.
+    // The build event stream carries public build metadata only; the server never emits a secret
+    // into it (the redaction scanner runs on every public surface).
     const body = logAsText(OUTPUT_LOG);
     const blob = new Blob([body], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);

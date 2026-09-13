@@ -14,10 +14,10 @@
  *    sanitized connection status.
  *  - Promotion moves the exact approved artifact. It never silently rebuilds.
  */
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ExternalLink, Play, Plug, RefreshCw, RotateCcw, Square, Upload } from 'lucide-react';
-import { StudioPage } from '@/components/studio/PageScaffold';
+import { StudioPage, useStudioPage } from '@/components/studio/PageScaffold';
 import {
   Badge,
   BlockchainRef,
@@ -31,8 +31,11 @@ import {
 } from '@/components/studio/primitives';
 import { Modal, SecurityConfirmation } from '@/components/studio/dialogs';
 import { useWorkbench } from '@/lib/studio/workbench';
-import { PROJECT, agentBySlug } from '@/lib/studio/mock/core';
-import { CRE, CRE_MODE_OPTIONS, CRE_RUNS } from '@/lib/studio/mock/operate';
+import { toCreModeOptions, toCreRuns, toCreState } from '@/lib/studio/api/adapters/operate';
+import { useCre, useCreConnect, useCreParity, useCreSimulations, useInvalidateAll } from '@/lib/studio/api/queries';
+import { lab as labApi } from '@/lib/studio/api/endpoints';
+import { ApiError } from '@/lib/studio/api/client';
+import { EmptyState } from '@/components/studio/primitives';
 import type { Status } from '@/lib/studio/types';
 
 export default function CrePage() {
@@ -40,20 +43,56 @@ export default function CrePage() {
   const searchParams = useSearchParams();
   const { pushToast, selection, setSelection } = useWorkbench();
 
-  const agentSlug = searchParams.get('agent') ?? PROJECT.agents[0].slug;
-  const agent = agentBySlug(agentSlug);
+  const { agent, agentSlug, ctx } = useStudioPage('cre');
+  const invalidate = useInvalidateAll();
+  const creQ = useCre(ctx.dataProjectId);
+  const connectQ = useCreConnect(ctx.dataProjectId);
+  const parityQ = useCreParity(ctx.dataProjectId);
+  const [running, setRunning] = useState(false);
+  const runsQ = useCreSimulations(ctx.dataProjectId, running);
+  const runs = useMemo(() => runsQ.data ?? [], [runsQ.data]);
+  useEffect(() => { if (!runs.some((r) => r.status === 'RUNNING')) setRunning(false); }, [runs]);
 
-  const [status, setStatus] = useState<Status>(CRE.status);
+  const CRE = useMemo(() => toCreState(creQ.data ?? null, runs, parityQ.data ?? null), [creQ.data, runs, parityQ.data]);
+  const CRE_MODE_OPTIONS = useMemo(() => toCreModeOptions(creQ.data ?? null, connectQ.data ?? null), [creQ.data, connectQ.data]);
+  const CRE_RUNS = useMemo(() => toCreRuns(runs), [runs]);
+  const status: Status = CRE.status;
   const [connectOpen, setConnectOpen] = useState(false);
   const [promoteOpen, setPromoteOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const canPromote = CRE.deployAccess && CRE.approvedWasmHash === CRE.wasmHash && CRE.paritySuite === 'PASS';
+
+  const runOnce = async () => {
+    if (!ctx.dataProjectId) return;
+    setError(null);
+    setRunning(true);
+    pushToast('Official CRE simulation started — compiling the workflow and running the Chainlink CLI');
+    try {
+      const r = await labApi.creSimulate(ctx.dataProjectId);
+      if (r.note) pushToast(r.note);
+      await invalidate();
+    } catch (e) {
+      setError(e instanceof ApiError ? e.message : (e as Error).message);
+    } finally {
+      setRunning(false);
+    }
+  };
+
+  if (!ctx.dataProjectId || (!ctx.buildView && !ctx.loading)) {
+    return (
+      <StudioPage segment="cre" title="Chainlink CRE" subtitle="Mode: OFFICIAL CLI SIMULATION">
+        <EmptyState title="No agent to simulate yet" body="The CRE workflow evaluates a built agent's policy. Describe the agent first." action={<button type="button" className="cl-btn cl-btn-primary" onClick={() => router.push(`/projects/${ctx.routeProjectId}/build`)}>Build Agent</button>} />
+      </StudioPage>
+    );
+  }
 
   return (
     <StudioPage
       segment="cre"
       title="Chainlink CRE"
       subtitle="Mode: OFFICIAL CLI SIMULATION"
+      banners={error ? <BlockerBanner tone="deny" title="The Studio API refused">{error}</BlockerBanner> : null}
       badges={
         <>
           <Badge tone="neutral">{agent.name}</Badge>
@@ -67,39 +106,15 @@ export default function CrePage() {
       }
       actions={
         <>
-          {status === 'RUNNING' ? (
-            <button
-              type="button"
-              className="cl-btn cl-btn-danger"
-              onClick={() => {
-                setStatus('STOPPED');
-                pushToast('Simulator stopped');
-              }}
-            >
-              <Square size={12} aria-hidden />
-              Stop Simulator
-            </button>
-          ) : (
-            <button
-              type="button"
-              className="cl-btn cl-btn-primary"
-              onClick={() => {
-                setStatus('RUNNING');
-                pushToast('Simulator started');
-              }}
-            >
-              <Play size={12} aria-hidden />
-              Start Simulator
-            </button>
-          )}
-          <button type="button" className="cl-btn" onClick={() => pushToast('Simulator restarting')}>
+          <button type="button" className="cl-btn cl-btn-primary" onClick={() => void runOnce()} disabled={running || status === 'RUNNING'}>
+            <Play size={12} aria-hidden />
+            {running || status === 'RUNNING' ? 'Simulation running…' : 'Run Once'}
+          </button>
+          <button type="button" className="cl-btn" disabled title="The simulator is not a long-running process here: each run invokes the official CLI once and records the result.">
             <RotateCcw size={13} aria-hidden />
             Restart Simulator
           </button>
-          <button type="button" className="cl-btn" onClick={() => pushToast('Single simulation run queued')}>
-            Run Once
-          </button>
-          <button type="button" className="cl-btn" onClick={() => pushToast('Parity suite queued')}>
+          <button type="button" className="cl-btn" onClick={() => { void parityQ.refetch(); pushToast(parityQ.data?.note ?? 'Parity compares the simulator against a deployed workflow; none is deployed'); }}>
             Run Parity Suite
           </button>
           <button type="button" className="cl-btn" onClick={() => setConnectOpen(true)}>
@@ -277,7 +292,7 @@ export default function CrePage() {
             <button type="button" className="cl-btn" onClick={() => setConnectOpen(false)}>
               Cancel
             </button>
-            <button type="button" className="cl-btn" onClick={() => pushToast('Checking CRE status…')}>
+            <button type="button" className="cl-btn" onClick={() => { void creQ.refetch(); void connectQ.refetch(); pushToast(connectQ.data?.account.connected === 'YES' ? `CRE CLI ${connectQ.data.account.cliVersion} · Deploy Access ${connectQ.data.account.deployAccess}` : 'No CRE CLI session detected on the Studio server'); }}>
               Check CRE Status
             </button>
             <button
@@ -285,7 +300,7 @@ export default function CrePage() {
               className="cl-btn cl-btn-primary"
               onClick={() => {
                 setConnectOpen(false);
-                pushToast('Launching ContextLock Bridge…');
+                pushToast('The Local Bridge is not shipped yet: run `cre login` on the machine that runs the Studio API, then Check CRE Status');
               }}
             >
               <ExternalLink size={13} aria-hidden />
@@ -318,7 +333,7 @@ export default function CrePage() {
         onClose={() => setPromoteOpen(false)}
         onConfirm={() => {
           setPromoteOpen(false);
-          pushToast('Exact workflow artifact promoted');
+          pushToast('Promotion is blocked: Deploy Access is not enabled (BLK-V2-CRE-DEPLOY)');
         }}
         action="Promote exact workflow artifact"
         currentState={<Badge tone="sim">Simulator only</Badge>}

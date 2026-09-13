@@ -44,8 +44,11 @@ import {
 } from '@/components/studio/primitives';
 import { Popover, MenuLabel } from '@/components/studio/shell/Popover';
 import { useWorkbench } from '@/lib/studio/workbench';
-import { PROJECT, agentBySlug } from '@/lib/studio/mock/core';
-import { ARCH_LAYERS, EDGE_KIND_LABEL, architectureForAgent } from '@/lib/studio/mock/design';
+import { ARCH_LAYERS, EDGE_KIND_LABEL } from '@/lib/studio/content/blueprint';
+import { toArchitecture, type LiveNodeStates } from '@/lib/studio/api/adapters/design';
+import { useStudioPage } from '@/components/studio/PageScaffold';
+import { policyStatusOf, runtimeStatusOf } from '@/lib/studio/api/adapters/operate';
+import { EmptyState } from '@/components/studio/primitives';
 import type { ArchLayer, ArchNodeData, ArchitectureGraph } from '@/lib/studio/types';
 
 const nodeTypes = { arch: ArchFlowNode };
@@ -77,9 +80,41 @@ function ArchitectureCanvas() {
   /* Each agent is its own principal with its own venues and execution class, so
      each gets its own graph. A reporting-only agent has no policy, capability or
      executor node at all. */
-  const agentSlug = searchParams.get('agent') ?? PROJECT.agents[0].slug;
-  const agent = agentBySlug(agentSlug);
-  const graph = architectureForAgent(agentSlug);
+  const { agent, agentSlug, ctx } = useStudioPage('architecture');
+  const view = ctx.buildView;
+
+  /*
+   * The graph is the backend's projection of the compiled Blueprint. The live overlay is the same
+   * graph with the control plane's readings painted on: nothing here is a second graph, and a node
+   * with no reading stays as the build left it rather than turning green from absence.
+   */
+  const liveStates = useMemo<LiveNodeStates>(() => {
+    const o = ctx.overview;
+    if (!ctx.deploymentId || !o) return {};
+    const runtime = runtimeStatusOf(o.panels.runtime.state);
+    const policy = policyStatusOf(o);
+    const identity = o.panels.identity?.value ? (o.panels.identity.value.revoked ? 'REVOKED' : o.panels.identity.isCurrent ? 'ACTIVE' : 'STALE') : 'UNKNOWN';
+    const adapters = o.panels.adapters.every((a) => a.state === 'HEALTHY') ? 'HEALTHY' : o.panels.adapters.some((a) => a.state === 'DEGRADED') ? 'DEGRADED' : 'UNKNOWN';
+    return {
+      'agent-runtime': runtime,
+      policy: policy === 'ENABLED' ? 'ENABLED' : policy === 'DISABLED' ? 'DISABLED' : 'UNKNOWN',
+      ens: identity,
+      cre: 'SIMULATED',
+      'chainlink-feed': adapters,
+      aave: adapters,
+      uniswap: adapters,
+      'adapter-broker': adapters,
+      executor: policy === 'ENABLED' ? 'READY' : 'DISABLED',
+      capability: policy === 'ENABLED' ? 'READY' : 'BLOCKED',
+      ledger: 'SIMULATED',
+    };
+  }, [ctx.overview, ctx.deploymentId]);
+
+  const graph = useMemo<ArchitectureGraph>(
+    () => (view?.graph ? toArchitecture(view.graph, view.blueprint, liveStates) : { revision: 0, nodes: [], edges: [] }),
+    [view?.graph, view?.blueprint, liveStates],
+  );
+  const hasGraph = graph.nodes.length > 0;
 
   const [liveOverlay, setLiveOverlay] = useState(true);
   const [locked, setLocked] = useState(false);
@@ -155,11 +190,23 @@ function ArchitectureCanvas() {
   const toggleLayer = (layer: ArchLayer) =>
     setActiveLayers((prev) => (prev.includes(layer) ? prev.filter((l) => l !== layer) : [...prev, layer]));
 
+  if (!hasGraph) {
+    return (
+      <StudioPage segment="architecture">
+        <EmptyState
+          title={ctx.loading ? 'Loading the architecture…' : 'No architecture yet'}
+          body={ctx.loading ? '' : 'The graph is a projection of a compiled Blueprint. Generate the Blueprint in the Composer and it appears here — nothing is drawn that the Blueprint does not define.'}
+          action={ctx.loading ? undefined : <button type="button" className="cl-btn cl-btn-primary" onClick={() => router.push(`/projects/${ctx.routeProjectId}/build`)}>Build Agent</button>}
+        />
+      </StudioPage>
+    );
+  }
+
   return (
     <StudioPage
       segment="architecture"
       bleed
-      live={liveOverlay}
+      live={liveOverlay && !!ctx.deploymentId}
       banners={
         <div className="cl-row cl-row-wrap" style={{ marginBottom: 12, gap: 8 }}>
           <span className="cl-page-title" style={{ fontSize: 22, marginRight: 8 }}>
@@ -168,7 +215,7 @@ function ArchitectureCanvas() {
           <Badge tone="neutral">{agent.name}</Badge>
           <Badge tone="neutral">Blueprint r{graph.revision}</Badge>
           {agent.executionClass === 'REPORTING_ONLY' ? <Badge tone="blocked">EXECUTION: NONE</Badge> : null}
-          {liveOverlay ? <Badge tone="pass">Live overlay · observed state</Badge> : <Badge tone="neutral">Configured state</Badge>}
+          {liveOverlay && ctx.deploymentId ? <Badge tone="pass">Live overlay · observed state</Badge> : liveOverlay ? <Badge tone="neutral">Live overlay · no deployment to observe</Badge> : <Badge tone="neutral">Configured state</Badge>}
           <span className="cl-spacer" />
 
           <div className="cl-btn-group">
@@ -360,7 +407,7 @@ function ArchitectureCanvas() {
                   graph={graph}
                   liveOverlay={liveOverlay}
                   onOpen={(segment, hash) =>
-                    router.push(`/projects/${PROJECT.id}/${segment}${hash ? `#${hash}` : ''}`)
+                    router.push(`/projects/${ctx.routeProjectId}/${segment}${hash ? `#${hash}` : ''}`)
                   }
                 />
               </div>

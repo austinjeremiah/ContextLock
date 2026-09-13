@@ -22,7 +22,7 @@ import {
   TriangleAlert,
   Workflow,
 } from 'lucide-react';
-import { StudioPage } from '@/components/studio/PageScaffold';
+import { StudioPage, useStudioPage } from '@/components/studio/PageScaffold';
 import { AgentPatchInbox } from '@/components/studio/AgentPatches';
 import {
   Badge,
@@ -36,15 +36,13 @@ import {
 } from '@/components/studio/primitives';
 import { Modal, StandardConfirmation } from '@/components/studio/dialogs';
 import { useWorkbench } from '@/lib/studio/workbench';
-import { PROJECT } from '@/lib/studio/mock/core';
-import {
-  AUTHORITY_DIFF,
-  BLUEPRINT,
-  BLUEPRINT_DRAFT,
-  STALE_ON_BLUEPRINT_CHANGE,
-  VALIDATION_GROUP_LABEL,
-} from '@/lib/studio/mock/design';
-import type { BlueprintField, BlueprintSection, ValidationFinding } from '@/lib/studio/types';
+import { STALE_ON_BLUEPRINT_CHANGE, VALIDATION_GROUP_LABEL } from '@/lib/studio/content/blueprint';
+import { blueprintPatch, toBlueprint } from '@/lib/studio/api/adapters/design';
+import { studio } from '@/lib/studio/api/endpoints';
+import { useInvalidateAll } from '@/lib/studio/api/queries';
+import { ApiError } from '@/lib/studio/api/client';
+import { EmptyState } from '@/components/studio/primitives';
+import type { Blueprint, BlueprintField, BlueprintSection, ValidationFinding } from '@/lib/studio/types';
 
 export default function BlueprintPage() {
   const router = useRouter();
@@ -59,23 +57,61 @@ export default function BlueprintPage() {
   const [validated, setValidated] = useState<null | 'running' | 'done'>(null);
   const [edits, setEdits] = useState<Record<string, string>>({});
   const [focusField, setFocusField] = useState<string | null>(null);
+  const [problems, setProblems] = useState<string[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
   const fieldRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const { project, ctx } = useStudioPage('blueprint');
+  const invalidate = useInvalidateAll();
 
-  const blueprint = editing ? BLUEPRINT_DRAFT : BLUEPRINT;
-  const deployedRevision = PROJECT.revisions.deployment ?? 0;
-  const liveBlueprintRevision = BLUEPRINT.revision;
+  const doc = ctx.buildView?.blueprint ?? null;
+  const findings = ctx.buildView?.findings ?? [];
 
-  /* Draft edits layer over the draft revision without touching the live one. */
+  /* The live revision, from the build; the draft is the same document with this page's edits. */
+  const live = useMemo<Blueprint | null>(() => (doc ? toBlueprint(doc, findings) : null), [doc, findings]);
+  const patched = useMemo(() => (doc ? blueprintPatch(doc, edits) : { patch: {}, diff: [], problems: [] }), [doc, edits]);
+  const AUTHORITY_DIFF = patched.diff;
+  const draftRevision = (doc?.revision ?? 0) + 1;
+  const blueprint: Blueprint = live
+    ? editing
+      ? { ...live, revision: draftRevision, isDraft: true, baseRevision: live.revision, status: AUTHORITY_DIFF.length ? 'DRAFT' : live.status }
+      : live
+    : { revision: 0, status: 'DRAFT', isDraft: false, baseRevision: null, sections: [], findings: [], raw: {} };
+  const deployedRevision = project.revisions.deployment ?? 0;
+  const liveBlueprintRevision = live?.revision ?? 0;
+
+  /* Draft edits layer over the live revision without touching it; a changed field carries its previous value. */
   const sections = useMemo<BlueprintSection[]>(
     () =>
       blueprint.sections.map((section) => ({
         ...section,
-        fields: section.fields.map((field) =>
-          edits[field.key] !== undefined ? { ...field, value: edits[field.key] } : field,
-        ),
+        fields: section.fields.map((field) => {
+          if (edits[field.key] === undefined || edits[field.key] === field.value) return field;
+          const d = AUTHORITY_DIFF.find((x) => x.field === field.key);
+          return { ...field, value: edits[field.key]!, previousValue: field.value, authorityExpansion: d?.expansion ?? false, authorityNote: d?.note };
+        }),
       })),
-    [blueprint.sections, edits],
+    [blueprint.sections, edits, AUTHORITY_DIFF],
   );
+
+  const createRevision = async () => {
+    if (!ctx.buildId || !doc) return;
+    setError(null);
+    if (patched.problems.length) { setProblems(patched.problems); return; }
+    setSaving(true);
+    try {
+      await studio.editBlueprint(ctx.buildId, patched.patch);
+      await invalidate();
+      setEdits({});
+      setEditing(false);
+      setCreateOpen(false);
+      pushToast(`Blueprint r${draftRevision} created — simulations and code are now STALE until rebuilt`);
+    } catch (e) {
+      setError(e instanceof ApiError ? e.message : String(e));
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const findingsByGroup = useMemo(() => {
     const groups = new Map<string, ValidationFinding[]>();
@@ -98,34 +134,32 @@ export default function BlueprintPage() {
     window.setTimeout(() => setFocusField(null), 2200);
   }, []);
 
+  /* Validate: the client checks what it can (shape of the edited fields); the deterministic
+     validator runs on the server when the revision is created, and its findings appear below. */
   useEffect(() => {
     if (validated !== 'running') return;
     const handle = window.setTimeout(() => {
+      setProblems(patched.problems);
       setValidated('done');
-      openBottom('problems');
-    }, 700);
+      if (patched.problems.length) openBottom('problems');
+    }, 300);
     return () => window.clearTimeout(handle);
-  }, [validated, openBottom]);
+  }, [validated, openBottom, patched.problems]);
 
-  const rawJson = useMemo(
-    () =>
-      JSON.stringify(
-        {
-          revision: blueprint.revision,
-          status: blueprint.status,
-          baseRevision: blueprint.baseRevision,
-          agent: 'guardian',
-          sections: sections.map((s) => ({
-            id: s.id,
-            title: s.title,
-            fields: Object.fromEntries(s.fields.map((f) => [f.key, f.value])),
-          })),
-        },
-        null,
-        2,
-      ),
-    [blueprint, sections],
-  );
+  /* The canonical document, exactly as the backend holds it — with the draft patch applied while editing. */
+  const rawJson = useMemo(() => JSON.stringify(doc ? (editing ? { ...doc, ...patched.patch, revision: draftRevision } : doc) : {}, null, 2), [doc, editing, patched.patch, draftRevision]);
+
+  if (!doc || !live) {
+    return (
+      <StudioPage segment="blueprint">
+        <EmptyState
+          title={ctx.loading ? 'Loading the Blueprint…' : 'No Blueprint yet'}
+          body={ctx.loading ? '' : 'Describe your agent first. ContextLock will generate a typed Blueprint that defines identity, data sources, actions and authority boundaries.'}
+          action={ctx.loading ? undefined : <button type="button" className="cl-btn cl-btn-primary" onClick={() => router.push(`/projects/${ctx.routeProjectId}/build`)}>Build Agent</button>}
+        />
+      </StudioPage>
+    );
+  }
 
   return (
     <StudioPage
@@ -164,7 +198,7 @@ export default function BlueprintPage() {
               <button
                 type="button"
                 className="cl-btn"
-                onClick={() => pushToast(`Draft r${BLUEPRINT_DRAFT.revision} saved`)}
+                onClick={() => pushToast(`Draft r${draftRevision} kept on this page — it is not a revision until you create one`)}
               >
                 Save Draft
               </button>
@@ -187,14 +221,14 @@ export default function BlueprintPage() {
           </button>
           {editing ? (
             /* Publishing an already-built agent creates a revision; it never "saves over" one. */
-            <button type="button" className="cl-btn cl-btn-primary" onClick={() => setCreateOpen(true)}>
+            <button type="button" className="cl-btn cl-btn-primary" onClick={() => setCreateOpen(true)} disabled={AUTHORITY_DIFF.length === 0}>
               Create Revision
             </button>
           ) : (
             <button
               type="button"
               className="cl-btn cl-btn-primary"
-              onClick={() => router.push(`/projects/${PROJECT.id}/architecture`)}
+              onClick={() => router.push(`/projects/${ctx.routeProjectId}/architecture`)}
             >
               <Workflow size={13} aria-hidden />
               Generate Architecture
@@ -204,12 +238,19 @@ export default function BlueprintPage() {
       }
       banners={
         <>
-          {editing ? (
+          {error ? <BlockerBanner tone="deny" title="The Studio API refused the revision">{error}</BlockerBanner> : null}
+          {problems.length > 0 ? <BlockerBanner tone="deny" title="The draft has problems">{problems.join(' · ')}</BlockerBanner> : null}
+          {ctx.buildView?.codeStale ? (
+            <BlockerBanner tone="warn" title="Architecture changed — rebuild required">
+              The generated code and its simulations were produced against an earlier Blueprint revision. Regenerate from the Composer to bring them up to r{liveBlueprintRevision}.
+            </BlockerBanner>
+          ) : null}
+          {deployedRevision > 0 && liveBlueprintRevision > deployedRevision ? (
             <DraftAheadBanner
-              draftRevision={BLUEPRINT_DRAFT.revision}
+              draftRevision={editing ? draftRevision : liveBlueprintRevision}
               deployedRevision={deployedRevision}
               onCompare={() => setCompareOpen(true)}
-              onDeploy={() => router.push(`/projects/${PROJECT.id}/deploy`)}
+              onDeploy={() => router.push(`/projects/${ctx.routeProjectId}/deploy`)}
             />
           ) : null}
           {expansions.length > 0 ? (
@@ -358,7 +399,7 @@ export default function BlueprintPage() {
       <Modal
         open={compareOpen}
         onClose={() => setCompareOpen(false)}
-        title={`Compare r${BLUEPRINT.revision} → r${BLUEPRINT_DRAFT.revision}`}
+        title={`Compare r${liveBlueprintRevision} → r${draftRevision}`}
         subtitle="Authority-increasing changes are listed first."
         wide
         footer={
@@ -368,6 +409,7 @@ export default function BlueprintPage() {
         }
       >
         <div className="cl-col" style={{ gap: 10 }}>
+          {AUTHORITY_DIFF.length === 0 ? <p className="cl-meta">No fields differ from r{liveBlueprintRevision}. Edit the Blueprint to see a comparison.</p> : null}
           {[...AUTHORITY_DIFF].sort((a, b) => Number(b.expansion) - Number(a.expansion)).map((diff) => (
             <div
               className="cl-card"
@@ -422,8 +464,8 @@ export default function BlueprintPage() {
           pushToast('Draft discarded');
         }}
         title="Discard draft"
-        consequence={`Draft r${BLUEPRINT_DRAFT.revision} and its unsaved edits are removed. The live Blueprint r${liveBlueprintRevision} and the active deployment are unaffected.`}
-        resource={`Blueprint draft r${BLUEPRINT_DRAFT.revision}`}
+        consequence={`Draft r${draftRevision} and its unsaved edits are removed. The live Blueprint r${liveBlueprintRevision} and the active deployment are unaffected.`}
+        resource={`Blueprint draft r${draftRevision}`}
         actionLabel="Discard Draft"
       />
 
@@ -431,7 +473,7 @@ export default function BlueprintPage() {
       <Modal
         open={createOpen}
         onClose={() => setCreateOpen(false)}
-        title={`Create Blueprint revision r${BLUEPRINT_DRAFT.revision}`}
+        title={`Create Blueprint revision r${draftRevision}`}
         subtitle="This publishes a new revision. It does not deploy anything."
         wide
         footer={
@@ -439,16 +481,8 @@ export default function BlueprintPage() {
             <button type="button" className="cl-btn" onClick={() => setCreateOpen(false)}>
               Cancel
             </button>
-            <button
-              type="button"
-              className="cl-btn cl-btn-primary"
-              onClick={() => {
-                setCreateOpen(false);
-                setEditing(false);
-                pushToast(`Blueprint r${BLUEPRINT_DRAFT.revision} created`);
-              }}
-            >
-              Create Revision r{BLUEPRINT_DRAFT.revision}
+            <button type="button" className="cl-btn cl-btn-primary" onClick={() => void createRevision()} disabled={saving}>
+              {saving ? 'Creating…' : `Create Revision r${draftRevision}`}
             </button>
           </>
         }
@@ -465,7 +499,7 @@ export default function BlueprintPage() {
           </div>
           <div className="cl-statechange-row">
             <dt>New revision</dt>
-            <dd>r{BLUEPRINT_DRAFT.revision}</dd>
+            <dd>r{draftRevision}</dd>
           </div>
           <div className="cl-statechange-row">
             <dt>Changed fields</dt>
@@ -474,7 +508,7 @@ export default function BlueprintPage() {
           <div className="cl-statechange-row">
             <dt>Active deployment</dt>
             <dd>
-              Stays on r{deployedRevision} until you deploy again
+              {deployedRevision > 0 ? `Stays on r${deployedRevision} until you deploy again` : 'None'}
             </dd>
           </div>
           <div className="cl-statechange-row">

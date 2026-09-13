@@ -2,7 +2,24 @@
 const nextConfig = {
   reactStrictMode: false,
 
+  /*
+   * The Studio API. Every `/api/*` request the browser makes is proxied to it on the server side, so
+   * the app is same-origin with its backend: no CORS, and the build's SSE stream is a plain
+   * same-origin EventSource. Point STUDIO_API_URL elsewhere to run against a remote API.
+   */
+  async rewrites() {
+    const api = (process.env.STUDIO_API_URL ?? 'http://127.0.0.1:4310').replace(/\/$/, '');
+    return [{ source: '/api/:path*', destination: `${api}/api/:path*` }];
+  },
+
   experimental: {
+    /*
+     * The dev proxy behind `rewrites()` drops a request after 30 s by default. Design and
+     * simulation calls run a model and hold the request open for longer than that; the backend
+     * finishes fine, and the browser sees "socket hang up" instead. Ten minutes covers a build.
+     */
+    proxyTimeout: 600_000,
+
     // These are barrel files: a single `import { X } from 'lucide-react'` pulls
     // the whole index in dev unless Next rewrites it to a deep import. Matters a
     // lot for per-route dev compile time.

@@ -28,7 +28,7 @@ import {
   ShieldCheck,
   Sparkles,
 } from 'lucide-react';
-import { StudioPage } from '@/components/studio/PageScaffold';
+import { StudioPage, useStudioPage } from '@/components/studio/PageScaffold';
 import {
   ArtifactHash,
   Badge,
@@ -46,13 +46,10 @@ import {
 import { Modal, StandardConfirmation } from '@/components/studio/dialogs';
 import { AgentPatchInbox } from '@/components/studio/AgentPatches';
 import { useWorkbench } from '@/lib/studio/workbench';
-import { PROJECT, agentBySlug } from '@/lib/studio/mock/core';
-import {
-  EVIDENCE,
-  EVIDENCE_KIND_LABEL,
-  REPORTS,
-  REPORT_TYPE_LABEL,
-} from '@/lib/studio/mock/reports';
+import { EVIDENCE_KIND_LABEL, REPORT_TYPE_LABEL, toEvidence, toReports } from '@/lib/studio/api/adapters/reports';
+import { useCreSimulations, useSafetyReport, useInvalidateAll } from '@/lib/studio/api/queries';
+import { lab as labApi } from '@/lib/studio/api/endpoints';
+import { apiUrl } from '@/lib/studio/api/client';
 import type { Report } from '@/lib/studio/types';
 
 type Tab = 'reports' | 'evidence';
@@ -67,11 +64,15 @@ export default function ReportsPage() {
   const searchParams = useSearchParams();
   const { setSelection, selection, pushToast, developerMode } = useWorkbench();
 
-  const agentSlug = searchParams.get('agent') ?? PROJECT.agents[0].slug;
-  const agent = agentBySlug(agentSlug);
+  const { agent, agentSlug, project, ctx } = useStudioPage('reports');
+  const invalidate = useInvalidateAll();
+  const reportQ = useSafetyReport(ctx.dataProjectId);
+  const creRuns = useCreSimulations(ctx.dataProjectId);
+  const REPORTS = useMemo(() => toReports(reportQ.data ?? null, ctx.buildView, ctx.deployment, creRuns.data ?? []), [reportQ.data, ctx.buildView, ctx.deployment, creRuns.data]);
+  const EVIDENCE = useMemo(() => toEvidence(reportQ.data ?? null, ctx.deployment, creRuns.data ?? []), [reportQ.data, ctx.deployment, creRuns.data]);
 
   const [tab, setTab] = useState<Tab>(searchParams.get('tab') === 'evidence' ? 'evidence' : 'reports');
-  const [selectedId, setSelectedId] = useState(REPORTS[0].id);
+  const [selectedId, setSelectedId] = useState('rep_safety');
   const [previewOpen, setPreviewOpen] = useState(false);
   const [verifyOpen, setVerifyOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
@@ -82,17 +83,30 @@ export default function ReportsPage() {
   const stale = REPORTS.filter((r) => !r.current && r.generatedAt);
   const ungenerated = REPORTS.filter((r) => !r.generatedAt);
 
-  const go = (segment: string) => router.push(`/projects/${PROJECT.id}/${segment}?agent=${agentSlug}`);
+  const go = (segment: string) => router.push(`/projects/${ctx.routeProjectId}/${segment}?agent=${agentSlug}`);
 
+  /* Generation is a server read: the backend rebuilds the report from live state, seals and scans it. */
   const generate = (report: Report) => {
     setGenerating(report.id);
-    window.setTimeout(() => {
+    void invalidate().then(() => {
       setGenerating(null);
-      pushToast(`${report.title} generated — secret scan queued before it can be shared`);
-    }, 1100);
+      pushToast(`${report.title} regenerated from the server's current state — secret scan runs before it leaves`);
+    });
   };
 
-  const simulatedEvidence = useMemo(() => EVIDENCE.filter((e) => e.simulated).length, []);
+  const downloadJson = (report: Report) => {
+    const body = report.type === 'agent-safety' && reportQ.data ? reportQ.data : { title: report.title, revision: report.revision, generatedAt: report.generatedAt, sections: report.sections ?? [] };
+    const blob = new Blob([JSON.stringify(body, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${report.type}-r${report.revision}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    pushToast(`${report.title}.json downloaded`);
+  };
+
+  const simulatedEvidence = useMemo(() => EVIDENCE.filter((e) => e.simulated).length, [EVIDENCE]);
 
   return (
     <StudioPage
@@ -155,7 +169,7 @@ export default function ReportsPage() {
               }
             >
               {stale.map((r) => `${r.title} (r${r.revision})`).join(', ')} — the Blueprint is now r
-              {PROJECT.revisions.blueprint}. A stale report still describes what it actually measured; it is simply not
+              {project.revisions.blueprint}. A stale report still describes what it actually measured; it is simply not
               evidence about the current revision.
             </BlockerBanner>
           ) : null}
@@ -172,7 +186,7 @@ export default function ReportsPage() {
         active={tab}
         onChange={(next) => {
           setTab(next);
-          router.replace(`/projects/${PROJECT.id}/reports?agent=${agentSlug}${next === 'evidence' ? '&tab=evidence' : ''}`);
+          router.replace(`/projects/${ctx.routeProjectId}/reports?agent=${agentSlug}${next === 'evidence' ? '&tab=evidence' : ''}`);
         }}
       />
 
@@ -282,7 +296,7 @@ export default function ReportsPage() {
                   className="cl-btn"
                   disabled={!canDistribute(selected)}
                   title={canDistribute(selected) ? undefined : 'Blocked until secret scanning passes'}
-                  onClick={() => pushToast(`${selected.title}.pdf prepared`)}
+                  onClick={() => pushToast('PDF rendering is not offered by the Studio API; download the JSON, which is the sealed artifact')}
                 >
                   <FileText size={13} aria-hidden />
                   Download PDF
@@ -292,7 +306,7 @@ export default function ReportsPage() {
                   className="cl-btn"
                   disabled={!canDistribute(selected)}
                   title={canDistribute(selected) ? undefined : 'Blocked until secret scanning passes'}
-                  onClick={() => pushToast(`${selected.title}.json prepared`)}
+                  onClick={() => downloadJson(selected)}
                 >
                   <FileJson size={13} aria-hidden />
                   Download JSON
@@ -406,7 +420,7 @@ export default function ReportsPage() {
               type="button"
               className="cl-btn cl-btn-primary"
               disabled={!canDistribute(selected)}
-              onClick={() => pushToast(`${selected.title}.pdf prepared`)}
+              onClick={() => downloadJson(selected)}
             >
               <Download size={13} aria-hidden />
               Download PDF
@@ -442,9 +456,14 @@ export default function ReportsPage() {
             type="button"
             className="cl-btn cl-btn-primary"
             onClick={() => {
-              setVerified((prev) => [...new Set([...prev, selected.id])]);
-              setVerifyOpen(false);
-              pushToast('Hash recomputed and matched');
+              /* Recompute means: ask the server to rebuild and reseal the report, then compare hashes. */
+              if (!ctx.dataProjectId) return;
+              void labApi.safetyReport(ctx.dataProjectId).then((fresh) => {
+                const match = selected.type === 'agent-safety' ? fresh.reportHash === selected.hash : false;
+                if (match) setVerified((prev) => [...new Set([...prev, selected.id])]);
+                setVerifyOpen(false);
+                pushToast(match ? 'Hash recomputed by the server and matched' : selected.type === 'agent-safety' ? `Hash differs: the server now seals ${fresh.reportHash.slice(0, 18)}… — the underlying state changed since this report` : 'Only the Agent Safety Report carries a sealed hash');
+              }).catch((e: Error) => pushToast(e.message));
             }}
           >
             <Check size={13} aria-hidden />
@@ -480,7 +499,9 @@ export default function ReportsPage() {
         onClose={() => setShareOpen(false)}
         onConfirm={() => {
           setShareOpen(false);
-          pushToast('Share link copied — secret-free revision only');
+          const link = `${window.location.origin}${apiUrl(`/api/lab/projects/${encodeURIComponent(ctx.dataProjectId ?? '')}/safety-report/public`)}`;
+          navigator.clipboard?.writeText(link);
+          pushToast('Public-view link copied — built from an allow-list on the server; it never carries deployments, runtime or reality sections');
         }}
         title="Copy share link"
         consequence="The link exposes this report's generated content to anyone who holds it. Only a revision that has passed secret scanning can be shared, and the link always points at that exact revision rather than at whatever is latest."

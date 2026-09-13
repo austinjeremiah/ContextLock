@@ -12,14 +12,39 @@ import type { ReactNode } from 'react';
 import { PageHeader } from './primitives';
 import { metaForSegment } from '@/lib/studio/nav';
 import { usePageRegistration } from '@/lib/studio/workbench';
-import { PROJECT, agentBySlug } from '@/lib/studio/mock/core';
+import { useStudioProject, type StudioProjectValue } from '@/lib/studio/api/project-context';
+import type { Agent, Project } from '@/lib/studio/types';
 
-export function useStudioPage(segment: string) {
+/**
+ * What every page starts from: the resolved project, the selected agent, and the backend ids the
+ * page's own queries should use. `project` is never null here — a route with no project yet gets a
+ * draft shell so the page can render its empty state.
+ */
+export function useStudioPage(segment: string): {
+  agent: Agent;
+  agentSlug: string;
+  meta: ReturnType<typeof metaForSegment>;
+  project: Project;
+  searchParams: ReturnType<typeof useSearchParams>;
+  ctx: StudioProjectValue;
+} {
   const searchParams = useSearchParams();
-  const agentSlug = searchParams.get('agent') ?? PROJECT.agents[0].slug;
-  const agent = agentBySlug(agentSlug);
+  const ctx = useStudioProject();
   const meta = metaForSegment(segment);
-  return { agent, agentSlug, meta, project: PROJECT, searchParams };
+  const project: Project = ctx.project ?? {
+    id: ctx.routeProjectId, name: ctx.isDraft ? 'New agent' : 'Loading…', description: '', agentCount: 1, lifecycle: 'DRAFT', lastRevision: null,
+    executionNetwork: 'Ethereum Sepolia', creMode: 'MY_CRE_SIMULATOR', updatedAt: new Date(0).toISOString(), alerts: 0, organization: null,
+    agents: [], revisions: { requirements: null, blueprint: null, blueprintDraft: null, strategy: null, build: null, deployment: null, runtime: null, policy: null, creArtifactHash: null },
+    environment: { executionNetwork: 'Ethereum Sepolia', executionChainId: 11155111, realitySource: 'Ethereum Mainnet', realityMode: 'LIVE_MAINNET_MIRROR', mainnetWrites: 'PROHIBITED', creMode: 'MY_CRE_SIMULATOR', label: 'TESTNET LAB' },
+    blockers: [],
+  };
+  const agent: Agent = ctx.agent ?? {
+    id: 'draft', name: project.name, slug: 'agent', role: '', objective: '', status: 'DRAFT', executionClass: 'WRITE_CAPABLE', ensName: '—', ensNode: '', address: '',
+    allowedAdapters: [], budget: { autonomousPerAction: 0, windowLimit: 0, windowUsed: 0, window: 'per action' }, orgBudgetImpact: 0, policyHash: '', runtimeRevision: null, parentId: null,
+    projectId: ctx.dataProjectId, buildId: ctx.buildId,
+  };
+  const agentSlug = searchParams.get('agent') ?? agent.slug;
+  return { agent, agentSlug, meta, project, searchParams, ctx };
 }
 
 export function StudioPage({
@@ -49,14 +74,12 @@ export function StudioPage({
   bleed?: boolean;
   surfaceClass?: string;
 }) {
-  const searchParams = useSearchParams();
-  const agentSlug = searchParams.get('agent') ?? PROJECT.agents[0].slug;
-  const meta = metaForSegment(segment);
+  const { agentSlug, meta, ctx } = useStudioPage(segment);
 
   usePageRegistration({
     id: `${segment}:${agentSlug}`,
     title: meta.tabTitle,
-    href: `/projects/${PROJECT.id}/${segment}?agent=${agentSlug}`,
+    href: `/projects/${ctx.routeProjectId}/${segment}?agent=${agentSlug}`,
     pageKind: meta.pageKind,
     live,
     stale,

@@ -158,6 +158,84 @@ export function useLedgerDevice(enabled: boolean) {
     }
   }, []);
 
+  /**
+   * Asks the device to sign EIP-712 typed data, and waits.
+   *
+   * This is the escalation path: the approval registry accepts a `ContextLockApproval` signature,
+   * and the device shows the domain and every field before the user approves. Newer Ethereum apps
+   * sign the structured message directly (clear signing); a Nano S, or an app that predates full
+   * EIP-712, refuses with a status code and gets the hashed form instead — the same digest, so the
+   * registry cannot tell the two apart, but the device screen then shows two hashes rather than
+   * fields. Which path signed is reported so the panel can say so.
+   *
+   * Returns a 65-byte `0x…` signature (r ‖ s ‖ v) or null on rejection / failure.
+   */
+  const signTypedData = useCallback(async (typed: TypedDataForDevice): Promise<{ signature: `0x${string}`; clearSigned: boolean } | null> => {
+    if (!transportRef.current) {
+      setState((s) => ({ ...s, error: 'No device connected.' }));
+      return null;
+    }
+    signing.current = true;
+    setState((s) => ({ ...s, rejected: false, error: null, hint: 'Approve on the device.' }));
+    try {
+      const { default: Eth } = await import('@ledgerhq/hw-app-eth');
+      const eth = new Eth(transportRef.current as never);
+      const message = {
+        domain: typed.domain,
+        types: {
+          EIP712Domain: [
+            { name: 'name', type: 'string' },
+            { name: 'version', type: 'string' },
+            { name: 'chainId', type: 'uint256' },
+            { name: 'verifyingContract', type: 'address' },
+          ],
+          ...typed.types,
+        },
+        primaryType: typed.primaryType,
+        message: typed.message,
+      };
+      let sig: { r: string; s: string; v: number };
+      let clearSigned = true;
+      try {
+        sig = await eth.signEIP712Message(ETH_PATH, message as never);
+      } catch (err) {
+        const status = (err as { statusCode?: number }).statusCode;
+        if (status === REJECTED) throw err;
+        // Anything else is the app declining structured 712 (Nano S, or an older app): fall back to
+        // the hashed form, which every Ethereum app since 1.6 signs.
+        const { hashDomain, hashStruct } = await import('viem');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const domainSeparator = (hashDomain as any)({ domain: typed.domain, types: message.types }).slice(2) as string;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const structHash = (hashStruct as any)({ data: typed.message, primaryType: typed.primaryType, types: typed.types }).slice(2) as string;
+        clearSigned = false;
+        setState((s) => ({ ...s, hint: 'This app signs the EIP-712 hashes: compare the domain and message hash shown on the device.' }));
+        sig = await eth.signEIP712HashedMessage(ETH_PATH, domainSeparator, structHash);
+      }
+      const v = (sig.v < 27 ? sig.v + 27 : sig.v).toString(16).padStart(2, '0');
+      const signature = `0x${sig.r}${sig.s}${v}` as `0x${string}`;
+      signed.current = true;
+      setState((s) => ({ ...s, step: 'signed', hint: null, signature: { r: `0x${sig.r}`, s: `0x${sig.s}`, v: `0x${v}` } }));
+      return { signature, clearSigned };
+    } catch (err) {
+      const status = (err as { statusCode?: number }).statusCode;
+      if (status === REJECTED) {
+        setState((s) => ({ ...s, step: 'review', rejected: true, hint: 'Rejected on the device. Nothing was signed.' }));
+      } else {
+        setState((s) => ({ ...s, hint: null, error: (err as Error).message }));
+      }
+      return null;
+    } finally {
+      signing.current = false;
+    }
+  }, []);
+
+  /** Back to `review` so another message can be signed on the same connection. */
+  const rearm = useCallback(() => {
+    signed.current = false;
+    setState((s) => ({ ...s, step: s.address ? 'review' : s.step, rejected: false, signature: null, hint: null, error: null }));
+  }, []);
+
   const reset = useCallback(() => {
     signed.current = false;
     signing.current = false;
@@ -265,7 +343,15 @@ export function useLedgerDevice(enabled: boolean) {
     };
   }, [enabled]);
 
-  return { ...state, requestPermission, sign, reset };
+  return { ...state, requestPermission, sign, signTypedData, rearm, reset };
+}
+
+/** EIP-712 typed data as the device wants it: the domain, the struct types (without EIP712Domain), one message. */
+export interface TypedDataForDevice {
+  domain: { name: string; version: string; chainId: number; verifyingContract: string };
+  types: Record<string, Array<{ name: string; type: string }>>;
+  primaryType: string;
+  message: Record<string, string | number>;
 }
 
 /** The fields the device is asked to display and sign. */

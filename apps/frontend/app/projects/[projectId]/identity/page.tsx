@@ -10,10 +10,10 @@
  * agents, ContextLock policy defines what they may spend. Financial limits are
  * never presented as ENS roles.
  */
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { CornerDownRight, RefreshCw, ShieldAlert, Workflow } from 'lucide-react';
-import { StudioPage } from '@/components/studio/PageScaffold';
+import { StudioPage, useStudioPage } from '@/components/studio/PageScaffold';
 import {
   Badge,
   BlockchainRef,
@@ -28,8 +28,9 @@ import {
 import { Modal, SecurityConfirmation } from '@/components/studio/dialogs';
 import { useWorkbench } from '@/lib/studio/workbench';
 import { useControlRequest } from '@/lib/studio/control-bridge';
-import { PROJECT, agentBySlug } from '@/lib/studio/mock/core';
-import { IDENTITY, POLICY } from '@/lib/studio/mock/operate';
+import { policyStatusOf, toIdentityState } from '@/lib/studio/api/adapters/operate';
+import { useControlCommand, useInvalidateAll } from '@/lib/studio/api/queries';
+import { ApiError } from '@/lib/studio/api/client';
 import type { Status } from '@/lib/studio/types';
 
 export default function IdentityPage() {
@@ -37,17 +38,21 @@ export default function IdentityPage() {
   const searchParams = useSearchParams();
   const { pushToast, selection, setSelection } = useWorkbench();
 
-  const agentSlug = searchParams.get('agent') ?? PROJECT.agents[0].slug;
-  const agent = agentBySlug(agentSlug);
+  const { agent, agentSlug, project, ctx } = useStudioPage('identity');
+  const invalidate = useInvalidateAll();
+  const command = useControlCommand(ctx.deploymentId, ctx.dataProjectId ?? undefined);
+  const IDENTITY = useMemo(() => toIdentityState(agent, project.agents, ctx.overview, ctx.deployment, ctx.buildView?.blueprint ?? null), [agent, project.agents, ctx.overview, ctx.deployment, ctx.buildView?.blueprint]);
+  const POLICY = { network: project.environment.executionNetwork, observed: policyStatusOf(ctx.overview) };
+  const [error, setError] = useState<string | null>(null);
 
-  const [state, setState] = useState<Status>(IDENTITY.state);
+  const state: Status = IDENTITY.state;
   const [revokeOpen, setRevokeOpen] = useState(false);
   const [recordsOpen, setRecordsOpen] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
   useControlRequest('REVOKE_AGENT', () => setRevokeOpen(true));
 
-  const go = (segment: string) => router.push(`/projects/${PROJECT.id}/${segment}?agent=${agentSlug}`);
+  const go = (segment: string) => router.push(`/projects/${ctx.routeProjectId}/${segment}?agent=${agentSlug}`);
 
   return (
     <StudioPage
@@ -66,10 +71,7 @@ export default function IdentityPage() {
             className="cl-btn"
             onClick={() => {
               setRefreshing(true);
-              window.setTimeout(() => {
-                setRefreshing(false);
-                pushToast('ENS state refreshed');
-              }, 800);
+              void invalidate().then(() => { setRefreshing(false); pushToast('Identity re-read from the fork'); });
             }}
             disabled={refreshing}
           >
@@ -134,13 +136,13 @@ export default function IdentityPage() {
               treasury.ctxlock.eth
             </div>
             <ul className="cl-col" style={{ gap: 8 }}>
-              {PROJECT.agents.map((sibling) => (
+              {project.agents.map((sibling) => (
                 <li key={sibling.id}>
                   <button
                     type="button"
                     className="cl-row"
                     style={{ gap: 8, width: '100%', textAlign: 'left', cursor: 'pointer' }}
-                    onClick={() => router.push(`/projects/${PROJECT.id}/identity?agent=${sibling.slug}`)}
+                    onClick={() => router.push(`/projects/${ctx.routeProjectId}/identity?agent=${sibling.slug}`)}
                   >
                     <CornerDownRight size={12} aria-hidden style={{ opacity: 0.5 }} />
                     <span style={{ flex: '1 1 auto', minWidth: 0 }}>
@@ -210,10 +212,17 @@ export default function IdentityPage() {
         open={revokeOpen}
         onClose={() => setRevokeOpen(false)}
         onConfirm={() => {
-          setState('REVOKED');
           setRevokeOpen(false);
-          pushToast('Revocation submitted — verify with a fresh ENS read');
+          if (!ctx.deployment) return;
+          setError(null);
+          command
+            .mutateAsync({ operation: 'REVOKE_IDENTITY', expectedRevision: ctx.deployment.revision, reason: 'revoked from the Identity page', target: { identityNode: IDENTITY.node || null } })
+            .then((r) => pushToast(r.ok === false ? `Refused: ${r.detail}` : `${r.detail ?? 'revoked'} — ${(r.result as { verification?: string } | undefined)?.verification ?? 'read back from the fork'}`))
+            .catch((e) => setError(e instanceof ApiError ? e.message : (e as Error).message));
         }}
+        busy={command.isPending}
+        disabled={!ctx.deploymentId || state === 'REVOKED'}
+        disabledReason={!ctx.deploymentId ? 'Revocation acts on a live deployment; this agent has none.' : 'Already revoked.'}
         action="Revoke agent identity"
         currentState={<StatusBadge status={state} />}
         requestedState={<StatusBadge status="REVOKED" />}

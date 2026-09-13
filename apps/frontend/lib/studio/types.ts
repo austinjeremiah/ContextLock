@@ -169,6 +169,14 @@ export interface Agent {
   policyHash: string;
   runtimeRevision: number | null;
   parentId: string | null;
+  /**
+   * The backend project this agent's artifacts live in. A single-agent project is its own; each
+   * member of an organization is a project of its own, so pages read the selected agent's.
+   */
+  projectId?: string | null;
+  buildId?: string | null;
+  /** Set when the member has no build yet — the Organization page offers to start one. */
+  unbuilt?: boolean;
 }
 
 /* ----------------------------------------------------------------- blueprint */
@@ -544,7 +552,7 @@ export interface Adapter {
   conformance: Status | null;
 }
 
-export type CredentialBoundary = 'LOCAL_BRIDGE' | 'CRE_LOCAL_SESSION' | 'SECRET_MANAGER' | 'NONE_PUBLIC';
+export type CredentialBoundary = 'LOCAL_BRIDGE' | 'CRE_LOCAL_SESSION' | 'SECRET_MANAGER' | 'LEDGER_KEY_RING' | 'NONE_PUBLIC';
 
 export interface Credential {
   id: string;
@@ -556,6 +564,8 @@ export interface Credential {
   usedBy: string[];
   rotatable: boolean;
   reconnectable: boolean;
+  /** The backend's own one-line account of where this credential is held. */
+  note?: string;
 }
 
 export interface OpenApiIntegration {

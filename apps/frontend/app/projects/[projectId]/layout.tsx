@@ -1,6 +1,7 @@
 import { Suspense, type ReactNode } from 'react';
 import { StudioProviders } from '@/components/studio/StudioProviders';
 import { StudioShell } from '@/components/studio/StudioShell';
+import { StudioProjectProvider } from '@/lib/studio/api/project-context';
 
 export const metadata = {
   title: 'ContextLock Studio',
@@ -18,7 +19,9 @@ export default function ProjectLayout({ children }: { children: ReactNode }) {
       <link rel="stylesheet" href="/styles/studio.css" precedence="high" />
       <StudioProviders>
         <Suspense fallback={<ShellFallback />}>
-          <StudioShell>{children}</StudioShell>
+          <StudioProjectProvider>
+            <StudioShell>{children}</StudioShell>
+          </StudioProjectProvider>
         </Suspense>
       </StudioProviders>
     </>

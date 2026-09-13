@@ -1,12 +1,13 @@
 {
-  "name": "ethglobal-context",
+  "name": "@contextlock/frontend",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "dev:webpack": "next dev"
+    "dev:webpack": "next dev",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
     "@ledgerhq/hw-app-eth": "^7.8.18",
@@ -15,12 +16,13 @@
     "@rainbow-me/rainbowkit": "^2.2.11",
     "@tanstack/react-query": "^5.102.8",
     "@xyflow/react": "^12.11.6",
+    "jszip": "^3.10.1",
     "lenis": "^1.3.26",
     "lottie-web": "^5.13.0",
     "lucide-react": "^1.44.0",
     "next": "15.1.6",
-    "react": "19.0.0",
-    "react-dom": "19.0.0",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
     "viem": "^2.56.3",
     "wagmi": "^2.19.5"
   },

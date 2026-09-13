@@ -14,10 +14,10 @@
  *    public explorer link.
  *  - The base snapshot is immutable; an overlay is applied on top of it.
  */
-import { useState } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Layers, Play, Plus, RotateCcw, Save, Trash2, Undo2 } from 'lucide-react';
-import { StudioPage } from '@/components/studio/PageScaffold';
+import { StudioPage, useStudioPage } from '@/components/studio/PageScaffold';
 import {
   Badge,
   BlockchainRef,
@@ -32,31 +32,65 @@ import {
 } from '@/components/studio/primitives';
 import { Modal, StandardConfirmation } from '@/components/studio/dialogs';
 import { useWorkbench } from '@/lib/studio/workbench';
-import { PROJECT, agentBySlug } from '@/lib/studio/mock/core';
-import { LOCAL_FORK, REALITY_MODES, SNAPSHOT, SYNTHETIC_OVERLAYS } from '@/lib/studio/mock/test';
-import type { RealityMode, RealitySource } from '@/lib/studio/types';
-
-/** A transaction that exists only on the local fork node. */
-const FORK_TX_HASH = '0x9a71c05e3d84b26f07a1c4e93b25d80f6a3c17e94b0d25a8c3f61e7b48d0a297';
+import { useReality, useScenarios, useInvalidateAll } from '@/lib/studio/api/queries';
+import { toLocalFork, toOverlays, toRealityModes, toSnapshot } from '@/lib/studio/api/adapters/test';
+import { fork as forkApi } from '@/lib/studio/api/endpoints';
+import { ApiError } from '@/lib/studio/api/client';
+import type { RealityMode, RealityModeOption, RealitySource } from '@/lib/studio/types';
 
 export default function RealityLabPage() {
-  const searchParams = useSearchParams();
+  const router = useRouter();
   const { setSelection, developerMode, pushToast } = useWorkbench();
-  const agent = agentBySlug(searchParams.get('agent'));
+  const { agent, project, ctx } = useStudioPage('reality');
+  const invalidate = useInvalidateAll();
+  const realityQ = useReality();
+  const scenariosQ = useScenarios(ctx.dataProjectId);
 
-  const [mode, setMode] = useState<RealityMode>('LIVE_MAINNET_MIRROR');
+  const modes = useMemo<RealityModeOption[]>(() => (realityQ.data ? toRealityModes(realityQ.data) : []), [realityQ.data]);
+  const deployment = ctx.deployment;
+  const snapshot = useMemo(() => (deployment ? toSnapshot(deployment, scenariosQ.data ?? null) : null), [deployment, scenariosQ.data]);
+  const localFork = useMemo(() => (deployment ? toLocalFork(deployment) : null), [deployment]);
+  const overlays = useMemo(() => toOverlays(scenariosQ.data ?? null), [scenariosQ.data]);
+  const forkLive = !!deployment?.live.fork;
+
+  const [mode, setMode] = useState<RealityMode>(deployment?.live.fork ? 'LOCAL_MAINNET_FORK' : 'LIVE_MAINNET_MIRROR');
   const [provenanceOf, setProvenanceOf] = useState<RealitySource | null>(null);
   const [appliedOverlay, setAppliedOverlay] = useState<string | null>(null);
   const [compareOpen, setCompareOpen] = useState(false);
   const [destroyOpen, setDestroyOpen] = useState(false);
-  const [forkDestroyed, setForkDestroyed] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const overlay = SYNTHETIC_OVERLAYS.find((o) => o.id === appliedOverlay) ?? null;
+  const overlay = overlays.find((o) => o.id === appliedOverlay) ?? null;
+  const graphSource = realityQ.data?.sources.find((src) => src.sourceId.startsWith('thegraph')) ?? null;
+
+  const destroyFork = async () => {
+    if (!deployment) return;
+    setError(null);
+    try {
+      await forkApi.stop(deployment.deploymentId, 'fork destroyed from the Reality Lab');
+      await invalidate();
+      pushToast('Fork destroyed — the deployment is STOPPED');
+    } catch (e) {
+      setError(e instanceof ApiError ? e.message : String(e));
+    }
+  };
+  const tickFork = async () => {
+    if (!deployment) return;
+    setError(null);
+    try {
+      const r = await forkApi.tick(deployment.deploymentId);
+      await invalidate();
+      pushToast(r.sample ? `Observed fork block ${r.sample.blockNumber} · ${r.sample.action}${r.sample.verdict ? ` ${r.sample.verdict}` : ''}` : 'No observation — the runtime is not running');
+    } catch (e) {
+      setError(e instanceof ApiError ? e.message : String(e));
+    }
+  };
 
   return (
     <StudioPage
       segment="reality"
       badges={<Badge tone="neutral">{agent.name}</Badge>}
+      banners={error ? <BlockerBanner tone="deny" title="The Studio API refused">{error}</BlockerBanner> : null}
     >
       {/* Market source and execution target are deliberately two fields. */}
       <Section label="Environment">
@@ -66,7 +100,7 @@ export default function RealityLabPage() {
               Market source
             </div>
             <div className="cl-display-s" style={{ marginBottom: 8 }}>
-              {PROJECT.environment.realitySource}
+              {project.environment.realitySource}
             </div>
             <div className="cl-row cl-row-wrap" style={{ gap: 6 }}>
               <Badge tone="data" large>
@@ -81,13 +115,13 @@ export default function RealityLabPage() {
               Execution target
             </div>
             <div className="cl-display-s" style={{ marginBottom: 8 }}>
-              {PROJECT.environment.executionNetwork}
+              {project.environment.executionNetwork}
             </div>
             <div className="cl-row cl-row-wrap" style={{ gap: 6 }}>
               <Badge tone="sim" large>
-                TESTNET
+                {project.environment.realityMode === 'LOCAL_MAINNET_FORK' ? 'LOCAL FORK' : 'TESTNET'}
               </Badge>
-              <span className="cl-meta">Chain id {PROJECT.environment.executionChainId}. Every transaction lands here.</span>
+              <span className="cl-meta">Chain id {project.environment.executionChainId}. Every transaction lands here.</span>
             </div>
           </Card>
         </div>
@@ -96,7 +130,7 @@ export default function RealityLabPage() {
       {/* mode selector */}
       <Section label="Reality mode">
         <div className="cl-grid cl-grid-2">
-          {REALITY_MODES.map((option) => {
+          {modes.map((option) => {
             const selectable = option.availability !== 'BLOCKED';
             const active = mode === option.mode;
             return (
@@ -144,6 +178,15 @@ export default function RealityLabPage() {
       {/* live mirror */}
       {mode === 'LIVE_MAINNET_MIRROR' || mode === 'HISTORICAL_REPLAY' || mode === 'SYNTHETIC' ? (
         <>
+          {!snapshot ? (
+            <Section label="Snapshot">
+              <Card>
+                <p className="cl-meta" style={{ whiteSpace: 'normal' }}>
+                  No market snapshot has been sealed for this agent. A snapshot is taken from the fork's own reads when the agent is deployed to the local mainnet fork, and every decision after that is valued against it.
+                </p>
+              </Card>
+            </Section>
+          ) : (
           <Section
             label="Snapshot"
             actions={<Badge tone={overlay ? 'sim' : 'neutral'}>{overlay ? `Overlay: ${overlay.label}` : 'Base snapshot'}</Badge>}
@@ -151,15 +194,15 @@ export default function RealityLabPage() {
             <Card>
               <KeyValue
                 rows={[
-                  { label: 'Snapshot ID', value: SNAPSHOT.id, mono: true },
+                  { label: 'Snapshot ID', value: snapshot.id, mono: true },
                   {
                     label: 'Mainnet anchor block',
-                    value: <BlockchainRef label={SNAPSHOT.anchorBlock.toLocaleString('en-US')} value={SNAPSHOT.anchorHash} kind="hash" />,
+                    value: <BlockchainRef label={snapshot.anchorBlock.toLocaleString('en-US')} value={snapshot.anchorHash} kind="hash" />,
                   },
-                  { label: 'Created', value: <TimeAgo iso={SNAPSHOT.createdAt} /> },
-                  { label: 'Age', value: `${SNAPSHOT.ageSeconds}s` },
-                  { label: 'Coherence', value: SNAPSHOT.coherence },
-                  { label: 'Snapshot hash', value: SNAPSHOT.hash, mono: true },
+                  { label: 'Created', value: <TimeAgo iso={snapshot.createdAt} /> },
+                  { label: 'Age', value: `${snapshot.ageSeconds}s` },
+                  { label: 'Coherence', value: snapshot.coherence },
+                  { label: 'Snapshot hash', value: snapshot.hash, mono: true },
                 ]}
               />
               {overlay ? (
@@ -173,6 +216,7 @@ export default function RealityLabPage() {
             </Card>
           </Section>
 
+          )}
           <Section label="Sources" actions={<span className="cl-meta">Click a row for full provenance</span>}>
             <Card flush>
               <div className="cl-table-scroll">
@@ -189,7 +233,7 @@ export default function RealityLabPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {SNAPSHOT.sources.map((source) => (
+                    {(snapshot?.sources ?? []).map((source) => (
                       <tr
                         key={source.id}
                         data-clickable="true"
@@ -246,7 +290,8 @@ export default function RealityLabPage() {
           }
         >
           <div className="cl-grid cl-grid-3">
-            {SYNTHETIC_OVERLAYS.map((preset) => (
+            {overlays.length === 0 ? <p className="cl-meta">Synthetic overlays apply to a sealed snapshot; deploy to the fork first.</p> : null}
+            {overlays.map((preset) => (
               <Card key={preset.id} title={preset.label}>
                 <p className="cl-meta" style={{ whiteSpace: 'normal', marginBottom: 10 }}>
                   {preset.description}
@@ -281,67 +326,62 @@ export default function RealityLabPage() {
       {mode === 'LOCAL_MAINNET_FORK' ? (
         <>
           <Section label="Local fork">
-            {forkDestroyed ? (
+            {!localFork || !forkLive ? (
               <Card>
-                <p className="cl-meta">No fork exists. Create one to execute against an isolated copy of mainnet.</p>
-                <button
-                  type="button"
-                  className="cl-btn cl-btn-primary"
-                  style={{ marginTop: 12 }}
-                  onClick={() => {
-                    setForkDestroyed(false);
-                    pushToast('Fork created');
-                  }}
-                >
+                <p className="cl-meta" style={{ whiteSpace: 'normal' }}>
+                  {localFork ? `The fork ${localFork.id} is ${localFork.state}${deployment?.record.stoppedReason ? ` — ${deployment.record.stoppedReason}` : ''}.` : 'No fork exists.'}{' '}
+                  A fork is created by deploying the agent: it forks mainnet at an exact block, deploys the ContextLock core and opens the positions the agent guards.
+                </p>
+                <button type="button" className="cl-btn cl-btn-primary" style={{ marginTop: 12 }} onClick={() => router.push(`/projects/${ctx.routeProjectId}/deploy`)}>
                   <Plus size={12} aria-hidden />
-                  Create Fork
+                  Create Fork (deploy)
                 </button>
               </Card>
             ) : (
               <Card>
                 <KeyValue
                   rows={[
-                    { label: 'Fork ID', value: LOCAL_FORK.id, mono: true },
-                    { label: 'Source chain', value: LOCAL_FORK.sourceChain },
+                    { label: 'Fork ID', value: localFork.id, mono: true },
+                    { label: 'Source chain', value: localFork.sourceChain },
                     {
                       label: 'Forked at block',
                       value: (
                         <BlockchainRef
-                          label={LOCAL_FORK.blockNumber.toLocaleString('en-US')}
-                          value={LOCAL_FORK.blockHash}
+                          label={localFork.blockNumber.toLocaleString('en-US')}
+                          value={localFork.blockHash}
                           kind="hash"
                           local
                         />
                       ),
                     },
-                    { label: 'Anvil version', value: LOCAL_FORK.anvilVersion, mono: true },
-                    { label: 'State', value: <StatusBadge status={LOCAL_FORK.state} /> },
+                    { label: 'Anvil version', value: localFork.anvilVersion, mono: true },
+                    { label: 'State', value: <StatusBadge status={localFork.state} /> },
                     {
                       label: 'Resource lifetime',
-                      value: `${Math.round(LOCAL_FORK.lifetimeSeconds / 60)} minutes from creation`,
+                      value: `${Math.round(localFork.lifetimeSeconds / 60)} minutes remaining · dies with the Studio server`,
                     },
                     ...(developerMode
-                      ? [{ label: 'Local endpoint', value: LOCAL_FORK.endpoint, mono: true }]
+                      ? [{ label: 'Local endpoint', value: localFork.endpoint, mono: true }]
                       : []),
                   ]}
                 />
 
                 <div className="cl-btn-group" style={{ marginTop: 14 }}>
-                  <button type="button" className="cl-btn cl-btn-sm" onClick={() => pushToast('Fork reset to its source block')}>
+                  <button type="button" className="cl-btn cl-btn-sm" disabled title="The fork lab does not expose reset; stop the deployment and deploy again to fork afresh.">
                     <RotateCcw size={11} aria-hidden />
                     Reset Fork
                   </button>
-                  <button type="button" className="cl-btn cl-btn-sm" onClick={() => pushToast('Fork state snapshotted')}>
+                  <button type="button" className="cl-btn cl-btn-sm" disabled title="Not offered by the fork lab.">
                     <Save size={11} aria-hidden />
                     Snapshot Fork
                   </button>
-                  <button type="button" className="cl-btn cl-btn-sm" onClick={() => pushToast('Fork restored from snapshot')}>
+                  <button type="button" className="cl-btn cl-btn-sm" disabled title="Not offered by the fork lab.">
                     <Undo2 size={11} aria-hidden />
                     Restore
                   </button>
-                  <button type="button" className="cl-btn cl-btn-sm cl-btn-primary" onClick={() => pushToast('Agent running against the fork')}>
+                  <button type="button" className="cl-btn cl-btn-sm cl-btn-primary" onClick={() => void tickFork()}>
                     <Play size={11} aria-hidden />
-                    Run Agent on Fork
+                    Observe now
                   </button>
                   <span className="cl-spacer" />
                   <button type="button" className="cl-btn cl-btn-sm cl-btn-danger" onClick={() => setDestroyOpen(true)}>
@@ -353,7 +393,7 @@ export default function RealityLabPage() {
             )}
           </Section>
 
-          {!forkDestroyed ? (
+          {localFork && deployment ? (
             <Section label="Fork transactions">
               <Card flush>
                 <table className="cl-table">
@@ -365,24 +405,24 @@ export default function RealityLabPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <td>
-                        <Badge tone="sim">LOCAL FORK TRANSACTION</Badge>
-                      </td>
-                      <td>
-                        {/* local=true: a fork transaction never gets a public explorer link */}
-                        <BlockchainRef value={FORK_TX_HASH} kind="tx" local />
-                      </td>
-                      <td>
-                        <StatusBadge status="PASS" />
-                      </td>
-                    </tr>
+                    {deployment.record.setupTransactions.map((tx) => (
+                      <tr key={tx.hash}>
+                        <td><Badge tone="sim">LOCAL FORK TRANSACTION</Badge></td>
+                        <td>
+                          <div className="cl-meta">{tx.label} · block {tx.blockNumber} · {tx.gasUsed} gas</div>
+                          {/* local=true: a fork transaction never gets a public explorer link */}
+                          <BlockchainRef value={tx.hash} kind="tx" local />
+                        </td>
+                        <td><StatusBadge status={tx.status === 'success' ? 'PASS' : 'FAIL'} /></td>
+                      </tr>
+                    ))}
+                    {deployment.record.setupTransactions.length === 0 ? <tr><td colSpan={3} className="cl-meta">No transactions yet.</td></tr> : null}
                   </tbody>
                 </table>
               </Card>
               <p className="cl-meta" style={{ marginTop: 8 }}>
                 Fork transactions exist only on your local node. They are never given a public explorer link, because
-                there is nothing public to link to.
+                there is nothing public to link to. The agent's own executions are on the Activity page.
               </p>
             </Section>
           ) : null}
@@ -391,9 +431,8 @@ export default function RealityLabPage() {
 
       {/* historical replay limits */}
       {mode === 'HISTORICAL_REPLAY' ? (
-        <BlockerBanner tone="warn" title="Historical Replay is LIMITED">
-          No archive RPC is registered, so replay can only reach the most recent 128 blocks. Anything older is
-          unavailable — it is not approximated from another source.
+        <BlockerBanner tone="warn" title={`Historical Replay is ${modes.find((m) => m.mode === 'HISTORICAL_REPLAY')?.availability ?? 'LIMITED'}`}>
+          {modes.find((m) => m.mode === 'HISTORICAL_REPLAY')?.blockerReason ?? 'No archive RPC is registered. Anything older than the recent-state window is unavailable — it is not approximated from another source.'}
         </BlockerBanner>
       ) : null}
 
@@ -463,7 +502,7 @@ export default function RealityLabPage() {
           </tbody>
         </table>
         <p className="cl-meta" style={{ marginTop: 12 }}>
-          The base snapshot {SNAPSHOT.id} is immutable. An overlay is a view on top of it and can be cleared without
+          The base snapshot {snapshot?.id ?? ''} is immutable. An overlay is a view on top of it and can be cleared without
           re-reading the chain.
         </p>
       </Modal>
@@ -474,12 +513,11 @@ export default function RealityLabPage() {
         onClose={() => setDestroyOpen(false)}
         onConfirm={() => {
           setDestroyOpen(false);
-          setForkDestroyed(true);
-          pushToast('Fork destroyed');
+          void destroyFork();
         }}
         title="Destroy fork"
         consequence="The local node and all state produced on it are discarded. Nothing on a public chain is affected, because a fork never touches one."
-        resource={LOCAL_FORK.id}
+        resource={localFork?.id ?? 'fork'}
         actionLabel="Destroy Fork"
       />
     </StudioPage>

@@ -27,12 +27,16 @@ import {
   Play,
   TriangleAlert,
 } from 'lucide-react';
-import { StudioPage } from '@/components/studio/PageScaffold';
+import { StudioPage, useStudioPage } from '@/components/studio/PageScaffold';
 import { Badge, BlockerBanner, StatusBadge } from '@/components/studio/primitives';
 import { StandardConfirmation } from '@/components/studio/dialogs';
 import { useWorkbench } from '@/lib/studio/workbench';
-import { PROJECT } from '@/lib/studio/mock/core';
-import { BUILD_REVISION, CODE_FILES, CODE_GROUPS, CODE_MARK_LABEL } from '@/lib/studio/mock/engineering';
+import { CODE_GROUPS, CODE_MARK_LABEL } from '@/lib/studio/content/code';
+import { toCodeFiles } from '@/lib/studio/api/adapters/design';
+import { useBuildFile, useInvalidateAll } from '@/lib/studio/api/queries';
+import { studio } from '@/lib/studio/api/endpoints';
+import { ApiError } from '@/lib/studio/api/client';
+import { EmptyState } from '@/components/studio/primitives';
 import type { CodeFile } from '@/lib/studio/types';
 
 /* Monaco is heavy and browser-only: keep it off every other route's graph. */
@@ -50,21 +54,31 @@ export default function CodePage() {
   const searchParams = useSearchParams();
   const { developerMode, openBottom, setSelection, pushToast } = useWorkbench();
 
-  const agentSlug = searchParams.get('agent') ?? PROJECT.agents[0].slug;
-  const blueprintRevision = PROJECT.revisions.blueprint ?? 0;
-  const buildIsStale = BUILD_REVISION < blueprintRevision;
+  const { agentSlug, ctx } = useStudioPage('code');
+  const invalidate = useInvalidateAll();
+  const view = ctx.buildView;
+  const blueprintRevision = view?.blueprint?.revision ?? view?.build.blueprintRevision ?? 0;
+  const BUILD_REVISION = view?.build.buildRevision ?? 0;
+  const buildIsStale = view?.codeStale ?? false;
 
-  const [selectedPath, setSelectedPath] = useState(CODE_FILES[0].path);
+  /* The live sandbox files, from the build. Contents load per file; the tree needs only paths. */
+  const CODE_FILES = useMemo<CodeFile[]>(() => (view ? toCodeFiles(view.files, blueprintRevision, BUILD_REVISION) : []), [view, blueprintRevision, BUILD_REVISION]);
+
+  const [selectedPath, setSelectedPath] = useState<string>('');
   const [mode, setMode] = useState<'edit' | 'diff'>('edit');
   const [drafts, setDrafts] = useState<Record<string, string>>({});
   const [unlockOpen, setUnlockOpen] = useState(false);
   const [unlocked, setUnlocked] = useState<string[]>([]);
+  const [busy, setBusy] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const file = CODE_FILES.find((f) => f.path === selectedPath) ?? CODE_FILES[0];
-  const draft = drafts[file.path];
-  const isModified = hasRealEdit(drafts, file.path, file.content);
-  const isUnlocked = unlocked.includes(file.path);
-  const readOnly = file.readOnly && !isUnlocked;
+  const listed = CODE_FILES.find((f) => f.path === selectedPath) ?? CODE_FILES[0] ?? null;
+  const contentQ = useBuildFile(ctx.buildId, listed?.path ?? null);
+  const file: CodeFile | null = listed ? { ...listed, content: contentQ.data ?? '' } : null;
+  const draft = file ? drafts[file.path] : undefined;
+  const isModified = file ? hasRealEdit(drafts, file.path, file.content) : false;
+  const isUnlocked = file ? unlocked.includes(file.path) : false;
+  const readOnly = !file || (file.readOnly && !isUnlocked);
 
   const grouped = useMemo(
     () =>
@@ -72,8 +86,46 @@ export default function CodePage() {
         ...group,
         files: CODE_FILES.filter((f) => f.group === group.id),
       })).filter((g) => g.files.length > 0),
-    [],
+    [CODE_FILES],
   );
+
+  const rebuild = async () => {
+    if (!ctx.buildId) return;
+    setError(null);
+    setBusy('Rebuilding in an isolated sandbox — this takes a few minutes');
+    try {
+      studio.build(ctx.buildId).catch((e) => setError(e instanceof ApiError ? e.message : String(e))).finally(() => { setBusy(null); void invalidate(); });
+      pushToast(`Rebuilding from Blueprint r${blueprintRevision}`);
+      router.push(`/projects/${ctx.routeProjectId}/build`);
+    } catch (e) {
+      setError(e instanceof ApiError ? e.message : String(e));
+      setBusy(null);
+    }
+  };
+
+  const downloadProject = async () => {
+    if (!ctx.buildId) return;
+    setError(null);
+    setBusy('Preparing the export');
+    try {
+      const bundle = await studio.exportBundle(ctx.buildId);
+      const { default: JSZip } = await import('jszip');
+      const zip = new JSZip();
+      for (const f of bundle.files) zip.file(f.path, f.content);
+      const blob = await zip.generateAsync({ type: 'blob' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${ctx.dataProjectId ?? 'agent'}-r${BUILD_REVISION}.zip`;
+      a.click();
+      URL.revokeObjectURL(url);
+      pushToast(`${bundle.files.length} files exported — secret scan passed on the server`);
+    } catch (e) {
+      setError(e instanceof ApiError ? e.message : String(e));
+    } finally {
+      setBusy(null);
+    }
+  };
 
   const select = (next: CodeFile) => {
     setSelectedPath(next.path);
@@ -82,7 +134,19 @@ export default function CodePage() {
   };
 
   const marksFor = (f: CodeFile) => (isModifiedFile(f) ? [...f.marks, 'modified' as const] : f.marks);
-  const isModifiedFile = (f: CodeFile) => hasRealEdit(drafts, f.path, f.content);
+  const isModifiedFile = (f: CodeFile) => drafts[f.path] !== undefined && f.path === file?.path && hasRealEdit(drafts, f.path, file.content);
+
+  if (!file || !view) {
+    return (
+      <StudioPage segment="code">
+        <EmptyState
+          title={ctx.loading ? 'Loading…' : 'No generated code yet'}
+          body={ctx.loading ? '' : view && view.build.stage === 'AWAITING_APPROVAL' ? 'The build stopped at the approval boundary. Approve it in the Composer and the sandbox files appear here as they are written.' : 'Code is generated in an isolated sandbox after you approve the design. Describe the agent first.'}
+          action={ctx.loading ? undefined : <button type="button" className="cl-btn cl-btn-primary" onClick={() => router.push(`/projects/${ctx.routeProjectId}/build`)}>Open Composer</button>}
+        />
+      </StudioPage>
+    );
+  }
 
   return (
     <StudioPage
@@ -91,6 +155,7 @@ export default function CodePage() {
       stale={buildIsStale}
       banners={
         <>
+          {error ? <div style={{ padding: '0 16px 12px' }}><BlockerBanner tone="deny" title="The Studio API refused">{error}</BlockerBanner></div> : null}
           <div className="cl-row cl-row-wrap" style={{ marginBottom: 12, gap: 8 }}>
             <span className="cl-page-title" style={{ fontSize: 22, marginRight: 8 }}>
               Code
@@ -103,10 +168,12 @@ export default function CodePage() {
               <button
                 type="button"
                 className="cl-btn cl-btn-sm"
-                onClick={() => pushToast(`Rebuilding from Blueprint r${blueprintRevision}`)}
+                onClick={() => void rebuild()}
+                disabled={!!busy || view.build.status === 'RUNNING'}
+                title="Runs the build pipeline again against the current Blueprint revision: new sandbox, new tests, new mandatory simulations."
               >
                 <Hammer size={11} aria-hidden />
-                Rebuild from Blueprint
+                {busy ?? 'Rebuild from Blueprint'}
               </button>
               <button type="button" className="cl-btn cl-btn-sm" onClick={() => openBottom('tests')}>
                 <Play size={11} aria-hidden />
@@ -127,24 +194,20 @@ export default function CodePage() {
                 <GitCompare size={11} aria-hidden />
                 Compare revision
               </button>
-              <button type="button" className="cl-btn cl-btn-sm cl-btn-primary" onClick={() => pushToast('Project archive prepared')}>
+              <button type="button" className="cl-btn cl-btn-sm cl-btn-primary" onClick={() => void downloadProject()} disabled={!!busy} title="Every generated file, the Blueprint, the simulation report and the security report — scanned for secrets on the server before it leaves.">
                 <Download size={11} aria-hidden />
                 Download project
               </button>
             </div>
           </div>
 
-          {CODE_FILES.some((f) => hasRealEdit(drafts, f.path, f.content)) ? (
+          {isModified ? (
             <div style={{ padding: '0 16px 12px' }}>
               <BlockerBanner
                 tone="warn"
                 title="Generated code has been edited by hand"
                 actions={
-                  <button
-                    type="button"
-                    className="cl-btn cl-btn-sm"
-                    onClick={() => pushToast(`Rebuilding from Blueprint r${blueprintRevision}`)}
-                  >
+                  <button type="button" className="cl-btn cl-btn-sm" onClick={() => void rebuild()} disabled={!!busy}>
                     Rebuild from Blueprint
                   </button>
                 }
@@ -221,7 +284,7 @@ export default function CodePage() {
               <button
                 type="button"
                 className="cl-btn cl-btn-ghost cl-btn-sm"
-                onClick={() => router.push(`/projects/${PROJECT.id}/blueprint?agent=${agentSlug}`)}
+                onClick={() => router.push(`/projects/${ctx.routeProjectId}/blueprint?agent=${agentSlug}`)}
                 title="Open the Blueprint section that generated this file"
               >
                 from Blueprint · {file.blueprintSection.replace(/-/g, ' ')}

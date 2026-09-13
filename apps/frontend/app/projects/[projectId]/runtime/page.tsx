@@ -13,10 +13,10 @@
  *  - After a revision switch the old runtime credential must be fenced, and the
  *    page shows that verification rather than assuming it.
  */
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { GitCompare, Pause, Play, RotateCcw, ScrollText, Square, Undo2 } from 'lucide-react';
-import { StudioPage } from '@/components/studio/PageScaffold';
+import { StudioPage, useStudioPage } from '@/components/studio/PageScaffold';
 import {
   Badge,
   BlockerBanner,
@@ -30,8 +30,10 @@ import {
 import { SecurityConfirmation, StandardConfirmation } from '@/components/studio/dialogs';
 import { useWorkbench } from '@/lib/studio/workbench';
 import { useControlRequest } from '@/lib/studio/control-bridge';
-import { PROJECT, agentBySlug } from '@/lib/studio/mock/core';
-import { POLICY, RUNTIME } from '@/lib/studio/mock/operate';
+import { policyStatusOf, toRuntimeState } from '@/lib/studio/api/adapters/operate';
+import { useControlCommand, useForkPosition } from '@/lib/studio/api/queries';
+import { ApiError } from '@/lib/studio/api/client';
+import { EmptyState } from '@/components/studio/primitives';
 import type { RuntimeRevisionRow, Status } from '@/lib/studio/types';
 
 export default function RuntimePage() {
@@ -39,14 +41,42 @@ export default function RuntimePage() {
   const searchParams = useSearchParams();
   const { openBottom, pushToast, selection, setSelection } = useWorkbench();
 
-  const agentSlug = searchParams.get('agent') ?? PROJECT.agents[0].slug;
-  const agent = agentBySlug(agentSlug);
+  const { agent, agentSlug, ctx } = useStudioPage('runtime');
+  const positionQ = useForkPosition(ctx.deploymentId, true);
+  const command = useControlCommand(ctx.deploymentId, ctx.dataProjectId ?? undefined);
+  const RUNTIME = useMemo(() => toRuntimeState(ctx.overview, positionQ.data ?? null, ctx.deployment), [ctx.overview, positionQ.data, ctx.deployment]);
+  const POLICY = { observed: policyStatusOf(ctx.overview) };
+  const state: Status = RUNTIME.state;
 
-  const [state, setState] = useState<Status>(RUNTIME.state);
   const [confirm, setConfirm] = useState<null | 'stop' | 'restart'>(null);
   const [rollbackTo, setRollbackTo] = useState<RuntimeRevisionRow | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  useControlRequest('PAUSE_RUNTIME', () => pushToast('Pause is available from the controls below'));
+  const issue = async (op: 'PAUSE_RUNTIME' | 'RESUME_RUNTIME') => {
+    if (!ctx.deployment) return;
+    setError(null);
+    try {
+      const r = await command.mutateAsync({ operation: op, expectedRevision: ctx.deployment.revision });
+      if (r.ok === false) throw new Error(r.detail ?? 'refused');
+      pushToast(`${r.detail ?? 'applied'}${r.claim?.warning ? ` — ${r.claim.warning}` : ''}`);
+    } catch (e) {
+      setError(e instanceof ApiError ? e.message : (e as Error).message);
+    }
+  };
+
+  useControlRequest('PAUSE_RUNTIME', () => void issue('PAUSE_RUNTIME'));
+
+  if (!ctx.deploymentId) {
+    return (
+      <StudioPage segment="runtime">
+        <EmptyState
+          title={ctx.loading ? 'Loading…' : 'No runtime is running'}
+          body={ctx.loading ? '' : 'The agent runtime is started by a deployment. Deploy to the local mainnet fork and it appears here with its heartbeat and dependencies.'}
+          action={ctx.loading ? undefined : <button type="button" className="cl-btn cl-btn-primary" onClick={() => router.push(`/projects/${ctx.routeProjectId}/deploy?agent=${agentSlug}`)}>Run Deployment Preflight</button>}
+        />
+      </StudioPage>
+    );
+  }
 
   const running = state === 'HEALTHY' || state === 'DEGRADED' || state === 'READY';
 
@@ -68,43 +98,22 @@ export default function RuntimePage() {
       actions={
         <>
           {state === 'STOPPED' ? (
-            <button
-              type="button"
-              className="cl-btn cl-btn-primary"
-              onClick={() => {
-                setState('HEALTHY');
-                pushToast('Runtime starting');
-              }}
-            >
+            <button type="button" className="cl-btn cl-btn-primary" disabled title="A stopped fork runtime died with its deployment; deploy again to start one.">
               <Play size={13} aria-hidden />
               Start Runtime
             </button>
           ) : state === 'PAUSED' ? (
-            <button
-              type="button"
-              className="cl-btn cl-btn-primary"
-              onClick={() => {
-                setState('HEALTHY');
-                pushToast('Runtime resumed');
-              }}
-            >
+            <button type="button" className="cl-btn cl-btn-primary" onClick={() => void issue('RESUME_RUNTIME')} disabled={command.isPending}>
               <Play size={13} aria-hidden />
               Resume Runtime
             </button>
           ) : (
-            <button
-              type="button"
-              className="cl-btn"
-              onClick={() => {
-                setState('PAUSED');
-                pushToast('Runtime paused — financial authority is unchanged');
-              }}
-            >
+            <button type="button" className="cl-btn" onClick={() => void issue('PAUSE_RUNTIME')} disabled={command.isPending}>
               <Pause size={13} aria-hidden />
               Pause Runtime
             </button>
           )}
-          <button type="button" className="cl-btn" onClick={() => setConfirm('restart')} disabled={state === 'STOPPED'}>
+          <button type="button" className="cl-btn" disabled title="Not offered by the fork lab: the runtime is one loop in the Studio server, paused and resumed in place.">
             <RotateCcw size={13} aria-hidden />
             Restart Runtime
           </button>
@@ -112,11 +121,7 @@ export default function RuntimePage() {
             <Square size={12} aria-hidden />
             Stop Runtime
           </button>
-          <button
-            type="button"
-            className="cl-btn"
-            onClick={() => setRollbackTo(RUNTIME.revisions.find((r) => !r.current && r.compatible) ?? null)}
-          >
+          <button type="button" className="cl-btn" disabled title="The fork runtime has a single revision; there is nothing to roll back to.">
             <Undo2 size={13} aria-hidden />
             Rollback Runtime
           </button>
@@ -127,6 +132,8 @@ export default function RuntimePage() {
         </>
       }
       banners={
+        <>
+        {error ? <BlockerBanner tone="deny" title="The control plane refused">{error}</BlockerBanner> : null}
         <BlockerBanner
           tone="warn"
           title="Runtime controls are not the financial kill switch"
@@ -134,7 +141,7 @@ export default function RuntimePage() {
             <button
               type="button"
               className="cl-btn cl-btn-sm"
-              onClick={() => router.push(`/projects/${PROJECT.id}/policies?agent=${agentSlug}`)}
+              onClick={() => router.push(`/projects/${ctx.routeProjectId}/policies?agent=${agentSlug}`)}
             >
               Open Policies
             </button>
@@ -144,6 +151,7 @@ export default function RuntimePage() {
           authority — the policy stays in whatever state the chain reports, currently {POLICY.observed}. Capabilities
           already issued remain valid until they expire.
         </BlockerBanner>
+        </>
       }
     >
       <div className="cl-grid cl-grid-2">
@@ -314,13 +322,14 @@ export default function RuntimePage() {
         open={confirm !== null}
         onClose={() => setConfirm(null)}
         onConfirm={() => {
-          if (confirm === 'stop') {
-            setState('STOPPED');
-            pushToast('Runtime stopped — financial authority is unchanged');
-          } else {
-            pushToast('Runtime restarting');
-          }
           setConfirm(null);
+          /* Stopping the fork runtime stops the deployment (its fork goes with it). Authority on the
+             fork is moot once the fork is gone; the record says STOPPED and why. */
+          if (ctx.deployment) {
+            void import('@/lib/studio/api/endpoints').then(({ fork }) => fork.stop(ctx.deployment!.deploymentId, 'runtime stopped from the Runtime page'))
+              .then(() => pushToast('Runtime and fork stopped — the deployment is STOPPED'))
+              .catch((e: Error) => setError(e.message));
+          }
         }}
         action={confirm === 'stop' ? 'Stop runtime' : 'Restart runtime'}
         currentState={<StatusBadge status={state} />}
@@ -350,10 +359,7 @@ export default function RuntimePage() {
       <StandardConfirmation
         open={rollbackTo !== null}
         onClose={() => setRollbackTo(null)}
-        onConfirm={() => {
-          pushToast(`Rolled back to runtime r${rollbackTo?.revision}. Old credential fenced.`);
-          setRollbackTo(null);
-        }}
+        onConfirm={() => setRollbackTo(null)}
         title={`Roll back to runtime r${rollbackTo?.revision ?? ''}`}
         consequence={
           rollbackTo

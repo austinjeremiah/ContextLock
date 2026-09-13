@@ -15,7 +15,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Copy, GitCompare, Plus, RotateCcw, Play, Radio, Square } from 'lucide-react';
-import { StudioPage } from '@/components/studio/PageScaffold';
+import { StudioPage, useStudioPage } from '@/components/studio/PageScaffold';
 import {
   Badge,
   Card,
@@ -30,8 +30,12 @@ import {
 } from '@/components/studio/primitives';
 import { Modal, StandardConfirmation } from '@/components/studio/dialogs';
 import { useWorkbench } from '@/lib/studio/workbench';
-import { PROJECT, agentBySlug } from '@/lib/studio/mock/core';
-import { SCENARIOS, SCENARIO_GROUPS } from '@/lib/studio/mock/test';
+import { SCENARIO_GROUPS } from '@/lib/studio/content/test';
+import { toScenarios } from '@/lib/studio/api/adapters/test';
+import { studio } from '@/lib/studio/api/endpoints';
+import { useInvalidateAll, useSimulationCenter } from '@/lib/studio/api/queries';
+import { ApiError } from '@/lib/studio/api/client';
+import { BlockerBanner, EmptyState } from '@/components/studio/primitives';
 import type { SimulationScenario, Status } from '@/lib/studio/types';
 
 type RunState = Record<string, Status | undefined>;
@@ -41,17 +45,27 @@ export default function SimulationPage() {
   const searchParams = useSearchParams();
   const { setSelection, openBottom, pushToast } = useWorkbench();
 
-  const agentSlug = searchParams.get('agent') ?? PROJECT.agents[0].slug;
-  const agent = agentBySlug(agentSlug);
-  const currentBlueprint = PROJECT.revisions.blueprint ?? 0;
+  const { agent, agentSlug, project, ctx } = useStudioPage('simulation');
+  const invalidate = useInvalidateAll();
+  const center = useSimulationCenter(ctx.dataProjectId);
+  const view = ctx.buildView;
+  const bp = view?.blueprint ?? null;
+  const currentBlueprint = bp?.revision ?? 0;
 
-  const [selectedId, setSelectedId] = useState<string>(searchParams.get('scenario') ?? SCENARIOS[0].id);
+  /* Every row is a declared scenario carrying its latest recorded result from the backend. */
+  const SCENARIOS = useMemo<SimulationScenario[]>(
+    () => (bp && view ? toScenarios(bp, view.simulations, currentBlueprint, view.build.buildRevision) : []),
+    [bp, view, currentBlueprint],
+  );
+
+  const [selectedId, setSelectedId] = useState<string>(searchParams.get('scenario') ?? '');
   const [checked, setChecked] = useState<string[]>([]);
   const [running, setRunning] = useState<string[]>([]);
   const [runResults, setRunResults] = useState<RunState>({});
   const [createOpen, setCreateOpen] = useState(false);
   const [resetOpen, setResetOpen] = useState(false);
   const [compareOpen, setCompareOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const timers = useRef<number[]>([]);
 
   useEffect(
@@ -61,9 +75,9 @@ export default function SimulationPage() {
     [],
   );
 
-  const selected = SCENARIOS.find((s) => s.id === selectedId) ?? SCENARIOS[0];
-  const selectedResult = runResults[selected.id] ?? selected.result;
-  const isStale = selected.builtAgainstBlueprint !== null && selected.builtAgainstBlueprint < currentBlueprint;
+  const selected: SimulationScenario | null = SCENARIOS.find((s) => s.id === selectedId) ?? SCENARIOS[0] ?? null;
+  const selectedResult = selected ? (runResults[selected.id] ?? selected.result) : null;
+  const isStale = !!selected && selected.builtAgainstBlueprint !== null && selected.builtAgainstBlueprint < currentBlueprint;
 
   const grouped = useMemo(
     () =>
@@ -71,43 +85,38 @@ export default function SimulationPage() {
         ...group,
         scenarios: SCENARIOS.filter((s) => s.group === group.id),
       })).filter((g) => g.scenarios.length > 0),
-    [],
+    [SCENARIOS],
   );
 
   const failing = SCENARIOS.filter((s) => (runResults[s.id] ?? s.result) === 'FAIL');
   const mandatoryCount = SCENARIOS.filter((s) => s.mandatory).length;
 
-  /** Simulated run. A real backend streams these over SSE. */
-  const run = (ids: string[]) => {
-    if (ids.length === 0) return;
+  /**
+   * Run scenarios on the backend. The deterministic engine is the same one the mandatory pass
+   * uses; a run here is recorded as user-requested and charged to the build's allowance.
+   */
+  const run = async (ids: string[]) => {
+    if (ids.length === 0 || !ctx.buildId) return;
+    setError(null);
     setRunning(ids);
-    setRunResults((prev) => {
-      const next = { ...prev };
-      ids.forEach((id) => {
-        delete next[id];
-      });
-      return next;
-    });
     openBottom('tests');
-
-    ids.forEach((id, index) => {
-      const handle = window.setTimeout(
-        () => {
-          const scenario = SCENARIOS.find((s) => s.id === id);
-          setRunResults((prev) => ({ ...prev, [id]: scenario?.result ?? 'PASS' }));
-          setRunning((prev) => prev.filter((r) => r !== id));
-        },
-        320 + index * 220,
-      );
-      timers.current.push(handle);
-    });
+    try {
+      const r = await studio.simulate(ctx.buildId, ids);
+      const next: RunState = {};
+      for (const sim of r.simulations) next[sim.scenarioId] = sim.passed ? 'PASS' : 'FAIL';
+      setRunResults((prev) => ({ ...prev, ...next }));
+      if (r.notDeclared.length) pushToast(`Not declared by this Blueprint: ${r.notDeclared.join(', ')}`);
+      await invalidate();
+    } catch (e) {
+      setError(e instanceof ApiError ? e.message : String(e));
+    } finally {
+      setRunning([]);
+    }
   };
 
   const stop = () => {
-    timers.current.forEach((t) => window.clearTimeout(t));
-    timers.current = [];
-    setRunning([]);
-    pushToast('Run stopped. Completed results were kept.');
+    /* A run is a single synchronous request to the engine; there is nothing to interrupt. */
+    pushToast('Runs complete in one request; completed results are kept.');
   };
 
   const select = (scenario: SimulationScenario) => {
@@ -115,11 +124,36 @@ export default function SimulationPage() {
     setSelection({ kind: 'simulation-scenario', id: scenario.id, label: scenario.name });
   };
 
+  if (!bp || !selected) {
+    return (
+      <StudioPage segment="simulation">
+        <EmptyState
+          title={ctx.loading ? 'Loading…' : 'No scenarios yet'}
+          body={ctx.loading ? '' : 'Scenarios are declared by the Blueprint and run by the deterministic engine during the build. Describe the agent first.'}
+          action={ctx.loading ? undefined : <button type="button" className="cl-btn cl-btn-primary" onClick={() => router.push(`/projects/${ctx.routeProjectId}/build`)}>Build Agent</button>}
+        />
+      </StudioPage>
+    );
+  }
+
+  const layers = center.data?.layers ?? [];
+
   return (
     <StudioPage
       segment="simulation"
       bleed
       banners={
+        <>
+        {error ? <BlockerBanner tone="deny" title="The Studio API refused the run">{error}</BlockerBanner> : null}
+        {layers.length > 0 ? (
+          <div className="cl-row cl-row-wrap" style={{ marginBottom: 10, gap: 6 }}>
+            {layers.map((l) => (
+              <span key={l.key} className="cl-badge" data-tone={l.status === 'PASS' ? 'pass' : l.status === 'FAIL' ? 'deny' : l.status === 'BLOCKED' ? 'blocked' : 'neutral'} title={`${l.detail}\nProves: ${l.proves}\nDoes not prove: ${l.doesNotProve}${l.blocker ? `\nBlocker: ${l.blocker}` : ''}`}>
+                {l.title}: {l.status}{l.passed !== null && l.total !== null ? ` ${l.passed}/${l.total}` : ''}
+              </span>
+            ))}
+          </div>
+        ) : null}
         <div className="cl-row cl-row-wrap" style={{ marginBottom: 12, gap: 8 }}>
           <span className="cl-page-title" style={{ fontSize: 22, marginRight: 8 }}>
             Simulation Center
@@ -147,7 +181,7 @@ export default function SimulationPage() {
                 <button
                   type="button"
                   className="cl-btn cl-btn-sm"
-                  onClick={() => run(checked.length > 0 ? checked : [selected.id])}
+                  onClick={() => void run(checked.length > 0 ? checked : [selected.id])}
                   title={checked.length > 0 ? `Run ${checked.length} selected` : 'Run the open scenario'}
                 >
                   <Play size={11} aria-hidden />
@@ -156,8 +190,8 @@ export default function SimulationPage() {
                 <button
                   type="button"
                   className="cl-btn cl-btn-sm cl-btn-primary"
-                  onClick={() => run(SCENARIOS.map((s) => s.id))}
-                  title={`Runs all ${SCENARIOS.length} scenarios. Mandatory security regression does not consume the user run allowance.`}
+                  onClick={() => void run(SCENARIOS.filter((s) => s.mandatory).map((s) => s.id))}
+                  title={`Re-runs all ${mandatoryCount} declared scenarios as a user-requested run. The mandatory pass itself runs during every build and is not charged.`}
                 >
                   <Play size={11} aria-hidden />
                   Run All ({SCENARIOS.length})
@@ -168,12 +202,13 @@ export default function SimulationPage() {
               <GitCompare size={11} aria-hidden />
               Compare Runs
             </button>
-            <button type="button" className="cl-btn cl-btn-sm" onClick={() => setCreateOpen(true)}>
+            <button type="button" className="cl-btn cl-btn-sm" onClick={() => setCreateOpen(true)} disabled title="Scenarios are declared by the Blueprint and its bound adapters; a custom scenario needs a Blueprint field the schema does not have yet.">
               <Plus size={11} aria-hidden />
               Create Scenario
             </button>
           </div>
         </div>
+        </>
       }
     >
       <div className="cl-split" style={{ borderTop: '1px solid var(--cl-line)' }}>
@@ -238,7 +273,7 @@ export default function SimulationPage() {
                 what="SIMULATION"
                 builtAgainst={selected.builtAgainstBlueprint ?? 0}
                 current={currentBlueprint}
-                onRerun={() => run([selected.id])}
+                onRerun={() => void run([selected.id])}
               />
             ) : null}
 
@@ -262,7 +297,7 @@ export default function SimulationPage() {
                 </div>
               </div>
               <div className="cl-page-actions">
-                <button type="button" className="cl-btn cl-btn-sm" onClick={() => run([selected.id])}>
+                <button type="button" className="cl-btn cl-btn-sm" onClick={() => void run([selected.id])} disabled={running.length > 0}>
                   <Play size={11} aria-hidden />
                   Run
                 </button>
@@ -270,17 +305,17 @@ export default function SimulationPage() {
                   <button
                     type="button"
                     className="cl-btn cl-btn-sm"
-                    onClick={() => router.push(`/projects/${PROJECT.id}/cre?agent=${agentSlug}`)}
+                    onClick={() => router.push(`/projects/${ctx.routeProjectId}/cre?agent=${agentSlug}`)}
                   >
                     <Radio size={11} aria-hidden />
                     Run CRE Simulation
                   </button>
                 ) : null}
-                <button type="button" className="cl-btn cl-btn-sm" onClick={() => pushToast('Scenario duplicated as a draft')}>
+                <button type="button" className="cl-btn cl-btn-sm" disabled title="Scenarios come from the Blueprint's declaration; there is nothing page-local to duplicate.">
                   <Copy size={11} aria-hidden />
                   Duplicate
                 </button>
-                <button type="button" className="cl-btn cl-btn-sm" onClick={() => setResetOpen(true)}>
+                <button type="button" className="cl-btn cl-btn-sm" onClick={() => setResetOpen(true)} disabled title="The expected result is fixed by the scenario's declaration and cannot be edited here.">
                   <RotateCcw size={11} aria-hidden />
                   Reset to Template
                 </button>
@@ -332,7 +367,7 @@ export default function SimulationPage() {
                         <ReasonCode
                           code={selected.reasonCode}
                           verdict={selectedResult === 'FAIL' ? 'FAIL' : undefined}
-                          onOpenPolicy={() => router.push(`/projects/${PROJECT.id}/policies?agent=${agentSlug}`)}
+                          onOpenPolicy={() => router.push(`/projects/${ctx.routeProjectId}/policies?agent=${agentSlug}`)}
                         />
                       ) : (
                         <span className="cl-meta">none</span>
@@ -376,7 +411,7 @@ export default function SimulationPage() {
             <Section label="Security path">
               <SecurityPath
                 steps={selected.path}
-                onReasonCode={() => router.push(`/projects/${PROJECT.id}/policies?agent=${agentSlug}`)}
+                onReasonCode={() => router.push(`/projects/${ctx.routeProjectId}/policies?agent=${agentSlug}`)}
               />
             </Section>
 
@@ -485,35 +520,32 @@ export default function SimulationPage() {
         <table className="cl-table">
           <thead>
             <tr>
-              <th>Run</th>
-              <th style={{ width: 110 }}>Result</th>
-              <th style={{ width: 120 }}>Blueprint</th>
-              <th style={{ width: 110 }}>Duration</th>
+              <th style={{ width: 90 }}>Result</th>
+              <th style={{ width: 120 }}>Verdict</th>
+              <th>Outcome</th>
+              <th style={{ width: 120 }}>Reason</th>
+              <th style={{ width: 90 }}>Blueprint</th>
+              <th style={{ width: 80 }}>Build</th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>
-                <TimeAgo iso={selected.lastRun} /> · current
-              </td>
-              <td>{selectedResult ? <StatusBadge status={selectedResult} /> : '—'}</td>
-              <td className="cl-mono">r{selected.builtAgainstBlueprint ?? '—'}</td>
-              <td className="cl-mono">{selected.durationMs ?? '—'} ms</td>
-            </tr>
-            <tr>
-              <td>
-                <TimeAgo iso={new Date(new Date(selected.lastRun ?? Date.now()).getTime() - 86_400_000).toISOString()} />
-              </td>
-              <td>
-                <StatusBadge status="PASS" />
-              </td>
-              <td className="cl-mono">r7</td>
-              <td className="cl-mono">{(selected.durationMs ?? 100) + 38} ms</td>
-            </tr>
+            {(view?.simulations ?? []).filter((r) => r.scenarioId === selected.id).map((r, i) => (
+              <tr key={i}>
+                <td><StatusBadge status={r.passed ? 'PASS' : 'FAIL'} /></td>
+                <td className="cl-mono">{r.verdict}</td>
+                <td>{r.outcome} · stopped at {r.stoppedAt.toLowerCase().replace(/_/g, ' ')}{r.stale ? <span className="cl-meta"> · STALE</span> : null}</td>
+                <td className="cl-mono">{r.reasonCode}</td>
+                <td className="cl-mono">r{r.blueprintRevision}</td>
+                <td className="cl-mono">r{r.buildRevision}</td>
+              </tr>
+            ))}
+            {(view?.simulations ?? []).filter((r) => r.scenarioId === selected.id).length === 0 ? (
+              <tr><td colSpan={6} className="cl-meta">No recorded runs for this scenario yet.</td></tr>
+            ) : null}
           </tbody>
         </table>
-        <p className="cl-meta" style={{ marginTop: 12 }}>
-          A run recorded against an earlier Blueprint is evidence about that revision, not about the current one.
+        <p className="cl-meta" style={{ marginTop: 8, whiteSpace: 'normal' }}>
+          Every recorded run for this scenario, oldest first: the mandatory pass of each build and any runs you requested. A run against an older revision is marked STALE and never presented as proof of the current design.
         </p>
       </Modal>
     </StudioPage>

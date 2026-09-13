@@ -15,7 +15,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Download, GitCompare, Play, Route, ShieldCheck, Swords } from 'lucide-react';
-import { StudioPage } from '@/components/studio/PageScaffold';
+import { StudioPage, useStudioPage } from '@/components/studio/PageScaffold';
 import {
   Badge,
   BlockerBanner,
@@ -30,33 +30,41 @@ import {
 } from '@/components/studio/primitives';
 import { Modal } from '@/components/studio/dialogs';
 import { useWorkbench } from '@/lib/studio/workbench';
-import { PROJECT, agentBySlug } from '@/lib/studio/mock/core';
-import { ATTACK_CATEGORIES, attacksForAgent } from '@/lib/studio/mock/test';
+import { ATTACK_CATEGORIES } from '@/lib/studio/content/test';
+import { toAttacks } from '@/lib/studio/api/adapters/test';
+import { useAttacks } from '@/lib/studio/api/queries';
+import { lab } from '@/lib/studio/api/endpoints';
+import { ApiError } from '@/lib/studio/api/client';
+import { EmptyState } from '@/components/studio/primitives';
 import type { Attack, Status } from '@/lib/studio/types';
+import type { AttackRun } from '@/lib/studio/api/types';
 
 export default function AttackLabPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { setSelection, pushToast } = useWorkbench();
 
-  const agentSlug = searchParams.get('agent') ?? PROJECT.agents[0].slug;
-  const agent = agentBySlug(agentSlug);
+  const { agent, agentSlug, ctx } = useStudioPage('attacks');
+  const catalogue = useAttacks(ctx.dataProjectId);
 
-  /* Applicability depends on the principal: an agent with no execution path has
-     nothing for a transaction-mutation attack to target. */
-  const attacks = useMemo(() => attacksForAgent(agent.executionClass), [agent.executionClass]);
+  /* Runs made on this page, by scenario. A run exercises the real guards on the backend. */
+  const [runs, setRuns] = useState<Record<string, AttackRun | undefined>>({});
+  /* Applicability is decided by the backend from the Blueprint: an agent with no execution path has
+     nothing for a transaction-mutation attack to target, and the catalogue says so per scenario. */
+  const attacks = useMemo(() => (catalogue.data ? toAttacks(catalogue.data, runs) : []), [catalogue.data, runs]);
 
-  const [selectedId, setSelectedId] = useState<string>(attacks[0].id);
+  const [selectedId, setSelectedId] = useState<string>('');
   const [results, setResults] = useState<Record<string, Status | undefined>>({});
   const [running, setRunning] = useState<string[]>([]);
   const [pathOpen, setPathOpen] = useState(false);
   const [compareOpen, setCompareOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const timers = useRef<number[]>([]);
 
   useEffect(() => {
-    setSelectedId(attacks[0].id);
+    setRuns({});
     setResults({});
-  }, [agentSlug, attacks]);
+  }, [ctx.dataProjectId]);
 
   useEffect(
     () => () => {
@@ -65,8 +73,8 @@ export default function AttackLabPage() {
     [],
   );
 
-  const selected = attacks.find((a) => a.id === selectedId) ?? attacks[0];
-  const selectedResult = results[selected.id] ?? selected.lastResult;
+  const selected: Attack | null = attacks.find((a) => a.id === selectedId) ?? attacks[0] ?? null;
+  const selectedResult = selected ? (results[selected.id] ?? selected.lastResult) : null;
 
   const grouped = useMemo(
     () =>
@@ -79,24 +87,25 @@ export default function AttackLabPage() {
 
   const applicable = attacks.filter((a) => a.applicable);
 
-  const run = (ids: string[]) => {
+  const run = async (ids: string[]) => {
     const runnable = ids.filter((id) => attacks.find((a) => a.id === id)?.applicable);
-    if (runnable.length === 0) {
+    if (runnable.length === 0 || !ctx.dataProjectId) {
       pushToast('Nothing to run: these attacks do not apply to this agent');
       return;
     }
+    setError(null);
     setRunning(runnable);
-    runnable.forEach((id, index) => {
-      const handle = window.setTimeout(
-        () => {
-          const attack = attacks.find((a) => a.id === id);
-          setResults((prev) => ({ ...prev, [id]: attack?.lastResult ?? 'DENY' }));
-          setRunning((prev) => prev.filter((r) => r !== id));
-        },
-        360 + index * 200,
-      );
-      timers.current.push(handle);
-    });
+    for (const id of runnable) {
+      try {
+        const r = await lab.runAttack(ctx.dataProjectId, id);
+        setRuns((prev) => ({ ...prev, [id]: r }));
+        setResults((prev) => ({ ...prev, [id]: r.result === 'DENIED' ? 'DENY' : r.result === 'ALLOWED' ? 'FAIL' : 'UNKNOWN' }));
+      } catch (e) {
+        setError(e instanceof ApiError ? e.message : String(e));
+      } finally {
+        setRunning((prev) => prev.filter((x) => x !== id));
+      }
+    }
   };
 
   const select = (attack: Attack) => {
@@ -104,11 +113,25 @@ export default function AttackLabPage() {
     setSelection({ kind: 'attack', id: attack.id, label: attack.name });
   };
 
+  if (!selected) {
+    return (
+      <StudioPage segment="attacks">
+        <EmptyState
+          title={ctx.loading || catalogue.isLoading ? 'Loading…' : 'No attacks to run yet'}
+          body={ctx.loading || catalogue.isLoading ? '' : 'The attack catalogue is derived from the Blueprint. Describe the agent first and generate it.'}
+          action={ctx.loading ? undefined : <button type="button" className="cl-btn cl-btn-primary" onClick={() => router.push(`/projects/${ctx.routeProjectId}/build`)}>Build Agent</button>}
+        />
+      </StudioPage>
+    );
+  }
+
   return (
     <StudioPage
       segment="attacks"
       bleed
       banners={
+        <>
+        {error ? <BlockerBanner tone="deny" title="The Studio API refused the run">{error}</BlockerBanner> : null}
         <div className="cl-row cl-row-wrap" style={{ marginBottom: 12, gap: 8 }}>
           <span className="cl-page-title" style={{ fontSize: 22, marginRight: 8 }}>
             Attack Lab
@@ -123,7 +146,7 @@ export default function AttackLabPage() {
             <button
               type="button"
               className="cl-btn cl-btn-sm"
-              onClick={() => run([selected.id])}
+              onClick={() => void run([selected.id])}
               disabled={!selected.applicable || running.length > 0}
             >
               <Play size={11} aria-hidden />
@@ -132,7 +155,7 @@ export default function AttackLabPage() {
             <button
               type="button"
               className="cl-btn cl-btn-sm cl-btn-primary"
-              onClick={() => run(applicable.map((a) => a.id))}
+              onClick={() => void run(applicable.map((a) => a.id))}
               disabled={running.length > 0 || applicable.length === 0}
             >
               <Swords size={11} aria-hidden />
@@ -140,6 +163,7 @@ export default function AttackLabPage() {
             </button>
           </div>
         </div>
+        </>
       }
     >
       {agent.executionClass === 'REPORTING_ONLY' ? (
@@ -242,7 +266,7 @@ export default function AttackLabPage() {
                   <button
                     type="button"
                     className="cl-btn cl-btn-sm"
-                    onClick={() => router.push(`/projects/${PROJECT.id}/policies?agent=${agentSlug}`)}
+                    onClick={() => router.push(`/projects/${ctx.routeProjectId}/policies?agent=${agentSlug}`)}
                   >
                     <ShieldCheck size={11} aria-hidden />
                     Open Policy Rule
@@ -254,7 +278,7 @@ export default function AttackLabPage() {
                     className="cl-btn cl-btn-sm"
                     onClick={() =>
                       router.push(
-                        `/projects/${PROJECT.id}/simulation?agent=${agentSlug}&scenario=${selected.relatedSimulationId}`,
+                        `/projects/${ctx.routeProjectId}/simulation?agent=${agentSlug}&scenario=${selected.relatedSimulationId}`,
                       )
                     }
                   >
@@ -311,10 +335,10 @@ export default function AttackLabPage() {
                         <ReasonCode
                           code={selected.reasonCode}
                           verdict="DENY"
-                          onOpenPolicy={() => router.push(`/projects/${PROJECT.id}/policies?agent=${agentSlug}`)}
+                          onOpenPolicy={() => router.push(`/projects/${ctx.routeProjectId}/policies?agent=${agentSlug}`)}
                           onOpenSimulation={() =>
                             router.push(
-                              `/projects/${PROJECT.id}/simulation?agent=${agentSlug}&scenario=${selected.relatedSimulationId ?? ''}`,
+                              `/projects/${ctx.routeProjectId}/simulation?agent=${agentSlug}&scenario=${selected.relatedSimulationId ?? ''}`,
                             )
                           }
                         />
@@ -326,19 +350,23 @@ export default function AttackLabPage() {
                         { label: 'Stopped by', value: selected.stoppingLayer ?? '—' },
                         {
                           label: 'Capability',
-                          value: selected.path.some((p) => p.layer === 'Capability' && p.status === 'NOT_ISSUED') ? (
-                            <Badge tone="blocked">NOT ISSUED</Badge>
+                          value: runs[selected.id] ? (
+                            runs[selected.id]!.capabilityIssued ? <Badge tone="deny">ISSUED</Badge> : <Badge tone="blocked">NOT ISSUED</Badge>
                           ) : (
                             '—'
                           ),
                         },
                         {
                           label: 'Transaction',
-                          value: selected.path.some((p) => p.layer === 'Transaction' && p.status === 'NOT_SUBMITTED') ? (
-                            <Badge tone="blocked">NOT SUBMITTED</Badge>
+                          value: runs[selected.id] ? (
+                            runs[selected.id]!.transactionSubmitted ? <Badge tone="deny">SUBMITTED</Badge> : <Badge tone="blocked">NOT SUBMITTED</Badge>
                           ) : (
                             '—'
                           ),
+                        },
+                        {
+                          label: 'Stopped where expected',
+                          value: runs[selected.id] ? <StatusBadge status={runs[selected.id]!.stoppedWhereExpected ? 'PASS' : 'WARN'} /> : '—',
                         },
                         { label: 'Last run', value: selected.lastRun ? <TimeAgo iso={selected.lastRun} /> : 'never' },
                       ]}
@@ -374,7 +402,7 @@ export default function AttackLabPage() {
                 <Section label="Security path">
                   <SecurityPath
                     steps={selected.path}
-                    onReasonCode={() => router.push(`/projects/${PROJECT.id}/policies?agent=${agentSlug}`)}
+                    onReasonCode={() => router.push(`/projects/${ctx.routeProjectId}/policies?agent=${agentSlug}`)}
                   />
                 </Section>
               </>
@@ -420,11 +448,13 @@ export default function AttackLabPage() {
             </tr>
           </thead>
           <tbody>
+            {selected.path.length === 0 ? <tr><td colSpan={3} className="cl-meta">Run the attack first — the path is what the guards actually did.</td></tr> : null}
             {selected.path.map((step) => (
               <tr key={step.layer}>
                 <td className="cl-strong">{step.layer}</td>
                 <td>
-                  <StatusBadge status="PASS" />
+                  {/* The baseline for a layer the run reached is PASS; a layer never reached has no baseline to claim. */}
+                  <StatusBadge status={step.status === 'NOT_SUBMITTED' || step.status === 'NOT_ISSUED' || step.status === 'UNKNOWN' ? 'UNKNOWN' : 'PASS'} />
                 </td>
                 <td>
                   <StatusBadge status={step.status} />

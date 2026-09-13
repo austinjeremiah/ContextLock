@@ -13,10 +13,10 @@
  *  - Enable is stricter than disable: every precondition must pass, and the
  *    dialog lists them with their real status.
  */
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { GitCompare, Play, RefreshCw, ShieldCheck, ShieldOff } from 'lucide-react';
-import { StudioPage } from '@/components/studio/PageScaffold';
+import { StudioPage, useStudioPage } from '@/components/studio/PageScaffold';
 import {
   Badge,
   BlockchainRef,
@@ -32,8 +32,10 @@ import {
 import { Modal, SecurityConfirmation } from '@/components/studio/dialogs';
 import { useWorkbench } from '@/lib/studio/workbench';
 import { useControlRequest } from '@/lib/studio/control-bridge';
-import { PROJECT, agentBySlug } from '@/lib/studio/mock/core';
-import { POLICY } from '@/lib/studio/mock/operate';
+import { toPolicyState } from '@/lib/studio/api/adapters/operate';
+import { useActivation, useControlCommand, useInvalidateAll } from '@/lib/studio/api/queries';
+import { ApiError } from '@/lib/studio/api/client';
+import { EmptyState } from '@/components/studio/primitives';
 import type { Status } from '@/lib/studio/types';
 
 export default function PoliciesPage() {
@@ -41,37 +43,70 @@ export default function PoliciesPage() {
   const searchParams = useSearchParams();
   const { pushToast, selection, setSelection } = useWorkbench();
 
-  const agentSlug = searchParams.get('agent') ?? PROJECT.agents[0].slug;
-  const agent = agentBySlug(agentSlug);
+  const { agent, agentSlug, project, ctx } = useStudioPage('policies');
+  const invalidate = useInvalidateAll();
+  const activation = useActivation(ctx.dataProjectId);
+  const command = useControlCommand(ctx.deploymentId, ctx.dataProjectId ?? undefined);
 
-  const [observed, setObserved] = useState<Status>(POLICY.observed);
-  const [transitional, setTransitional] = useState<Status | null>(null);
+  const [transitional, setTransitional] = useState<'ENABLING' | 'DISABLING' | null>(null);
   const [disableOpen, setDisableOpen] = useState(false);
   const [enableOpen, setEnableOpen] = useState(false);
   const [compareOpen, setCompareOpen] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  /* The observed state comes from the control plane's fresh read of the fork's registry — every render. */
+  const POLICY = useMemo(
+    () => toPolicyState({ overview: ctx.overview, deployment: ctx.deployment, bp: ctx.buildView?.blueprint ?? null, state: ctx.labState, activation: activation.data ?? null, network: project.environment.executionNetwork, pending: transitional }),
+    [ctx.overview, ctx.deployment, ctx.buildView?.blueprint, ctx.labState, activation.data, project.environment.executionNetwork, transitional],
+  );
+  const observed: Status = POLICY.observed;
 
   useControlRequest('DISABLE_POLICY', () => setDisableOpen(true));
   useControlRequest('ACTIVATE_TESTNET_POLICY', () => setEnableOpen(true));
 
   const failingPreconditions = POLICY.enablePreconditions.filter((p) => p.status !== 'PASS');
-  const canEnable = failingPreconditions.length === 0;
+  const canEnable = failingPreconditions.length === 0 && !!ctx.deploymentId && observed !== 'ENABLED';
   const drifted = POLICY.drift.filter((d) => d.drifted);
 
-  const refreshChainState = () => {
+  const refreshChainState = async () => {
     setRefreshing(true);
-    window.setTimeout(() => {
-      setRefreshing(false);
-      // A fresh read is what resolves a transitional state — not the submission.
-      if (transitional) {
-        setObserved(transitional === 'DISABLING' ? 'DISABLED' : 'ENABLED');
-        setTransitional(null);
-        pushToast('Fresh chain read confirms the new state');
-      } else {
-        pushToast('Chain state refreshed');
-      }
-    }, 900);
+    await invalidate();
+    setRefreshing(false);
+    pushToast('Chain state re-read from the fork');
   };
+
+  /**
+   * Issue the command and wait for the fresh read. The backend enables or disables the policy with the
+   * deployer role, then reads `isPolicyEnabled` back before it answers — so the state the page shows
+   * after this is a chain read, not the submission.
+   */
+  const setPolicy = async (op: 'ENABLE_POLICY' | 'DISABLE_POLICY') => {
+    if (!ctx.deployment) return;
+    setError(null);
+    setTransitional(op === 'ENABLE_POLICY' ? 'ENABLING' : 'DISABLING');
+    try {
+      const r = await command.mutateAsync({ operation: op, expectedRevision: ctx.deployment.revision, reason: `${op} from the Policies page` });
+      if (r.ok === false) throw new Error(r.detail ?? 'the control plane refused');
+      pushToast(`${r.detail ?? 'applied'} — ${(r.result as { verification?: string } | undefined)?.verification ?? 'read back from the fork'}`);
+    } catch (e) {
+      setError(e instanceof ApiError ? e.message : (e as Error).message);
+    } finally {
+      setTransitional(null);
+    }
+  };
+
+  if (!ctx.deploymentId) {
+    return (
+      <StudioPage segment="policies" title="ContextLock Policy" subtitle="The deterministic financial authority boundary for this agent.">
+        <EmptyState
+          title={ctx.loading ? 'Loading…' : 'No policy is registered on chain yet'}
+          body={ctx.loading ? '' : 'The policy is registered — DISABLED — when the agent is deployed. Until then the authority model lives in the Blueprint and is reviewed on the Permissions page.'}
+          action={ctx.loading ? undefined : <div className="cl-row" style={{ gap: 8 }}><button type="button" className="cl-btn" onClick={() => router.push(`/projects/${ctx.routeProjectId}/security?agent=${agentSlug}`)}>Open Permissions</button><button type="button" className="cl-btn cl-btn-primary" onClick={() => router.push(`/projects/${ctx.routeProjectId}/deploy?agent=${agentSlug}`)}>Run Deployment Preflight</button></div>}
+        />
+      </StudioPage>
+    );
+  }
 
   return (
     <StudioPage
@@ -93,14 +128,14 @@ export default function PoliciesPage() {
       }
       actions={
         <>
-          <button type="button" className="cl-btn" onClick={refreshChainState} disabled={refreshing}>
+          <button type="button" className="cl-btn" onClick={() => void refreshChainState()} disabled={refreshing}>
             <RefreshCw size={13} aria-hidden />
             {refreshing ? 'Reading…' : 'Refresh Chain State'}
           </button>
           <button
             type="button"
             className="cl-btn"
-            onClick={() => router.push(`/projects/${PROJECT.id}/blueprint?agent=${agentSlug}`)}
+            onClick={() => router.push(`/projects/${ctx.routeProjectId}/blueprint?agent=${agentSlug}`)}
           >
             Create Policy Revision
           </button>
@@ -111,7 +146,7 @@ export default function PoliciesPage() {
           <button
             type="button"
             className="cl-btn"
-            onClick={() => router.push(`/projects/${PROJECT.id}/simulation?agent=${agentSlug}&group=policy-boundaries`)}
+            onClick={() => router.push(`/projects/${ctx.routeProjectId}/simulation?agent=${agentSlug}&group=policy-boundaries`)}
           >
             <Play size={13} aria-hidden />
             Run Policy Simulations
@@ -141,6 +176,7 @@ export default function PoliciesPage() {
       }
       banners={
         <>
+          {error ? <BlockerBanner tone="deny" title="The control plane refused">{error}</BlockerBanner> : null}
           {transitional ? (
             <BlockerBanner
               tone="warn"
@@ -173,7 +209,7 @@ export default function PoliciesPage() {
                 <button
                   type="button"
                   className="cl-btn cl-btn-sm"
-                  onClick={() => router.push(`/projects/${PROJECT.id}/control-plane?agent=${agentSlug}`)}
+                  onClick={() => router.push(`/projects/${ctx.routeProjectId}/control-plane?agent=${agentSlug}`)}
                 >
                   Open Control Plane
                 </button>
@@ -311,14 +347,13 @@ export default function PoliciesPage() {
         onClose={() => setDisableOpen(false)}
         onConfirm={() => {
           setDisableOpen(false);
-          setTransitional('DISABLING');
-          pushToast('Disable submitted — state stays DISABLING until a fresh chain read confirms it');
+          void setPolicy('DISABLE_POLICY');
         }}
         action="Disable financial authority"
         currentState={<StatusBadge status={observed} />}
         requestedState={<StatusBadge status="DISABLED" />}
         network={POLICY.network}
-        resource={<BlockchainRef label="Policy Registry" value={POLICY.onChain.contracts[0].address} network={POLICY.network} />}
+        resource={<BlockchainRef label="Policy Registry" value={POLICY.onChain.contracts.find((c) => c.label === 'ContextLockPolicyRegistry')?.address ?? ''} network={POLICY.network} local />}
         extraRows={[
           { label: 'Signer', value: <BlockchainRef value={POLICY.onChain.admin} network={POLICY.network} /> },
           { label: 'Estimated gas', value: '~48,200 · ~0.00007 SepoliaETH' },
@@ -333,14 +368,13 @@ export default function PoliciesPage() {
         onClose={() => setEnableOpen(false)}
         onConfirm={() => {
           setEnableOpen(false);
-          setTransitional('ENABLING');
-          pushToast('Enable submitted — state stays ENABLING until a fresh chain read confirms it');
+          void setPolicy('ENABLE_POLICY');
         }}
         action="Enable testnet financial authority"
         currentState={<StatusBadge status={observed} />}
         requestedState={<StatusBadge status="ENABLED" />}
         network={POLICY.network}
-        resource={<BlockchainRef label="Policy Registry" value={POLICY.onChain.contracts[0].address} network={POLICY.network} />}
+        resource={<BlockchainRef label="Policy Registry" value={POLICY.onChain.contracts.find((c) => c.label === 'ContextLockPolicyRegistry')?.address ?? ''} network={POLICY.network} local />}
         extraRows={[
           { label: 'Signer', value: <BlockchainRef value={POLICY.onChain.admin} network={POLICY.network} /> },
           { label: 'Policy version', value: String(POLICY.version) },

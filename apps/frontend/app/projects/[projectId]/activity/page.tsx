@@ -15,7 +15,7 @@
 import { useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Copy, Download, Route, X } from 'lucide-react';
-import { StudioPage } from '@/components/studio/PageScaffold';
+import { StudioPage, useStudioPage } from '@/components/studio/PageScaffold';
 import {
   Badge,
   BlockchainRef,
@@ -30,8 +30,9 @@ import {
   VerdictBadge,
 } from '@/components/studio/primitives';
 import { useWorkbench } from '@/lib/studio/workbench';
-import { PROJECT, agentBySlug } from '@/lib/studio/mock/core';
-import { EVENTS } from '@/lib/studio/mock/operate';
+import { useActivity } from '@/lib/studio/api/queries';
+import { toRuntimeEvent } from '@/lib/studio/api/adapters/operate';
+import { EmptyState } from '@/components/studio/primitives';
 import type { EventSource, RuntimeEvent } from '@/lib/studio/types';
 
 const SOURCES: EventSource[] = ['agent', 'cre', 'policy', 'chain', 'adapter', 'runtime', 'operator'];
@@ -41,8 +42,13 @@ export default function ActivityPage() {
   const searchParams = useSearchParams();
   const { setSelection, pushToast } = useWorkbench();
 
-  const agentSlug = searchParams.get('agent') ?? PROJECT.agents[0].slug;
-  const agent = agentBySlug(agentSlug);
+  const { agent, agentSlug, project, ctx } = useStudioPage('activity');
+  const eventsQ = useActivity(ctx.deploymentId, { limit: '500' }, true);
+  /* The persisted RuntimeEvent stream for this deployment, newest first, as the backend holds it. */
+  const EVENTS = useMemo<RuntimeEvent[]>(
+    () => (eventsQ.data ?? []).map((e) => toRuntimeEvent(e, agent.id, ctx.deployment?.blueprintRevision ?? null, project.environment.creMode)),
+    [eventsQ.data, agent.id, ctx.deployment?.blueprintRevision, project.environment.creMode],
+  );
 
   const [source, setSource] = useState<EventSource | 'all'>('all');
   const [verdict, setVerdict] = useState<'all' | 'ALLOW' | 'ESCALATE' | 'DENY'>('all');
@@ -63,7 +69,7 @@ export default function ActivityPage() {
         (event.txHash ?? '').toLowerCase().includes(q)
       );
     });
-  }, [source, verdict, query]);
+  }, [source, verdict, query, EVENTS]);
 
   const selected = EVENTS.find((e) => e.id === selectedId) ?? null;
 
@@ -73,13 +79,25 @@ export default function ActivityPage() {
       selected
         ? EVENTS.filter((e) => e.correlationId === selected.correlationId).slice().reverse()
         : [],
-    [selected],
+    [selected, EVENTS],
   );
 
   const select = (event: RuntimeEvent) => {
     setSelectedId(event.id);
     setSelection({ kind: 'runtime-event', id: event.id, label: event.type });
   };
+
+  if (!ctx.deploymentId) {
+    return (
+      <StudioPage segment="activity">
+        <EmptyState
+          title={ctx.loading ? 'Loading…' : 'No deployment to observe'}
+          body={ctx.loading ? '' : 'RuntimeEvents are recorded by a deployment. This agent has none yet; deploy it to the local mainnet fork and every decision, capability and fork transaction appears here.'}
+          action={ctx.loading ? undefined : <button type="button" className="cl-btn cl-btn-primary" onClick={() => router.push(`/projects/${ctx.routeProjectId}/deploy?agent=${agentSlug}`)}>Run Deployment Preflight</button>}
+        />
+      </StudioPage>
+    );
+  }
 
   return (
     <StudioPage
@@ -222,7 +240,7 @@ export default function ActivityPage() {
                   <ReasonCode
                     code={selected.reasonCode}
                     verdict={selected.verdict ?? undefined}
-                    onOpenPolicy={() => router.push(`/projects/${PROJECT.id}/policies?agent=${agentSlug}`)}
+                    onOpenPolicy={() => router.push(`/projects/${ctx.routeProjectId}/policies?agent=${agentSlug}`)}
                   />
                 </div>
               ) : null}
@@ -272,7 +290,7 @@ export default function ActivityPage() {
                             <BlockchainRef
                               value={selected.txHash}
                               kind="tx"
-                              network={selected.txKind === 'TESTNET' ? PROJECT.environment.executionNetwork : undefined}
+                              network={selected.txKind === 'TESTNET' ? project.environment.executionNetwork : undefined}
                               local={selected.txKind === 'LOCAL_FORK'}
                             />
                           ),
@@ -359,7 +377,7 @@ export default function ActivityPage() {
                   <button
                     type="button"
                     className="cl-btn cl-btn-block"
-                    onClick={() => router.push(`/projects/${PROJECT.id}/policies?agent=${agentSlug}`)}
+                    onClick={() => router.push(`/projects/${ctx.routeProjectId}/policies?agent=${agentSlug}`)}
                   >
                     Open decision
                   </button>
@@ -368,7 +386,7 @@ export default function ActivityPage() {
                   <button
                     type="button"
                     className="cl-btn cl-btn-block"
-                    onClick={() => router.push(`/projects/${PROJECT.id}/simulation?agent=${agentSlug}`)}
+                    onClick={() => router.push(`/projects/${ctx.routeProjectId}/simulation?agent=${agentSlug}`)}
                   >
                     Open simulation
                   </button>
@@ -387,7 +405,16 @@ export default function ActivityPage() {
                 <button
                   type="button"
                   className="cl-btn cl-btn-block"
-                  onClick={() => pushToast('Sanitized trace exported')}
+                  onClick={() => {
+                    const blob = new Blob([JSON.stringify(correlated, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `trace-${selected.correlationId}.json`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    pushToast('Trace exported — public metadata only; the backend never emits confidential fields');
+                  }}
                 >
                   <Download size={12} aria-hidden />
                   Export sanitized trace

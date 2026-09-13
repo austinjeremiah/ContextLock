@@ -7,10 +7,10 @@
  * records what was true when it was made — it is evidence about that revision,
  * not a claim about the current one.
  */
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Rocket } from 'lucide-react';
-import { StudioPage } from '@/components/studio/PageScaffold';
+import { StudioPage, useStudioPage } from '@/components/studio/PageScaffold';
 import {
   Badge,
   BlockchainRef,
@@ -22,19 +22,24 @@ import {
 } from '@/components/studio/primitives';
 import { Modal } from '@/components/studio/dialogs';
 import { useWorkbench } from '@/lib/studio/workbench';
-import { PROJECT, agentBySlug } from '@/lib/studio/mock/core';
-import { DEPLOYMENTS } from '@/lib/studio/mock/operate';
+import { toDeployment } from '@/lib/studio/api/adapters/operate';
+import { useForkDeployments } from '@/lib/studio/api/queries';
 import type { Deployment } from '@/lib/studio/types';
 
 export default function DeploymentsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { setSelection } = useWorkbench();
-  const agentSlug = searchParams.get('agent') ?? PROJECT.agents[0].slug;
-  const agent = agentBySlug(agentSlug);
+  const { agent, agentSlug, project, ctx } = useStudioPage('deployments');
+  const list = useForkDeployments(ctx.dataProjectId, true);
+  /* Every fork deployment this project has made, newest first; the revision number is its ordinal. */
+  const DEPLOYMENTS = useMemo<Deployment[]>(() => {
+    const rows = [...(list.data ?? [])].reverse();
+    return rows.map((d, i) => toDeployment(d, i + 1, project.revisions.creArtifactHash)).reverse();
+  }, [list.data, project.revisions.creArtifactHash]);
 
   const [receipt, setReceipt] = useState<Deployment | null>(null);
-  const current = PROJECT.revisions.deployment;
+  const current = ctx.deployment ? (DEPLOYMENTS.find((d) => d.id === ctx.deployment!.deploymentId)?.revision ?? null) : null;
 
   return (
     <StudioPage
@@ -50,7 +55,7 @@ export default function DeploymentsPage() {
         <button
           type="button"
           className="cl-btn cl-btn-primary"
-          onClick={() => router.push(`/projects/${PROJECT.id}/deploy?agent=${agentSlug}`)}
+          onClick={() => router.push(`/projects/${ctx.routeProjectId}/deploy?agent=${agentSlug}`)}
         >
           <Rocket size={13} aria-hidden />
           Run Deployment Preflight
@@ -118,7 +123,7 @@ export default function DeploymentsPage() {
           </div>
         </Card>
         <p className="cl-meta" style={{ marginTop: 10 }}>
-          A deployment records what was true when it was made. The active deployment stays on r{current} until a new
+          A deployment records what was true when it was made. {current ? `The active deployment stays on r${current} until a new` : 'There is no active deployment; a new'}
           one is made, regardless of how far the Blueprint has moved on.
         </p>
       </Section>

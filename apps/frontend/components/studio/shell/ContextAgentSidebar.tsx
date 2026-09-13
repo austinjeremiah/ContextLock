@@ -26,8 +26,9 @@ import { Badge } from '../primitives';
 import { useWorkbench } from '@/lib/studio/workbench';
 import { respond, streamText } from '@/lib/studio/agent-engine';
 import { searchMentions, type MentionEntity } from '@/lib/studio/mentions';
+import { useMentionSource } from '@/lib/studio/api/mention-source';
 import { metaForSegment, segmentForPageKind } from '@/lib/studio/nav';
-import { PROBLEMS } from '@/lib/studio/mock/core';
+import { useStudioProject } from '@/lib/studio/api/project-context';
 import type {
   Agent,
   AgentCitation,
@@ -118,17 +119,19 @@ export function ContextAgentSidebar({
   const thread = threads.find((t) => t.id === activeThreadId) ?? threads[0];
   const messages = thread?.messages ?? [];
 
+  const mentionSource = useMentionSource();
   const mentionMatches = useMemo(
-    () => (mentionToken ? searchMentions(mentionToken.query) : []),
-    [mentionToken],
+    () => (mentionToken ? searchMentions(mentionToken.query, mentionSource) : []),
+    [mentionToken, mentionSource],
   );
 
   /* Highest severity first, so "attach the error" attaches the one that
      matters rather than whichever happens to be first in the list. */
+  const { problems } = useStudioProject();
   const currentProblem = useMemo(() => {
     const rank: Record<string, number> = { CRITICAL: 0, HIGH: 1, MEDIUM: 2, LOW: 3, INFO: 4 };
-    return [...PROBLEMS].sort((a, b) => (rank[a.severity] ?? 9) - (rank[b.severity] ?? 9))[0] ?? null;
-  }, []);
+    return [...problems].sort((a, b) => (rank[a.severity] ?? 9) - (rank[b.severity] ?? 9))[0] ?? null;
+  }, [problems]);
 
   /** Replaces the token under the caret with a resolved entity. */
   const insertMention = useCallback(
@@ -210,7 +213,7 @@ export function ContextAgentSidebar({
       setAttachments([]);
       setStreaming(true);
 
-      const cards = respond({ prompt, context, selectionLabel: selection?.label ?? null });
+      const cards = respond({ prompt, context, selectionLabel: selection?.label ?? null, mentions: mentionSource });
       const first = cards[0];
       const leadText = first?.kind === 'explanation' ? first.text : '';
       const rest = first?.kind === 'explanation' ? cards.slice(1) : cards;

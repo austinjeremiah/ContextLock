@@ -19,7 +19,8 @@
 import { useRouter } from 'next/navigation';
 import { Activity, ArrowRight, FileText, Gauge, ShieldCheck } from 'lucide-react';
 import { Badge, StatusBadge } from '../primitives';
-import { POLICY, RUNTIME, ALERTS } from '@/lib/studio/mock/operate';
+import { useStudioProject } from '@/lib/studio/api/project-context';
+import { policyStatusOf, runtimeStatusOf } from '@/lib/studio/api/adapters/operate';
 
 /** Segments that remain useful and safe on a small screen. */
 export const MONITOR_SEGMENTS = ['overview', 'activity', 'control-plane', 'policies', 'runtime', 'reports'] as const;
@@ -45,7 +46,8 @@ export function MonitorNav({
   segment: string;
 }) {
   const router = useRouter();
-  const openAlerts = ALERTS.filter((a) => a.state === 'OPEN').length;
+  const { overview } = useStudioProject();
+  const openAlerts = overview?.alerts.open ?? 0;
 
   return (
     <nav className="cl-monitor-nav" aria-label="Monitoring navigation">
@@ -74,15 +76,18 @@ export function MonitorNav({
 
 /** Compact policy/runtime status — the "simple status" §46 asks for. */
 export function MonitorStatus() {
+  const { overview, deploymentId } = useStudioProject();
+  const policyState = deploymentId ? policyStatusOf(overview) : 'UNKNOWN';
+  const runtimeState = deploymentId ? runtimeStatusOf(overview?.panels.runtime.state) : 'STOPPED';
   return (
     <div className="cl-monitor-status">
       <div className="cl-monitor-status-row">
         <span className="cl-label">Policy</span>
-        <StatusBadge status={POLICY.observed} />
+        <StatusBadge status={policyState} />
       </div>
       <div className="cl-monitor-status-row">
         <span className="cl-label">Runtime</span>
-        <StatusBadge status={RUNTIME.state} />
+        <StatusBadge status={runtimeState} />
       </div>
       <div className="cl-monitor-status-row">
         <span className="cl-label">Execution</span>

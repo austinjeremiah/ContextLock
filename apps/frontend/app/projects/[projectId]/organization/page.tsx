@@ -10,8 +10,8 @@
  */
 import { useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { CornerDownRight, Copy, Plus, ShieldAlert, Trash2 } from 'lucide-react';
-import { StudioPage } from '@/components/studio/PageScaffold';
+import { CornerDownRight, Copy, Hammer, Plus, ShieldAlert, Trash2 } from 'lucide-react';
+import { StudioPage, useStudioPage } from '@/components/studio/PageScaffold';
 import {
   Badge,
   BlockchainRef,
@@ -23,71 +23,112 @@ import {
   StatusBadge,
   formatUsd,
 } from '@/components/studio/primitives';
-import { Modal, SecurityConfirmation, StandardConfirmation } from '@/components/studio/dialogs';
+import { SecurityConfirmation, StandardConfirmation } from '@/components/studio/dialogs';
 import { useWorkbench } from '@/lib/studio/workbench';
 import { useControlRequest } from '@/lib/studio/control-bridge';
-import { PROJECT } from '@/lib/studio/mock/core';
+import { studio } from '@/lib/studio/api/endpoints';
+import { useControlCommand, useInvalidateAll } from '@/lib/studio/api/queries';
+import { ApiError } from '@/lib/studio/api/client';
 import type { Agent } from '@/lib/studio/types';
 
 export default function OrganizationPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { setSelection, pushToast } = useWorkbench();
+  const { project, ctx } = useStudioPage('organization');
+  const invalidate = useInvalidateAll();
 
-  const agents = PROJECT.agents;
-  const initial = agents.find((a) => a.slug === searchParams.get('agent')) ?? agents[0];
-  const [selectedId, setSelectedId] = useState(initial.id);
+  const agents = project.agents;
+  const initial = agents.find((a) => a.slug === searchParams.get('agent')) ?? agents[0] ?? null;
+  const [selectedId, setSelectedId] = useState<string | null>(initial?.id ?? null);
   const [revokeOpen, setRevokeOpen] = useState(false);
-  const [addOpen, setAddOpen] = useState(false);
   const [duplicateOpen, setDuplicateOpen] = useState(false);
   const [removeOpen, setRemoveOpen] = useState(false);
-  const [revoked, setRevoked] = useState<string[]>([]);
+  const [building, setBuilding] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const selected = agents.find((a) => a.id === selectedId) ?? agents[0];
-  const isRevoked = revoked.includes(selected.id);
+  const selected: Agent | null = agents.find((a) => a.id === selectedId) ?? initial;
+  const isRevoked = ctx.overview?.panels.identity?.value?.revoked === true && selected?.projectId === ctx.dataProjectId;
+  const revoke = useControlCommand(ctx.deploymentId, ctx.dataProjectId ?? undefined);
 
   useControlRequest('REVOKE_AGENT', () => setRevokeOpen(true));
 
-  /* A forbidden shared primitive between principals is a blocking issue. */
+  /* A forbidden shared primitive between principals is a blocking issue — the backend's own check. */
+  /* Every issue that stops the organization from being built, not only the CRITICAL ones: a HIGH
+     validator finding (an unstated daily cap) disables the Build button just the same, and the
+     page has to say so where the button is. */
+  const blockingIssues = useMemo(() => {
+    const issues = ctx.orgView?.issues ?? [];
+    return ctx.orgView?.buildable === false ? issues.filter((i) => i.severity === 'CRITICAL' || i.severity === 'HIGH') : issues.filter((i) => i.severity === 'CRITICAL');
+  }, [ctx.orgView]);
   const sharedPolicy = useMemo(() => {
-    const seen = new Map<string, Agent[]>();
-    for (const agent of agents) {
-      seen.set(agent.policyHash, [...(seen.get(agent.policyHash) ?? []), agent]);
-    }
-    return [...seen.values()].filter((group) => group.length > 1);
-  }, [agents]);
+    const issues = ctx.orgView?.issues ?? [];
+    return issues.filter((i) => i.severity === 'CRITICAL');
+  }, [ctx.orgView]);
 
   const aggregate = agents.reduce((sum, a) => sum + a.orgBudgetImpact, 0);
+  const blast = selected ? ctx.orgView?.blastRadii.find((b) => b.compromisedAgentId === selected.id) ?? null : null;
 
-  const go = (segment: string) => router.push(`/projects/${PROJECT.id}/${segment}?agent=${selected.slug}`);
+  const go = (segment: string) => {
+    if (!selected) return;
+    const base = selected.projectId ?? ctx.routeProjectId;
+    router.push(`/projects/${base}/${segment}?agent=${selected.slug}`);
+  };
+
+  /** Start a member's build: an ordinary single-agent build whose prompt is derived from its role. */
+  const buildMember = async (agent: Agent) => {
+    if (!ctx.organization) return;
+    setError(null);
+    setBuilding(agent.id);
+    try {
+      const r = await studio.buildMember(ctx.organization.id, agent.id);
+      await invalidate();
+      router.push(`/projects/${r.build.projectId}/build?start=1`);
+    } catch (e) {
+      setError(e instanceof ApiError ? e.message : String(e));
+    } finally {
+      setBuilding(null);
+    }
+  };
+
+  if (!selected) {
+    return (
+      <StudioPage segment="organization">
+        <Card>
+          <p className="cl-meta">{ctx.loading ? 'Loading the organization…' : 'This project has no agents to show yet.'}</p>
+        </Card>
+      </StudioPage>
+    );
+  }
 
   return (
     <StudioPage
       segment="organization"
       actions={
-        <button type="button" className="cl-btn cl-btn-primary" onClick={() => setAddOpen(true)}>
+        <button type="button" className="cl-btn cl-btn-primary" disabled title="Members are designed together from the organization's description. To add one, design the organization again with the new member described.">
           <Plus size={13} aria-hidden />
           Add Agent
         </button>
       }
       banners={
-        sharedPolicy.length > 0 ? (
-          <BlockerBanner
-            tone="deny"
-            title="CRITICAL — shared policy principal"
-            actions={
-              <button type="button" className="cl-btn cl-btn-sm" onClick={() => go('policies')}>
-                Open Policy
-              </button>
-            }
-          >
-            {sharedPolicy
-              .map((group) => group.map((a) => a.name).join(' and '))
-              .join('; ')}{' '}
-            share a policy hash. Agents must be separate principals: a shared policy means one agent&apos;s authority is
-            indistinguishable from another&apos;s.
-          </BlockerBanner>
-        ) : null
+        <>
+          {error ? <BlockerBanner tone="deny" title="The Studio API refused">{error}</BlockerBanner> : null}
+          {blockingIssues.length > 0 ? (
+            <BlockerBanner tone="deny" title={sharedPolicy.length > 0 ? 'CRITICAL — the organization is not buildable' : 'The organization is not buildable until its design states every limit'}>
+              <ul style={{ margin: 0, paddingLeft: 18 }}>
+                {blockingIssues.map((i) => (
+                  <li key={`${i.code}-${i.path}`}><span className="cl-mono">{i.code}</span> · {i.message} <span className="cl-meta">{i.remediation}</span></li>
+                ))}
+              </ul>
+              <p className="cl-meta" style={{ marginTop: 8, whiteSpace: 'normal' }}>Members are designed together from the description, so the fix is to design the organization again with the missing statements in it (for example “at most $10,000 a day” per agent).</p>
+            </BlockerBanner>
+          ) : null}
+          {ctx.orgView?.unknowns?.length ? (
+            <BlockerBanner tone="warn" title="Not established">
+              {ctx.orgView.unknowns.join(' · ')}
+            </BlockerBanner>
+          ) : null}
+        </>
       }
     >
       {/* auto-fit rather than a fixed two-column split: the centre pane narrows
@@ -98,10 +139,10 @@ export default function OrganizationPage() {
         style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))', alignItems: 'start' }}
       >
         {/* organization tree */}
-        <Card title={PROJECT.organization ?? 'Agents'} flush>
+        <Card title={project.organization ?? 'Agents'} flush>
           <ul>
             {agents.map((agent) => {
-              const agentRevoked = revoked.includes(agent.id);
+              const agentRevoked = false;
               return (
                 <li key={agent.id}>
                   <button
@@ -121,7 +162,7 @@ export default function OrganizationPage() {
                       </span>
                       <span className="cl-meta">{agent.role}</span>
                     </span>
-                    <StatusBadge status={agentRevoked ? 'REVOKED' : agent.status} />
+                    <StatusBadge status={agentRevoked ? 'REVOKED' : agent.unbuilt ? 'DRAFT' : agent.status} />
                   </button>
                 </li>
               );
@@ -133,7 +174,7 @@ export default function OrganizationPage() {
               <span className="cl-strong">{formatUsd(aggregate)}</span>
             </div>
             <p className="cl-meta" style={{ marginTop: 5, whiteSpace: 'normal' }}>
-              Worst-case combined authority across all principals in a single rolling window.
+              Worst-case combined daily authority across all principals{ctx.organization ? ` under ${ctx.organization.rootEns}` : ''}.
             </p>
           </div>
         </Card>
@@ -166,15 +207,30 @@ export default function OrganizationPage() {
               </div>
             }
           >
-            <p style={{ fontSize: 13, lineHeight: 1.6, marginBottom: 14 }}>{selected.objective}</p>
+            <p style={{ fontSize: 13, lineHeight: 1.6, marginBottom: 14 }}>{selected.objective || selected.role}</p>
+
+            {selected.unbuilt ? (
+              <BlockerBanner
+                tone="warn"
+                title="Not built yet"
+                actions={
+                  <button type="button" className="cl-btn cl-btn-sm cl-btn-primary" disabled={building === selected.id || !ctx.orgView?.buildable} title={!ctx.orgView?.buildable ? `Not buildable: ${blockingIssues.map((i) => i.message).join(' ')}` : undefined} onClick={() => void buildMember(selected)}>
+                    <Hammer size={12} aria-hidden />
+                    {building === selected.id ? 'Starting…' : 'Build this member'}
+                  </button>
+                }
+              >
+                This member is a design. Building it runs the ordinary single-agent pipeline on a prompt derived from its role and limits, and stops for your review before any code is generated.
+              </BlockerBanner>
+            ) : null}
 
             <KeyValue
               rows={[
                 {
                   label: 'ENS identity',
-                  value: <BlockchainRef label={selected.ensName} value={selected.ensNode} kind="node" network="Ethereum Sepolia" />,
+                  value: selected.ensNode ? <BlockchainRef label={selected.ensName} value={selected.ensNode} kind="node" network={project.environment.executionNetwork} /> : <span className="cl-mono">{selected.ensName}</span>,
                 },
-                { label: 'Agent address', value: <BlockchainRef value={selected.address} network="Ethereum Sepolia" /> },
+                { label: 'Agent address', value: selected.address ? <BlockchainRef value={selected.address} network={project.environment.executionNetwork} /> : <span className="cl-meta">Not established until the agent is deployed.</span> },
                 { label: 'Role / objective', value: selected.role },
                 {
                   label: 'Execution class',
@@ -192,7 +248,7 @@ export default function OrganizationPage() {
                   label: 'Allowed adapters',
                   value: (
                     <span className="cl-row cl-row-wrap" style={{ gap: 5 }}>
-                      {selected.allowedAdapters.map((a) => (
+                      {selected.allowedAdapters.length === 0 ? <span className="cl-meta">none bound yet</span> : selected.allowedAdapters.map((a) => (
                         <Badge key={a} tone="neutral">
                           {a.replace('adp_', '')}
                         </Badge>
@@ -207,12 +263,15 @@ export default function OrganizationPage() {
                       <span className="cl-meta">No budget — this agent holds no spending authority.</span>
                     ) : (
                       <>
-                        {formatUsd(selected.budget.autonomousPerAction)} per action ·{' '}
-                        {formatUsd(selected.budget.windowLimit)} per {selected.budget.window}
-                        <div className="cl-meta">
-                          Used {formatUsd(selected.budget.windowUsed)} of {formatUsd(selected.budget.windowLimit)} in the
-                          current window.
-                        </div>
+                        {formatUsd(selected.budget.autonomousPerAction)} autonomous per action ·{' '}
+                        {selected.budget.window === '24h' ? `${formatUsd(selected.budget.windowLimit)} per 24h` : `escalate up to ${formatUsd(selected.budget.windowLimit)}`}
+                        {blast ? (
+                          <div className="cl-meta" style={{ whiteSpace: 'normal' }}>
+                            Blast radius if compromised: {blast.directCapabilities.join(', ') || 'no direct capabilities'};
+                            {' '}reaches {blast.authorityReachesAgents.length === 0 ? 'no other agent' : blast.authorityReachesAgents.map((r) => `${r.agentId} via ${r.via}`).join(', ')};
+                            {' '}contained by {blast.containedBy.join(', ') || '—'}.
+                          </div>
+                        ) : null}
                       </>
                     ),
                 },
@@ -220,7 +279,7 @@ export default function OrganizationPage() {
                   label: 'Organization impact',
                   value: `${formatUsd(selected.orgBudgetImpact)} of the ${formatUsd(aggregate)} aggregate`,
                 },
-                { label: 'Policy hash', value: <BlockchainRef value={selected.policyHash} kind="hash" /> },
+                { label: 'Policy hash', value: selected.policyHash ? <BlockchainRef value={selected.policyHash} kind="hash" /> : <span className="cl-meta">Assigned at deployment.</span> },
                 {
                   label: 'Runtime revision',
                   value: selected.runtimeRevision === null ? 'Never deployed' : `r${selected.runtimeRevision}`,
@@ -240,21 +299,11 @@ export default function OrganizationPage() {
 
           <Section label="Agent controls">
             <div className="cl-btn-group">
-              <button type="button" className="cl-btn" onClick={() => setDuplicateOpen(true)}>
+              <button type="button" className="cl-btn" onClick={() => setDuplicateOpen(true)} disabled={!selected.projectId}>
                 <Copy size={13} aria-hidden />
                 Duplicate as New Agent
               </button>
-              <button
-                type="button"
-                className="cl-btn"
-                onClick={() => setRemoveOpen(true)}
-                disabled={selected.runtimeRevision !== null}
-                title={
-                  selected.runtimeRevision !== null
-                    ? 'This agent has been deployed and cannot be removed as a draft.'
-                    : undefined
-                }
-              >
+              <button type="button" className="cl-btn" onClick={() => setRemoveOpen(true)} disabled title="Members are part of the organization's design; removing one means designing the organization again without it.">
                 <Trash2 size={13} aria-hidden />
                 Remove Draft Agent
               </button>
@@ -263,7 +312,8 @@ export default function OrganizationPage() {
                 type="button"
                 className="cl-btn cl-btn-danger"
                 onClick={() => setRevokeOpen(true)}
-                disabled={isRevoked}
+                disabled={isRevoked || !ctx.deploymentId || selected.projectId !== ctx.dataProjectId}
+                title={!ctx.deploymentId ? 'Identity revocation acts on a live deployment. This agent has none.' : undefined}
               >
                 <ShieldAlert size={13} aria-hidden />
                 Revoke Agent
@@ -278,15 +328,21 @@ export default function OrganizationPage() {
         open={revokeOpen}
         onClose={() => setRevokeOpen(false)}
         onConfirm={() => {
-          setRevoked((prev) => [...prev, selected.id]);
           setRevokeOpen(false);
-          pushToast(`Revocation submitted for ${selected.ensName}`);
+          if (!ctx.deployment) return;
+          revoke.mutate(
+            { operation: 'REVOKE_IDENTITY', expectedRevision: ctx.deployment.revision, reason: 'revoked from the Organization page', target: { identityNode: selected.ensNode || null } },
+            {
+              onSuccess: (r) => pushToast(r.ok === false ? `Revocation refused: ${r.detail}` : 'Revocation submitted — the identity page shows the fresh read'),
+              onError: (e) => setError((e as Error).message),
+            },
+          );
         }}
         action="Revoke agent identity"
         currentState={<StatusBadge status="ACTIVE" />}
         requestedState={<StatusBadge status="REVOKED" />}
-        network={PROJECT.environment.executionNetwork}
-        resource={<BlockchainRef label={selected.ensName} value={selected.ensNode} kind="node" />}
+        network={project.environment.executionNetwork}
+        resource={<BlockchainRef label={selected.ensName} value={selected.ensNode || selected.ensName} kind="node" />}
         extraRows={[
           {
             label: 'Sibling impact',
@@ -303,62 +359,18 @@ export default function OrganizationPage() {
         actionLabel="Revoke Agent Identity"
       />
 
-      {/* add agent */}
-      <Modal
-        open={addOpen}
-        onClose={() => setAddOpen(false)}
-        title="Add agent"
-        subtitle="Creates a draft principal with its own identity, policy and budget."
-        footer={
-          <>
-            <button type="button" className="cl-btn" onClick={() => setAddOpen(false)}>
-              Cancel
-            </button>
-            <button
-              type="button"
-              className="cl-btn cl-btn-primary"
-              onClick={() => {
-                setAddOpen(false);
-                pushToast('Draft agent created');
-                router.push(`/projects/${PROJECT.id}/build`);
-              }}
-            >
-              Create Draft Agent
-            </button>
-          </>
-        }
-      >
-        <div className="cl-field">
-          <label className="cl-field-label" htmlFor="agent-name">
-            Agent name
-          </label>
-          <input id="agent-name" className="cl-input" placeholder="Settlement" autoComplete="off" />
-        </div>
-        <div className="cl-field">
-          <label className="cl-field-label" htmlFor="agent-class">
-            Execution class
-          </label>
-          <select id="agent-class" className="cl-select" defaultValue="REPORTING_ONLY">
-            <option value="REPORTING_ONLY">Reporting only — no execution authority</option>
-            <option value="READ_ONLY">Read only — may read chain state, cannot execute</option>
-            <option value="WRITE_CAPABLE">Write capable — may execute within a policy</option>
-          </select>
-          <span className="cl-field-hint">
-            Execution class cannot be widened in place later. Widening requires a new principal with a new identity.
-          </span>
-        </div>
-        <p className="cl-meta">
-          The draft starts with no ENS identity, no policy and financial authority disabled.
-        </p>
-      </Modal>
-
       {/* duplicate */}
       <StandardConfirmation
         open={duplicateOpen}
         onClose={() => setDuplicateOpen(false)}
         onConfirm={() => {
           setDuplicateOpen(false);
-          pushToast(`${selected.name} duplicated as a new draft principal`);
+          const row = ctx.row;
+          if (!row) return;
+          void studio
+            .createBuild({ prompt: row.prompt, name: `${selected.name} (copy)`, idempotencyKey: `dup-${row.id}-${Date.now()}` })
+            .then(async (b) => { await invalidate(); router.push(`/projects/${b.projectId}/build?start=1`); })
+            .catch((e) => setError(e instanceof ApiError ? e.message : String(e)));
         }}
         title="Duplicate as new agent"
         consequence="Configuration is copied. A new ENS identity, a new namespace entry and a new policy are required — identity, policy hash and any active authority are never copied, so the duplicate starts with no authority."
@@ -370,10 +382,7 @@ export default function OrganizationPage() {
       <StandardConfirmation
         open={removeOpen}
         onClose={() => setRemoveOpen(false)}
-        onConfirm={() => {
-          setRemoveOpen(false);
-          pushToast('Draft agent removed');
-        }}
+        onConfirm={() => setRemoveOpen(false)}
         title="Remove draft agent"
         consequence="The draft principal and its unsaved configuration are removed. This is only possible because the agent has never been deployed."
         resource={selected.name}

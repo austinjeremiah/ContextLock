@@ -13,10 +13,10 @@
  *  - An alert is only resolvable once evidence or reconciliation supports it.
  *  - Drift is expected-vs-observed, with observed treated as the truth.
  */
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Activity, RefreshCw, ShieldAlert, ShieldOff } from 'lucide-react';
-import { StudioPage } from '@/components/studio/PageScaffold';
+import { StudioPage, useStudioPage } from '@/components/studio/PageScaffold';
 import {
   Badge,
   BlockerBanner,
@@ -31,25 +31,57 @@ import {
 import { EmergencyConfirmation, SecurityConfirmation, StandardConfirmation } from '@/components/studio/dialogs';
 import { useWorkbench } from '@/lib/studio/workbench';
 import { useControlRequest } from '@/lib/studio/control-bridge';
-import { PROJECT, agentBySlug } from '@/lib/studio/mock/core';
-import { ALERTS, CRE, EMERGENCY_STEPS, POLICY, RUNTIME, TOPOLOGY } from '@/lib/studio/mock/operate';
+import { policyStatusOf, runtimeStatusOf, toAlert, toPolicyState, topologyOf } from '@/lib/studio/api/adapters/operate';
+import { useActivation, useAlerts, useCommands, useControlCommand, useInvalidateAll } from '@/lib/studio/api/queries';
+import { control as controlApi } from '@/lib/studio/api/endpoints';
+import { ApiError } from '@/lib/studio/api/client';
+import { EmptyState } from '@/components/studio/primitives';
 import type { Alert, EmergencyLockResult, Status } from '@/lib/studio/types';
+import type { EmergencyLockResultPayload } from '@/lib/studio/api/types';
+
+const EMERGENCY_STEPS = ['Disable ContextLock policy', 'Block new capabilities', 'Pause / stop CRE path', 'Stop agent runtime', 'Optionally revoke agent identity'];
 
 export default function ControlPlanePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { setSelection, pushToast } = useWorkbench();
 
-  const agentSlug = searchParams.get('agent') ?? PROJECT.agents[0].slug;
-  const agent = agentBySlug(agentSlug);
+  const { agent, agentSlug, project, ctx } = useStudioPage('control-plane');
+  const invalidate = useInvalidateAll();
+  const alertsQ = useAlerts(ctx.deploymentId, true);
+  const commandsQ = useCommands(ctx.deploymentId);
+  const activation = useActivation(ctx.dataProjectId);
+  const command = useControlCommand(ctx.deploymentId, ctx.dataProjectId ?? undefined);
+  const [error, setError] = useState<string | null>(null);
 
-  const [alerts, setAlerts] = useState<Alert[]>(ALERTS);
+  /* Every row is an observation from the control plane, with the moment it was read. */
+  const TOPOLOGY = useMemo(() => (ctx.overview ? topologyOf(ctx.overview, ctx.overview.panels.runtime.note) : []), [ctx.overview]);
+  const POLICY = useMemo(() => toPolicyState({ overview: ctx.overview, deployment: ctx.deployment, bp: ctx.buildView?.blueprint ?? null, state: ctx.labState, activation: activation.data ?? null, network: project.environment.executionNetwork, pending: null }), [ctx.overview, ctx.deployment, ctx.buildView?.blueprint, ctx.labState, activation.data, project.environment.executionNetwork]);
+  const RUNTIME = { state: runtimeStatusOf(ctx.overview?.panels.runtime.state) };
+  const CRE = { mode: project.environment.creMode };
+  const [alerts, setAlerts] = useState<Alert[]>([]);
+  useEffect(() => { setAlerts((alertsQ.data ?? []).map(toAlert)); }, [alertsQ.data]);
+
   const [emergencyOpen, setEmergencyOpen] = useState(false);
   const [revokeEns, setRevokeEns] = useState(false);
   const [disableOpen, setDisableOpen] = useState(false);
   const [revokeOpen, setRevokeOpen] = useState(false);
   const [reconciling, setReconciling] = useState(false);
   const [result, setResult] = useState<EmergencyLockResult | null>(null);
+
+  /* The last emergency lock this deployment recorded, so a reload still shows its per-step result. */
+  useEffect(() => {
+    const last = (commandsQ.data ?? []).find((c) => c.operation === 'EMERGENCY_LOCK' && c.result);
+    if (!last || result) return;
+    const payload = last.result as EmergencyLockResultPayload;
+    if (!payload?.lock) return;
+    setResult({
+      outcome: payload.lock.state === 'COMPLETE' ? 'EMERGENCY_LOCK_COMPLETE' : payload.lock.state === 'PARTIAL' ? 'EMERGENCY_LOCK_PARTIAL' : 'EMERGENCY_LOCK_FAILED',
+      steps: payload.lock.steps.map((st) => ({ id: st.step, label: st.step.replace(/_/g, ' ').toLowerCase(), status: st.outcome === 'SUCCEEDED' ? 'PASS' : st.outcome === 'FAILED' ? 'FAIL' : st.outcome === 'NOT_APPLICABLE' || st.outcome === 'SKIPPED' ? 'NOT_REQUESTED' : 'PENDING', detail: st.detail ?? st.verification ?? undefined })),
+      policyState: payload.lock.financialPolicyDisabled ? 'DISABLED' : 'UNKNOWN',
+      at: new Date(last.completedAtMs ?? last.issuedAtMs).toISOString(),
+    });
+  }, [commandsQ.data, result]);
 
   useControlRequest('EMERGENCY_LOCK', () => setEmergencyOpen(true));
   useControlRequest('DISABLE_POLICY', () => setDisableOpen(true));
@@ -58,35 +90,67 @@ export default function ControlPlanePage() {
   const drifted = TOPOLOGY.filter((c) => c.drift);
   const openAlerts = alerts.filter((a) => a.state === 'OPEN');
 
-  /* The financial policy is attempted first, and each step reports its own
-     outcome. A step that fails does not stop the rest, and does not get folded
-     into an overall "success". */
-  const runEmergencyLock = () => {
+  /**
+   * Emergency Lock: one control-plane command. The backend attempts the financial policy first and
+   * reports every step separately; a partial result is shown as partial, never rounded up.
+   */
+  const runEmergencyLock = async () => {
     setEmergencyOpen(false);
-    const steps = [
-      { id: 'el_policy', label: 'Disable ContextLock policy', status: 'PASS' as Status },
-      { id: 'el_capability', label: 'Block new capability issuance', status: 'PASS' as Status },
-      {
-        id: 'el_cre',
-        label: 'Pause CRE path',
-        status: 'FAIL' as Status,
-        detail: 'Simulator did not acknowledge the pause request within the timeout.',
-      },
-      { id: 'el_runtime', label: 'Stop agent runtime', status: 'PASS' as Status },
-      {
-        id: 'el_ens',
-        label: 'Revoke agent identity',
-        status: (revokeEns ? 'PASS' : 'NOT_REQUESTED') as Status,
-      },
-    ];
-    setResult({
-      outcome: steps.some((s) => s.status === 'FAIL') ? 'EMERGENCY_LOCK_PARTIAL' : 'EMERGENCY_LOCK_COMPLETE',
-      steps,
-      policyState: 'DISABLED',
-      at: new Date().toISOString(),
-    });
-    pushToast('Emergency Lock executed — see the per-step result');
+    if (!ctx.deployment) return;
+    setError(null);
+    try {
+      const r = await command.mutateAsync({ operation: 'EMERGENCY_LOCK', expectedRevision: ctx.deployment.revision, confirmation: { includeIdentityRevocation: revokeEns } });
+      const payload = r.result as EmergencyLockResultPayload | undefined;
+      if (payload?.lock) {
+        setResult({
+          outcome: payload.lock.state === 'COMPLETE' ? 'EMERGENCY_LOCK_COMPLETE' : payload.lock.state === 'PARTIAL' ? 'EMERGENCY_LOCK_PARTIAL' : 'EMERGENCY_LOCK_FAILED',
+          steps: payload.lock.steps.map((st) => ({ id: st.step, label: st.step.replace(/_/g, ' ').toLowerCase(), status: st.outcome === 'SUCCEEDED' ? 'PASS' : st.outcome === 'FAILED' ? 'FAIL' : st.outcome === 'NOT_APPLICABLE' || st.outcome === 'SKIPPED' ? 'NOT_REQUESTED' : 'PENDING', detail: st.detail ?? st.verification ?? undefined })),
+          policyState: payload.lock.financialPolicyDisabled ? 'DISABLED' : 'UNKNOWN',
+          at: new Date().toISOString(),
+        });
+      }
+      pushToast(r.detail ?? 'Emergency Lock executed — see the per-step result');
+    } catch (e) {
+      setError(e instanceof ApiError ? e.message : (e as Error).message);
+    }
   };
+
+  const disablePolicy = async () => {
+    setDisableOpen(false);
+    if (!ctx.deployment) return;
+    setError(null);
+    try {
+      const r = await command.mutateAsync({ operation: 'DISABLE_POLICY', expectedRevision: ctx.deployment.revision, reason: 'disabled from the Control Plane' });
+      if (r.ok === false) throw new Error(r.detail ?? 'refused');
+      pushToast(`${r.detail ?? 'applied'} — read back from the fork`);
+    } catch (e) {
+      setError(e instanceof ApiError ? e.message : (e as Error).message);
+    }
+  };
+
+  const resolveAlert = async (alert: Alert) => {
+    if (!ctx.deploymentId) return;
+    setError(null);
+    try {
+      await controlApi.resolveAlert(ctx.deploymentId, alert.id, `acknowledged and reconciled by the operator at ${new Date().toISOString()}`);
+      await invalidate();
+      pushToast('Alert resolved');
+    } catch (e) {
+      setError(e instanceof ApiError ? `${e.reason ? `${e.reason}: ` : ''}${e.message}` : (e as Error).message);
+    }
+  };
+
+  if (!ctx.deploymentId) {
+    return (
+      <StudioPage segment="control-plane" subtitle="Operator view of every live component, its expected state and its drift.">
+        <EmptyState
+          title={ctx.loading ? 'Loading…' : 'Nothing to reconcile'}
+          body={ctx.loading ? '' : 'The control plane observes a deployment: its chain state, runtime, CRE mode, adapters and alerts. This agent has none yet.'}
+          action={ctx.loading ? undefined : <button type="button" className="cl-btn cl-btn-primary" onClick={() => router.push(`/projects/${ctx.routeProjectId}/deploy?agent=${agentSlug}`)}>Run Deployment Preflight</button>}
+        />
+      </StudioPage>
+    );
+  }
 
   return (
     <StudioPage
@@ -97,7 +161,7 @@ export default function ControlPlanePage() {
         <>
           <Badge tone="neutral">{agent.name}</Badge>
           <span className="cl-meta">Last full reconciliation</span>
-          <FreshnessBadge freshness={TOPOLOGY[0].freshness} />
+          {TOPOLOGY[0] ? <FreshnessBadge freshness={TOPOLOGY[0].freshness} /> : <span className="cl-meta">not read yet</span>}
           {drifted.length > 0 ? <Badge tone="warn">{drifted.length} drifted</Badge> : <Badge tone="pass">No drift</Badge>}
         </>
       }
@@ -108,10 +172,7 @@ export default function ControlPlanePage() {
             className="cl-btn"
             onClick={() => {
               setReconciling(true);
-              window.setTimeout(() => {
-                setReconciling(false);
-                pushToast('Reconciliation complete');
-              }, 1000);
+              void invalidate().then(() => { setReconciling(false); pushToast('Re-read every observation from the fork'); });
             }}
             disabled={reconciling}
           >
@@ -122,7 +183,7 @@ export default function ControlPlanePage() {
             type="button"
             className="cl-btn cl-btn-danger"
             onClick={() => setDisableOpen(true)}
-            disabled={POLICY.observed === 'DISABLED'}
+            disabled={POLICY.observed !== 'ENABLED'}
           >
             <ShieldOff size={13} aria-hidden />
             Disable Policy
@@ -135,9 +196,10 @@ export default function ControlPlanePage() {
       }
       banners={
         <>
+          {error ? <BlockerBanner tone="deny" title="The control plane refused">{error}</BlockerBanner> : null}
           {result ? (
             <BlockerBanner
-              tone={result.outcome === 'EMERGENCY_LOCK_PARTIAL' ? 'warn' : 'pass'}
+              tone={result.outcome === 'EMERGENCY_LOCK_PARTIAL' ? 'warn' : result.outcome === 'EMERGENCY_LOCK_FAILED' ? 'deny' : 'pass'}
               title={result.outcome}
             >
               Financial policy: {result.policyState}. Each step is reported separately below — a partial result is not
@@ -256,17 +318,18 @@ export default function ControlPlanePage() {
                 </tr>
               ))}
               <tr>
-                <td className="cl-strong">Runtime state</td>
-                <td className="cl-mono" style={{ fontSize: 11.5 }}>
-                  READY
-                </td>
-                <td className="cl-mono" style={{ fontSize: 11.5, color: 'var(--cl-warn)' }}>
-                  {RUNTIME.state}
-                </td>
-                <td>
-                  <SeverityBadge severity="MEDIUM" />
-                </td>
+                <td className="cl-strong">Policy enabled</td>
+                <td className="cl-mono" style={{ fontSize: 11.5 }}>{ctx.labState?.hasFinancialAuthority ? 'true' : 'false'}</td>
+                <td className="cl-mono" style={{ fontSize: 11.5 }}>{POLICY.onChain.enabled ? 'true' : 'false'}</td>
+                <td><StatusBadge status="PASS" /></td>
               </tr>
+              <tr>
+                <td className="cl-strong">Runtime state</td>
+                <td className="cl-mono" style={{ fontSize: 11.5 }}>HEALTHY</td>
+                <td className="cl-mono" style={{ fontSize: 11.5, color: RUNTIME.state === 'HEALTHY' ? undefined : 'var(--cl-warn)' }}>{RUNTIME.state}</td>
+                <td>{RUNTIME.state === 'HEALTHY' ? <StatusBadge status="PASS" /> : <SeverityBadge severity="MEDIUM" />}</td>
+              </tr>
+              {POLICY.drift.length === 0 ? <tr><td colSpan={4} className="cl-meta">No drift between the deployment's expectation and the fork's observed state.</td></tr> : null}
             </tbody>
           </table>
         </Card>
@@ -339,7 +402,7 @@ export default function ControlPlanePage() {
                           className="cl-btn cl-btn-sm"
                           onClick={() =>
                             router.push(
-                              `/projects/${PROJECT.id}/activity?agent=${agentSlug}&event=${alert.evidenceEventIds[0] ?? ''}`,
+                              `/projects/${ctx.routeProjectId}/activity?agent=${agentSlug}&event=${alert.evidenceEventIds[0] ?? ''}`,
                             )
                           }
                           disabled={alert.evidenceEventIds.length === 0}
@@ -357,9 +420,7 @@ export default function ControlPlanePage() {
                               ? 'Acknowledge and reconcile before resolving'
                               : undefined
                           }
-                          onClick={() =>
-                            setAlerts((prev) => prev.map((a) => (a.id === alert.id ? { ...a, state: 'RESOLVED' } : a)))
-                          }
+                          onClick={() => void resolveAlert(alert)}
                         >
                           Resolve
                         </button>
@@ -381,7 +442,7 @@ export default function ControlPlanePage() {
               <button
                 type="button"
                 className="cl-btn"
-                onClick={() => router.push(`/projects/${PROJECT.id}/runtime?agent=${agentSlug}`)}
+                onClick={() => router.push(`/projects/${ctx.routeProjectId}/runtime?agent=${agentSlug}`)}
               >
                 Pause / Resume Runtime
               </button>
@@ -396,13 +457,13 @@ export default function ControlPlanePage() {
               <button
                 type="button"
                 className="cl-btn"
-                onClick={() => router.push(`/projects/${PROJECT.id}/cre?agent=${agentSlug}`)}
+                onClick={() => router.push(`/projects/${ctx.routeProjectId}/cre?agent=${agentSlug}`)}
               >
                 Start / Stop / Restart Simulator
               </button>
             </div>
             <p className="cl-meta" style={{ marginTop: 10 }}>
-              Mode is {CRE.mode === 'CONTEXTLOCK_SIMULATOR' ? 'the official CLI simulator' : CRE.mode}. No DON workflow
+              Mode is {CRE.mode === 'CONTEXTLOCK_SIMULATOR' || CRE.mode === 'MY_CRE_SIMULATOR' ? 'the official CLI simulator' : CRE.mode}. No DON workflow
               is deployed, so there is nothing to pause or activate.
             </p>
           </Card>
@@ -456,7 +517,8 @@ export default function ControlPlanePage() {
       <EmergencyConfirmation
         open={emergencyOpen}
         onClose={() => setEmergencyOpen(false)}
-        onConfirm={runEmergencyLock}
+        onConfirm={() => void runEmergencyLock()}
+        busy={command.isPending}
         steps={EMERGENCY_STEPS}
         revokeEns={revokeEns}
         onRevokeEnsChange={setRevokeEns}
@@ -465,16 +527,12 @@ export default function ControlPlanePage() {
       <SecurityConfirmation
         open={disableOpen}
         onClose={() => setDisableOpen(false)}
-        onConfirm={() => {
-          setDisableOpen(false);
-          pushToast('Disable submitted — confirm with a fresh chain read on Policies');
-          router.push(`/projects/${PROJECT.id}/policies?agent=${agentSlug}`);
-        }}
+        onConfirm={() => void disablePolicy()}
         action="Disable financial authority"
         currentState={<StatusBadge status={POLICY.observed} />}
         requestedState={<StatusBadge status="DISABLED" />}
         network={POLICY.network}
-        resource={`Policy Registry · ${POLICY.onChain.contracts[0].address}`}
+        resource={`Policy Registry · ${POLICY.onChain.contracts.find((c) => c.label === 'ContextLockPolicyRegistry')?.address ?? '—'}`}
         consequence="No new capability can be issued, so no new execution can be authorized."
         actionLabel="Disable Financial Authority"
       />
@@ -484,7 +542,7 @@ export default function ControlPlanePage() {
         onClose={() => setRevokeOpen(false)}
         onConfirm={() => {
           setRevokeOpen(false);
-          router.push(`/projects/${PROJECT.id}/identity?agent=${agentSlug}`);
+          router.push(`/projects/${ctx.routeProjectId}/identity?agent=${agentSlug}`);
         }}
         title="Revoke agent identity"
         consequence="Revocation is completed on the Identity page, where the sibling and capability impact are stated in full before anything is submitted."

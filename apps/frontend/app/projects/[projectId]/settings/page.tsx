@@ -15,10 +15,10 @@
  *    constrained terminal and verbose events are all presentation. No toggle
  *    on this page can switch off a security check, and the page says so.
  */
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Archive, Download, RotateCcw, Save } from 'lucide-react';
-import { StudioPage } from '@/components/studio/PageScaffold';
+import { StudioPage, useStudioPage } from '@/components/studio/PageScaffold';
 import {
   Badge,
   BlockerBanner,
@@ -31,7 +31,10 @@ import {
 import { StandardConfirmation } from '@/components/studio/dialogs';
 import { AgentPatchInbox } from '@/components/studio/AgentPatches';
 import { useWorkbench, PANEL_LIMITS } from '@/lib/studio/workbench';
-import { PROJECT, SETTINGS } from '@/lib/studio/mock/core';
+import { useHealth, useInvalidateAll } from '@/lib/studio/api/queries';
+import { studio } from '@/lib/studio/api/endpoints';
+import { ApiError } from '@/lib/studio/api/client';
+import type { StudioSettings } from '@/lib/studio/types';
 
 type Tab = 'project' | 'appearance' | 'limits' | 'runtime' | 'notifications' | 'developer';
 
@@ -48,7 +51,25 @@ export default function SettingsPage() {
     resetPanelSize,
   } = useWorkbench();
 
-  const agentSlug = searchParams.get('agent') ?? PROJECT.agents[0].slug;
+  const { agentSlug, project: PROJECT, ctx } = useStudioPage('settings');
+  const health = useHealth();
+  const invalidate = useInvalidateAll();
+  const [error, setError] = useState<string | null>(null);
+
+  /* Workspace preferences are local; project data is the server's; quotas are the server's policy. */
+  const SETTINGS: StudioSettings = {
+    project: { name: PROJECT.name, description: PROJECT.description, organization: PROJECT.organization ?? '', defaultAgentId: PROJECT.agents[0]?.id ?? '' },
+    appearance: { theme: 'light', density: 'comfortable', editorFontSize: 13 },
+    simulationLimits: {
+      userRunsPerDay: Number(health.data?.limits.userRequestedSimulationsPerBuild ?? 0),
+      userRunsUsed: ctx.buildView?.usage.userSimulations ?? 0,
+      mandatoryRegressionRuns: ctx.buildView?.usage.mandatorySimulations ?? ctx.buildView?.blueprint?.simulationScenarios.length ?? 0,
+      serverEnforced: true,
+    },
+    runtime: { autoRestart: false, restartBackoffSeconds: 0, logRetentionDays: 0 },
+    notifications: { criticalAlerts: true, deploymentEvents: true, simulationFailures: true, weeklyDigest: false },
+    developerMode: { enabled: developerMode, showRawIds: developerMode, showRawJson: developerMode, constrainedTerminal: false, verboseEvents: developerMode },
+  };
 
   const [tab, setTab] = useState<Tab>('project');
   const [dirty, setDirty] = useState(false);
@@ -58,11 +79,15 @@ export default function SettingsPage() {
   /* Local drafts for the fields that are project data rather than workspace
      preference — those only take effect on Save. */
   const [project, setProject] = useState(SETTINGS.project);
+  useEffect(() => { setProject((p) => (p.name === '' || p.name === 'Loading…' ? SETTINGS.project : p)); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [PROJECT.name]);
   const [runtime, setRuntime] = useState(SETTINGS.runtime);
   const [notifications, setNotifications] = useState(SETTINGS.notifications);
   const [devDetail, setDevDetail] = useState(SETTINGS.developerMode);
 
   const limits = SETTINGS.simulationLimits;
+  /* The unlimited policy reports a very large ceiling; show it as what it is. */
+  const unlimited = limits.userRunsPerDay >= 1_000_000;
   const remaining = limits.userRunsPerDay - limits.userRunsUsed;
 
   const edit = <T,>(setter: (value: T) => void) => (value: T) => {
@@ -73,6 +98,7 @@ export default function SettingsPage() {
   return (
     <StudioPage
       segment="settings"
+      banners={error ? <BlockerBanner tone="deny" title="The Studio API refused">{error}</BlockerBanner> : null}
       badges={
         <>
           <Badge tone="neutral">{PROJECT.name}</Badge>
@@ -87,8 +113,16 @@ export default function SettingsPage() {
             className="cl-btn cl-btn-primary"
             disabled={!dirty}
             onClick={() => {
-              setDirty(false);
-              pushToast('Settings saved');
+              setError(null);
+              const target = ctx.dataProjectId;
+              if (target && project.name.trim() && project.name !== PROJECT.name) {
+                void studio.renameProject(target, project.name.trim())
+                  .then(async () => { await invalidate(); setDirty(false); pushToast('Project renamed on the server; workspace preferences are kept in this browser'); })
+                  .catch((e) => setError(e instanceof ApiError ? e.message : String(e)));
+              } else {
+                setDirty(false);
+                pushToast('Workspace preferences saved in this browser. Runtime and notification preferences are not offered by the Studio API yet.');
+              }
             }}
           >
             <Save size={13} aria-hidden />
@@ -289,15 +323,15 @@ export default function SettingsPage() {
             <KeyValue
               rows={[
                 {
-                  label: 'Runs per day',
+                  label: 'Requested runs per build',
                   value: (
                     <span className="cl-row" style={{ gap: 8 }}>
-                      {formatNumber(limits.userRunsPerDay)}
-                      <Badge tone="neutral">server enforced</Badge>
+                      {unlimited ? 'No limit' : formatNumber(limits.userRunsPerDay)}
+                      <Badge tone="neutral">{unlimited ? 'quotas off on this server' : 'server enforced'}</Badge>
                     </span>
                   ),
                 },
-                { label: 'Used today', value: `${formatNumber(limits.userRunsUsed)} — ${formatNumber(remaining)} remaining` },
+                { label: 'Used on this build', value: unlimited ? `${formatNumber(limits.userRunsUsed)} — no ceiling` : `${formatNumber(limits.userRunsUsed)} — ${formatNumber(remaining)} remaining (per build, not per day)` },
                 {
                   label: 'Mandatory regression',
                   value: `${limits.mandatoryRegressionRuns} scenarios, run on every build and not counted against your daily quota`,
@@ -313,7 +347,7 @@ export default function SettingsPage() {
                 <div
                   style={{
                     height: '100%',
-                    width: `${(limits.userRunsUsed / limits.userRunsPerDay) * 100}%`,
+                    width: `${limits.userRunsPerDay && !unlimited ? (limits.userRunsUsed / limits.userRunsPerDay) * 100 : 0}%`,
                     background: 'var(--cl-ink)',
                   }}
                 />
@@ -477,8 +511,8 @@ export default function SettingsPage() {
         onClose={() => setExportOpen(false)}
         onConfirm={() => {
           setExportOpen(false);
-          pushToast('Project export prepared — secrets excluded');
-          router.push(`/projects/${PROJECT.id}/reports?agent=${agentSlug}`);
+          router.push(`/projects/${ctx.routeProjectId}/code?agent=${agentSlug}`);
+          pushToast('Use Download project on the Code page — the server scans the bundle for secrets before it leaves');
         }}
         title="Export project"
         consequence="Exports the Blueprint, architecture, policy definition, simulation and attack results and deployment receipts. Credentials and any stored secret are excluded — the export passes the same secret scan a report does."
@@ -492,7 +526,7 @@ export default function SettingsPage() {
         onClose={() => setArchiveOpen(false)}
         onConfirm={() => {
           setArchiveOpen(false);
-          pushToast('Project archived');
+          pushToast('Archiving is not offered by the Studio API yet; nothing was changed');
         }}
         title="Archive project"
         consequence="The project becomes read-only and stops appearing in the active list. Archiving does not stop a deployed agent and does not disable financial authority — if the policy is enabled it stays enabled, and the runtime keeps whatever state it is in."

@@ -15,10 +15,30 @@
  * Never include a secret. Credentials are deliberately absent from the index —
  * an adapter is mentionable, the API key that authenticates it is not.
  */
-import { AGENTS, PROBLEMS } from './mock/core';
-import { ALERTS, DEPLOYMENTS, EVENTS, POLICY } from './mock/operate';
-import { SCENARIOS, attacksForAgent } from './mock/test';
-import { ADAPTERS, CODE_FILES } from './mock/engineering';
+import type { Agent, Alert, ProblemItem, RuntimeEvent } from './types';
+
+/**
+ * What can be mentioned, as the pages currently have it.
+ *
+ * Supplied by the sidebar from the project context, so a mention can never drift from what is on
+ * screen. Credentials are deliberately absent: an adapter is mentionable, its API key is not.
+ */
+export interface MentionSource {
+  agents: Agent[];
+  policy: { version: number | null; observed: string; network: string } | null;
+  adapters: Array<{ id: string; adapterId: string; name: string; trustClass: string; status: string }>;
+  scenarios: Array<{ id: string; name: string; group: string; result: string | null }>;
+  attacks: Array<{ id: string; name: string; severity: string; lastResult: string | null }>;
+  deployments: Array<{ id: string; revision: number; network: string; status: string; contracts: Array<{ name: string; txHash: string | null }> }>;
+  events: RuntimeEvent[];
+  alerts: Alert[];
+  files: Array<{ name: string; path: string; group: string; coveredByTest?: string }>;
+  problems: ProblemItem[];
+}
+
+export const EMPTY_MENTION_SOURCE: MentionSource = {
+  agents: [], policy: null, adapters: [], scenarios: [], attacks: [], deployments: [], events: [], alerts: [], files: [], problems: [],
+};
 
 export type MentionKind =
   | 'blueprint'
@@ -59,14 +79,12 @@ function slug(value: string): string {
 }
 
 /**
- * The full mentionable surface of the project.
- *
- * Built once per call from the same mock modules the pages read, so a mention
- * can never drift from what is actually on screen. When this is backed by a
- * real API the shape stays identical — only the source of the rows changes.
+ * The full mentionable surface of the project, from what the pages currently hold.
  */
-export function mentionIndex(): MentionEntity[] {
+export function mentionIndex(src: MentionSource): MentionEntity[] {
   const entities: MentionEntity[] = [];
+  const { agents: AGENTS, adapters: ADAPTERS, scenarios: SCENARIOS, deployments: DEPLOYMENTS, events: EVENTS, alerts: ALERTS, files: CODE_FILES, problems: PROBLEMS } = src;
+  const POLICY = src.policy ?? { version: null, observed: 'UNKNOWN', network: 'not deployed' };
 
   /* ---- singletons: the artifacts there is only ever one of ---- */
   entities.push(
@@ -89,8 +107,8 @@ export function mentionIndex(): MentionEntity[] {
     {
       token: 'policy',
       kind: 'policy',
-      id: `policy_v${POLICY.version}`,
-      label: `Policy v${POLICY.version}`,
+      id: `policy_v${POLICY.version ?? '—'}`,
+      label: POLICY.version === null ? 'Policy' : `Policy v${POLICY.version}`,
       detail: `Observed ${POLICY.observed} on ${POLICY.network}`,
       href: 'policies',
     },
@@ -137,7 +155,7 @@ export function mentionIndex(): MentionEntity[] {
     });
   }
 
-  for (const attack of attacksForAgent('WRITE_CAPABLE')) {
+  for (const attack of src.attacks) {
     entities.push({
       token: `attack:${slug(attack.name)}`,
       kind: 'attack',
@@ -240,8 +258,8 @@ export function mentionIndex(): MentionEntity[] {
  * ranking a substring hit deep in a description could outrank the exact entity
  * whose name the user was spelling out.
  */
-export function searchMentions(query: string, limit = 8): MentionEntity[] {
-  const index = mentionIndex();
+export function searchMentions(query: string, src: MentionSource, limit = 8): MentionEntity[] {
+  const index = mentionIndex(src);
   const q = query.trim().toLowerCase().replace(/^@/, '');
   if (!q) {
     /* Empty query: lead with the singletons and one of each collection, so the
@@ -289,8 +307,8 @@ const MENTION_PATTERN = /@([a-z]+(?::[A-Za-z0-9_\-.:]+)?)/g;
  * silently treated as plain text: the agent must be able to say "I don't know
  * what @foo is" instead of inventing an answer about it.
  */
-export function resolveMentions(text: string): ResolvedMentions {
-  const index = mentionIndex();
+export function resolveMentions(text: string, src: MentionSource): ResolvedMentions {
+  const index = mentionIndex(src);
   const byToken = new Map(index.map((e) => [e.token.toLowerCase(), e]));
 
   const entities: MentionEntity[] = [];

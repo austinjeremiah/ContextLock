@@ -12,6 +12,7 @@
  * value will arrive.
  */
 import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { useEffect, useRef } from 'react';
 import { useAccount, useBalance } from 'wagmi';
 import { AlertTriangle, ExternalLink, Wallet } from 'lucide-react';
 import { Badge, BlockerBanner, KeyValue, StatusBadge } from '../primitives';
@@ -25,9 +26,15 @@ const FAUCETS = [
 export function ConnectTestnetWallet({
   recommendedEth,
   onStateChange,
+  role = 'deployer',
 }: {
   recommendedEth: number;
   onStateChange?: (state: { connected: boolean; sufficient: boolean; onExecutionChain: boolean }) => void;
+  /**
+   * What the wallet is for. A deployer pays testnet gas and must be on the execution chain; an
+   * approver only signs EIP-712 approvals, for which the connected chain and balance do not matter.
+   */
+  role?: 'deployer' | 'approver';
 }) {
   const { address, isConnected, chain } = useAccount();
   const { data: balance } = useBalance({ address });
@@ -36,7 +43,14 @@ export function ConnectTestnetWallet({
   const balanceEth = balance ? Number(balance.formatted) : null;
   const sufficient = balanceEth !== null && balanceEth >= recommendedEth;
 
-  onStateChange?.({ connected: isConnected, sufficient, onExecutionChain });
+  /* Report state to the parent from an effect, and only when it changes. Calling the parent's
+     setState during render with a fresh object each time re-rendered the parent, which re-rendered
+     this, forever — the Deploy page froze the moment a wallet was connected. */
+  const onStateChangeRef = useRef(onStateChange);
+  onStateChangeRef.current = onStateChange;
+  useEffect(() => {
+    onStateChangeRef.current?.({ connected: isConnected, sufficient, onExecutionChain });
+  }, [isConnected, sufficient, onExecutionChain]);
 
   return (
     <div className="cl-col" style={{ gap: 14 }}>
@@ -62,7 +76,7 @@ export function ConnectTestnetWallet({
                   Connect Testnet Wallet
                 </button>
                 <span className="cl-meta">
-                  Needed to sign the deployment transactions. Nothing is signed without an explicit confirmation.
+                  {role === 'approver' ? 'Needed to sign escalation approvals. Nothing is signed without an explicit confirmation.' : 'Needed to sign the deployment transactions. Nothing is signed without an explicit confirmation.'}
                 </span>
               </div>
             );
@@ -78,14 +92,16 @@ export function ConnectTestnetWallet({
                 <button type="button" className="cl-btn" onClick={openChainModal}>
                   {rkChain.name ?? `Chain ${rkChain.id}`}
                 </button>
-                {onExecutionChain ? (
+                {role === 'approver' ? (
+                  <Badge tone="sim">APPROVER</Badge>
+                ) : onExecutionChain ? (
                   <Badge tone="sim">TESTNET</Badge>
                 ) : (
                   <Badge tone="deny">WRONG NETWORK</Badge>
                 )}
               </div>
 
-              {!onExecutionChain ? (
+              {role === 'deployer' && !onExecutionChain ? (
                 <BlockerBanner
                   tone="deny"
                   title="Connected wallet is not on the execution network"
@@ -101,21 +117,29 @@ export function ConnectTestnetWallet({
               ) : null}
 
               <KeyValue
-                rows={[
-                  { label: 'Deployer address', value: address ?? '—', mono: true },
-                  {
-                    label: 'Balance',
-                    value: balance ? `${Number(balance.formatted).toFixed(5)} ${balance.symbol}` : 'reading…',
-                  },
-                  { label: 'Recommended balance', value: `${recommendedEth} SepoliaETH` },
-                  {
-                    label: 'Sufficient',
-                    value: <StatusBadge status={sufficient ? 'PASS' : 'BLOCKED'} />,
-                  },
-                ]}
+                rows={
+                  role === 'approver'
+                    ? [
+                        { label: 'Approver address', value: address ?? '—', mono: true },
+                        { label: 'Signs', value: 'ContextLockApproval EIP-712 messages for escalated actions — one per capability, in the wallet, on request' },
+                        { label: 'Pays', value: 'nothing on the fork' },
+                      ]
+                    : [
+                        { label: 'Deployer address', value: address ?? '—', mono: true },
+                        {
+                          label: 'Balance',
+                          value: balance ? `${Number(balance.formatted).toFixed(5)} ${balance.symbol}` : 'reading…',
+                        },
+                        { label: 'Recommended balance', value: `${recommendedEth} SepoliaETH` },
+                        {
+                          label: 'Sufficient',
+                          value: <StatusBadge status={sufficient ? 'PASS' : 'BLOCKED'} />,
+                        },
+                      ]
+                }
               />
 
-              {!sufficient ? (
+              {role === 'deployer' && !sufficient ? (
                 <div>
                   <div className="cl-label" style={{ marginBottom: 8 }}>
                     Fund testnet wallet

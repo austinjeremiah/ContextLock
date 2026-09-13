@@ -15,13 +15,15 @@
  * shapes and the authority rules stay exactly as they are.
  */
 import { refusalFor } from './agent-refusals';
-import { resolveMentions, type MentionEntity } from './mentions';
+import { resolveMentions, EMPTY_MENTION_SOURCE, type MentionEntity, type MentionSource } from './mentions';
 import type { AgentCitation, AgentPageContext, AgentResponseCard, PageKind } from './types';
 
 export interface AgentRequest {
   prompt: string;
   context: AgentPageContext;
   selectionLabel?: string | null;
+  /** What the project currently has, for resolving @mentions. */
+  mentions?: MentionSource;
 }
 
 function explanation(text: string, citations?: AgentCitation[]): AgentResponseCard {
@@ -299,7 +301,7 @@ export function respond(req: AgentRequest): AgentResponseCard[] {
 
   /* Mentions are resolved by the frontend, never left for the model to guess
      at (§6.2). An unknown one is reported rather than answered around. */
-  const mentions = resolveMentions(req.prompt);
+  const mentions = resolveMentions(req.prompt, req.mentions ?? EMPTY_MENTION_SOURCE);
   if (mentions.unresolved.length > 0) {
     return [
       explanation(

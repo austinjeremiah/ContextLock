@@ -15,7 +15,7 @@
 import { useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { FileUp, KeyRound, Plug, Plus, RefreshCw, ShieldCheck } from 'lucide-react';
-import { StudioPage } from '@/components/studio/PageScaffold';
+import { StudioPage, useStudioPage } from '@/components/studio/PageScaffold';
 import {
   Badge,
   BlockerBanner,
@@ -31,13 +31,9 @@ import {
 } from '@/components/studio/primitives';
 import { Modal, StandardConfirmation } from '@/components/studio/dialogs';
 import { useWorkbench } from '@/lib/studio/workbench';
-import { PROJECT, agentById } from '@/lib/studio/mock/core';
-import {
-  ADAPTERS,
-  CREDENTIALS,
-  CREDENTIAL_BOUNDARY_LABEL,
-  OPENAPI_INTEGRATIONS,
-} from '@/lib/studio/mock/engineering';
+import { CREDENTIAL_BOUNDARY_LABEL, toAdapters, toCredentials } from '@/lib/studio/api/adapters/engineering';
+import { useAdapters, useCre, useReality } from '@/lib/studio/api/queries';
+import type { OpenApiIntegration } from '@/lib/studio/types';
 import type { Adapter, Credential } from '@/lib/studio/types';
 
 type Tab = 'adapters' | 'sources' | 'credentials' | 'openapi';
@@ -46,7 +42,19 @@ export default function IntegrationsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { setSelection, pushToast } = useWorkbench();
-  const agentSlug = searchParams.get('agent') ?? PROJECT.agents[0].slug;
+  const { agent, agentSlug, ctx } = useStudioPage('integrations');
+  const manifests = useAdapters();
+  const reality = useReality();
+  const cre = useCre(ctx.dataProjectId);
+  /* Which credentials exist is a fact the backend reports (by name, never value) through the
+     reality capabilities. A missing one leaves its adapter UNAVAILABLE with the blocker named. */
+  const available = useMemo(() => new Set<string>(reality.data?.configuredSecretNames ?? []), [reality.data?.configuredSecretNames]);
+  const ADAPTERS = useMemo(() => toAdapters(manifests.data?.adapters ?? [], ctx.buildView?.blueprint ?? null, reality.data ?? null, available, agent.id), [manifests.data, ctx.buildView?.blueprint, reality.data, available, agent.id]);
+  const CREDENTIALS = useMemo(() => toCredentials(manifests.data?.adapters ?? [], available, cre.data ?? null, reality.data?.protectedSources ?? []), [manifests.data, available, cre.data, reality.data?.protectedSources]);
+  const ringSources = (reality.data?.protectedSources ?? []).filter((s) => s.source === 'ledger-key-ring');
+  const ringStatus = ringSources[0]?.ring?.status ?? null;
+  const OPENAPI_INTEGRATIONS: OpenApiIntegration[] = [];
+  const agentById = (id: string) => (id === agent.id ? agent : undefined);
 
   const [tab, setTab] = useState<Tab>('adapters');
   const [inspecting, setInspecting] = useState<Adapter | null>(null);
@@ -56,7 +64,7 @@ export default function IntegrationsPage() {
   const [importOpen, setImportOpen] = useState(false);
   const [testing, setTesting] = useState<string | null>(null);
 
-  const blocked = useMemo(() => ADAPTERS.filter((a) => a.status === 'UNAVAILABLE'), []);
+  const blocked = useMemo(() => ADAPTERS.filter((a) => a.status === 'UNAVAILABLE' && (ctx.buildView?.blueprint?.adapters.some((b) => b.adapterId === a.id) ?? false)), [ADAPTERS, ctx.buildView?.blueprint]);
 
   const testConnection = (adapter: Adapter) => {
     setTesting(adapter.id);
@@ -103,8 +111,8 @@ export default function IntegrationsPage() {
               </button>
             }
           >
-            {blocked.map((a) => a.name).join(', ')} cannot authenticate. No indexed data is being served, and nothing of
-            a lower trust class is being substituted for it — a decision that depends on this source is refused instead.
+            {blocked.map((a) => a.name).join(', ')} cannot authenticate: {blocked.map((a) => (a.blockerReason ?? '').replace(/ — no lower-trust source is substituted$/, '')).filter(Boolean).join('; ')}.
+            No data from {blocked.length === 1 ? 'it' : 'them'} is being served — a decision that depends on such a source is refused rather than fed anything of lower trust.
           </BlockerBanner>
         ) : null
       }
@@ -224,6 +232,16 @@ export default function IntegrationsPage() {
             itself is never read back into the browser, in developer mode or otherwise.
           </BlockerBanner>
 
+          {ringSources.length > 0 ? (
+            <BlockerBanner tone={ringStatus === 'READY' ? 'pass' : 'warn'} title={ringStatus === 'READY' ? 'Credentials held by the Ledger Key Ring' : `Ledger Key Ring ${ringStatus === 'NOT_INITIALIZED' ? 'not initialised on the Studio machine' : 'unavailable'}`}>
+              {ringSources.map((s) => s.name).join(', ')} {ringSources.length === 1 ? 'is' : 'are'} stored as <span className="cl-mono">wallet-cli ring encrypt</span> ciphertext and decrypted through the ring on the Studio backend when used — one device tap at setup, headless after. The agent only ever receives observations.
+              {ringStatus !== 'READY' ? ' Until the ring answers, these credentials are UNAVAILABLE and nothing of lower trust is substituted.' : ''}
+            </BlockerBanner>
+          ) : (
+            <p className="cl-meta" style={{ whiteSpace: 'normal', marginBottom: 10 }}>
+              Credentials in the Studio server environment can be moved under the Ledger Key Ring with <span className="cl-mono">scripts/studio/ring-secret.sh &lt;NAME&gt;</span> (one device tap; headless decrypt after).
+            </p>
+          )}
           <Card flush>
             <div className="cl-table-scroll">
               <table className="cl-table" style={{ minWidth: 940 }}>
@@ -244,7 +262,7 @@ export default function IntegrationsPage() {
                       <td className="cl-strong">{credential.name}</td>
                       <td className="cl-meta">{credential.scope}</td>
                       <td>
-                        <Badge tone={credential.boundary === 'NONE_PUBLIC' ? 'warn' : 'neutral'}>
+                        <Badge tone={credential.boundary === 'NONE_PUBLIC' ? 'warn' : credential.boundary === 'LEDGER_KEY_RING' ? 'pass' : 'neutral'} title={credential.note}>
                           {CREDENTIAL_BOUNDARY_LABEL[credential.boundary]}
                         </Badge>
                       </td>

@@ -1,9 +1,6 @@
 /**
- * Mock backend — Composer / build pipeline.
- *
- * The parser output is explicitly DRAFT until a deterministic Requirements
- * artifact exists, and a missing financial ceiling stays REQUIRED rather than
- * being invented.
+ * Composer content: worked examples, structured prompt helpers and the clarifying questions the
+ * interview asks (spec §10, §30). Static product copy — nothing here is project state.
  */
 import type { Status } from '../types';
 
@@ -69,71 +66,6 @@ export const COMPOSER_SLASH_HELPERS: { command: string; description: string; ins
   },
 ];
 
-export const DETECTED_REQUIREMENTS: DetectedRequirement[] = [
-  { id: 'req_objective', label: 'Objective', value: 'Prevent liquidation of the Aave v3 position', status: 'PASS' },
-  { id: 'req_protocol', label: 'Protocol', value: 'Aave v3 · Sepolia', status: 'PASS' },
-  { id: 'req_trigger', label: 'Trigger', value: 'Health factor < 1.25', status: 'PASS' },
-  { id: 'req_action', label: 'Action', value: 'Repay USDC debt from treasury', status: 'PASS' },
-  { id: 'req_data', label: 'Data requirement', value: 'Chainlink ETH/USD · VERIFIED_ORACLE · ≤ 60s', status: 'PASS' },
-  { id: 'req_autonomous', label: 'Autonomous limit', value: '$1,000 per action', status: 'PASS' },
-  { id: 'req_escalation', label: 'Escalation band', value: '$1,000 – $5,000', status: 'PASS' },
-  {
-    id: 'req_ceiling',
-    label: 'Hard deny ceiling',
-    value: 'Not stated',
-    status: 'REQUIRED',
-    note: 'A hard ceiling must be stated explicitly. It is never inferred from the other limits.',
-  },
-  { id: 'req_recipients', label: 'Recipient restriction', value: 'Aave v3 Pool only', status: 'PASS' },
-  {
-    id: 'req_forbidden',
-    label: 'Forbidden actions',
-    value: 'Borrow · withdraw collateral · external recipient',
-    status: 'PASS',
-  },
-  {
-    id: 'req_window',
-    label: 'Rolling window budget',
-    value: 'Not stated',
-    status: 'WARN',
-    note: 'Without a window budget, repeated actions inside the autonomous limit are unbounded over time.',
-  },
-];
-
-export const BUILD_STAGES: BuildStage[] = [
-  { id: 'stg_requirements', name: 'Requirements', status: 'PASS', detail: 'Requirements r6 produced and validated.', panel: 'output' },
-  { id: 'stg_blueprint', name: 'Blueprint', status: 'PASS', detail: 'Blueprint r8 generated from requirements r6.', panel: 'output' },
-  { id: 'stg_security', name: 'Security Review', status: 'PASS', detail: 'Deterministic invariants checked; 0 critical findings.', panel: 'problems' },
-  { id: 'stg_user', name: 'User Review', status: 'PASS', detail: 'Blueprint r8 accepted by operator@treasury.', panel: 'output' },
-  { id: 'stg_build', name: 'Build', status: 'PASS', detail: 'Build r7 produced 24 files and a CRE workflow binary.', panel: 'output' },
-  {
-    id: 'stg_tests',
-    name: 'Tests',
-    status: 'WARN',
-    detail: '23 of 24 mandatory security scenarios passed; 1 failed with DATA_SOURCE_UNAVAILABLE.',
-    panel: 'tests',
-  },
-];
-
-export const COMPOSER_DRAFT = COMPOSER_EXAMPLES[0].body;
-
-export const QUOTA = { used: 47, limit: 200, window: 'today' };
-
-/* ---------------------------------------------------------- clarification */
-
-/**
- * A question the agent asks to close a gap in the requirements (spec §10, §30).
- *
- * The distinguishing rule of this product lives in `userMustDecide`. The agent
- * conducts the whole interview, but for the fields that bound money it asks and
- * then refuses to answer — it will not offer a figure, will not suggest a
- * "typical" value and will not infer one from the other limits. Every other AI
- * builder would happily propose $5,000 here; proposing it is precisely the
- * failure this product exists to argue against.
- *
- * When the backend lands, `respond()` returns these instead of the static list.
- * The component does not care where they came from.
- */
 export interface ClarifyingQuestion {
   /** The requirement this answer closes. */
   requirementId: string;
@@ -199,6 +131,8 @@ export const CLARIFYING_QUESTIONS: ClarifyingQuestion[] = [
     suggestions: ['Borrow · withdraw collateral · external recipient'],
   },
 ];
+
+/** Questions for the gaps that are actually open, most severe first. */
 
 /** Questions for the gaps that are actually open, most severe first. */
 export function questionsFor(requirements: DetectedRequirement[]): ClarifyingQuestion[] {

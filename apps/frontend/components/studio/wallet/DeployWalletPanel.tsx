@@ -23,9 +23,11 @@ const ConnectTestnetWallet = dynamic(
 export function DeployWalletPanel({
   recommendedEth,
   onStateChange,
+  role = 'deployer',
 }: {
   recommendedEth: number;
   onStateChange?: (state: { connected: boolean; sufficient: boolean; onExecutionChain: boolean }) => void;
+  role?: 'deployer' | 'approver';
 }) {
   const { activated, requestConnect } = useWalletSession();
 
@@ -34,15 +36,16 @@ export function DeployWalletPanel({
       <div className="cl-row cl-row-wrap" style={{ gap: 12 }}>
         <button type="button" className="cl-btn cl-btn-primary" onClick={requestConnect}>
           <Wallet size={13} aria-hidden />
-          Connect Testnet Wallet
+          {role === 'approver' ? 'Connect Approver Wallet' : 'Connect Testnet Wallet'}
         </button>
         <span className="cl-meta" style={{ flex: '1 1 260px', whiteSpace: 'normal' }}>
-          Needed to sign the deployment transactions. The connection is shared across the workspace, and nothing is
-          signed without an explicit confirmation.
+          {role === 'approver'
+            ? 'Its address becomes the escalation approver at deployment. The connection is shared across the workspace, and nothing is signed without an explicit confirmation.'
+            : 'Needed to sign the deployment transactions. The connection is shared across the workspace, and nothing is signed without an explicit confirmation.'}
         </span>
       </div>
     );
   }
 
-  return <ConnectTestnetWallet recommendedEth={recommendedEth} onStateChange={onStateChange} />;
+  return <ConnectTestnetWallet recommendedEth={recommendedEth} onStateChange={onStateChange} role={role} />;
 }

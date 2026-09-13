@@ -22,7 +22,7 @@
 import { useMemo, useState } from 'react';
 import { ArrowRight, Check, Lock, MessageCircleQuestion, SkipForward } from 'lucide-react';
 import { Badge, Card } from './primitives';
-import type { ClarifyingQuestion } from '@/lib/studio/mock/build';
+import type { ClarifyingQuestion } from '@/lib/studio/content/composer';
 
 export function RequirementInterview({
   questions,
