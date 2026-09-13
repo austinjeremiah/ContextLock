@@ -1,57 +1,82 @@
-# Dependencies
-node_modules/
-.pnp
-.pnp.js
-.yarn/install-state.gz
-
-# Next.js
-# NOTE: these are anchored to the repo/app root on purpose. An unanchored
-# "build/" would also match app route segments such as
-# app/projects/[projectId]/build/ and silently drop real source files.
-.next/
-/out/
-/frontend/out/
-/build/
-/frontend/build/
-/dist/
-/frontend/dist/
-
-# Production
-*.tsbuildinfo
-next-env.d.ts
-
-# Environment
+# --- secrets: never commit ---
 .env
-.env*.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*
+!.env.example
+*.key
+*.pem
+keystore/
+wallets.json
+secrets.yaml
+!secrets.example.yaml
+.cre/
+cre.yaml
+~/.cre
+WALLET_PASS*
+*.keyring
+ring-*.json
 
-# Logs
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
+# --- build / deps ---
+node_modules/
+dist/
+/build/
+# Route segments named "build" (apps/frontend/app/.../build/) are source, not output.
+!apps/frontend/app/**/build/
+out/
+cache/
+cache_forge/
+broadcast/
+*.tsbuildinfo
+.next/
+coverage/
+lcov.info
+
+# --- local db / logs ---
+*.db
+*.db-journal
+*.sqlite
 *.log
+logs/
 
-# Testing
-/coverage/
-/frontend/coverage/
+# --- foundry vendored deps (restore with: cd contracts && forge install foundry-rs/forge-std --no-git) ---
+contracts/lib/
+contracts/out/
+contracts/cache/
 
-# Caches
-.turbo/
-.cache/
-.eslintcache
+# --- CRE project build artifacts ---
+.cre_build_tmp.js
+workflows/cre-policy/**/node_modules/
 
-# OS
+# The CRE secrets.yaml maps secret IDs to ENV VAR NAMES only — it holds no values, and the CRE
+# CLI requires it at a fixed path, so a fresh checkout needs it. The blanket `secrets.yaml` ignore
+# above stays in force everywhere else, and secret-scan.sh separately asserts this file contains
+# no assigned values.
+!workflows/cre-policy/**/secrets.yaml
+studio*.db
+studio*.db*
+
+# Group E: the attested OCI archive is 80MB of build output. The digests, SBOM, provenance and
+# image record it produces ARE committed; the archive itself is reproducible from them.
+reports/group-e/evidence/image/agent-runtime.oci.tar
+reports/group-e/evidence/image/oci/
+
+# Studio credentials held under the Ledger Key Ring (wallet-cli ring encrypt). Ciphertext, but never committed.
+/secrets/
+
+# --- OS / editors ---
 .DS_Store
 Thumbs.db
-
-# Editors
 .idea/
 .vscode/
 *.swp
 *.swo
 
-# Vercel
+# --- tooling caches ---
+.turbo/
+.cache/
+.eslintcache
+.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# --- vercel ---
 .vercel
